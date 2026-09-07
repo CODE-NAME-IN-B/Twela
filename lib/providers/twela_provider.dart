@@ -140,6 +140,15 @@ class TwelaProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> updateTransaction(TwelaTransaction transaction) async {
+    final index = _transactions.indexWhere((t) => t.id == transaction.id);
+    if (index != -1) {
+      _transactions[index] = transaction;
+      await _storage.saveTransactions(_transactions);
+      notifyListeners();
+    }
+  }
+
   Future<void> removeTransaction(String id) async {
     _transactions.removeWhere((t) => t.id == id);
     await _storage.saveTransactions(_transactions);

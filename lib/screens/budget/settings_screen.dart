@@ -673,62 +673,168 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          GestureDetector(
-            onTap: () async {
-              final uri = Uri.parse('https://github.com/CODE-NAME-IN-B');
-              if (await canLaunchUrl(uri)) {
-                await launchUrl(uri, mode: LaunchMode.externalApplication);
-              }
-            },
-            child: Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFB),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFB),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              children: [
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: primaryColor.withOpacity(isDark ? 0.15 : 0.08),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.person_outline,
+                    color: primaryColor,
+                    size: 32,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'CODE-NAME-IN-B',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Flutter Developer',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Libya',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                GestureDetector(
+                  onTap: () async {
+                    final uri = Uri.parse('https://github.com/CODE-NAME-IN-B');
+                    if (await canLaunchUrl(uri)) {
+                      await launchUrl(uri, mode: LaunchMode.externalApplication);
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     decoration: BoxDecoration(
                       color: primaryColor.withOpacity(isDark ? 0.15 : 0.08),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Icon(
-                      Icons.code_outlined,
-                      color: primaryColor,
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          'CODE-NAME-IN-B',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            color: theme.colorScheme.onSurface,
-                          ),
+                        Icon(
+                          Icons.code_outlined,
+                          color: primaryColor,
+                          size: 18,
                         ),
-                        const SizedBox(height: 2),
+                        const SizedBox(width: 8),
                         Text(
                           'github.com/CODE-NAME-IN-B',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                          style: TextStyle(
+                            color: primaryColor,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  Icon(
-                    Icons.open_in_new,
-                    color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                    size: 18,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'مشاريع',
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 8),
+          _buildProjectItem(
+            context,
+            theme: theme,
+            isDark: isDark,
+            name: 'Twela',
+            description: 'تطبيق تتبع المصاريف بالدينار الليبي',
+            icon: Icons.account_balance_wallet_outlined,
+            color: primaryColor,
+          ),
+          const SizedBox(height: 6),
+          _buildProjectItem(
+            context,
+            theme: theme,
+            isDark: isDark,
+            name: 'All Other Projects',
+            description: 'مشاريع مفتوحة المصدر متنوعة',
+            icon: Icons.folder_outlined,
+            color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProjectItem(
+    BuildContext context, {
+    required ThemeData theme,
+    required bool isDark,
+    required String name,
+    required String description,
+    required IconData icon,
+    required Color color,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: theme.scaffoldBackgroundColor,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: color, size: 18),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.onSurface,
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  description,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
           ),
         ],

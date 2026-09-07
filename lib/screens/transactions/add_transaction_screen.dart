@@ -69,15 +69,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
           _type == TransactionType.expense ? 'إضافة صرف' : 'إضافة دخل',
           style: TextStyle(color: theme.colorScheme.onSurface),
         ),
-        actions: [
-          TextButton(
-            onPressed: _saveTransaction,
-            child: Text(
-              'حفظ',
-              style: TextStyle(color: theme.colorScheme.primary),
-            ),
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
@@ -144,7 +135,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: _type == TransactionType.expense
-                      ? const Color(0xFFE5484D)
+                      ? theme.colorScheme.primary
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(10),
                 ),
