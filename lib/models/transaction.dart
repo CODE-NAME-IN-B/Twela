@@ -1,4 +1,6 @@
-enum TransactionType { income, expense }
+import 'package:uuid/uuid.dart';
+
+enum TransactionType { income, expense, debtGiven, debtReceived, debtPayment, savings }
 
 enum WalletType { cash, bank }
 
@@ -10,6 +12,7 @@ class TwelaTransaction {
   final String categoryId;
   final String note;
   final DateTime date;
+  final String? relatedId;
 
   const TwelaTransaction({
     required this.id,
@@ -19,7 +22,13 @@ class TwelaTransaction {
     required this.categoryId,
     this.note = '',
     required this.date,
+    this.relatedId,
   });
+
+  bool get isExpense => type == TransactionType.expense;
+  bool get isIncome => type == TransactionType.income;
+  bool get isDebt => type == TransactionType.debtGiven || type == TransactionType.debtReceived || type == TransactionType.debtPayment;
+  bool get isSavings => type == TransactionType.savings;
 
   TwelaTransaction copyWith({
     String? id,
@@ -29,6 +38,7 @@ class TwelaTransaction {
     String? categoryId,
     String? note,
     DateTime? date,
+    String? relatedId,
   }) {
     return TwelaTransaction(
       id: id ?? this.id,
@@ -38,6 +48,7 @@ class TwelaTransaction {
       categoryId: categoryId ?? this.categoryId,
       note: note ?? this.note,
       date: date ?? this.date,
+      relatedId: relatedId ?? this.relatedId,
     );
   }
 
@@ -50,6 +61,7 @@ class TwelaTransaction {
       'categoryId': categoryId,
       'note': note,
       'date': date.toIso8601String(),
+      'relatedId': relatedId,
     };
   }
 
@@ -62,6 +74,7 @@ class TwelaTransaction {
       categoryId: json['categoryId'] as String,
       note: json['note'] as String? ?? '',
       date: DateTime.parse(json['date'] as String),
+      relatedId: json['relatedId'] as String?,
     );
   }
 }

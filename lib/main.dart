@@ -7,6 +7,8 @@ import 'providers/twela_provider.dart';
 import 'providers/debt_provider.dart';
 import 'providers/routine_provider.dart';
 import 'providers/theme_provider.dart';
+import 'providers/savings_provider.dart';
+import 'providers/person_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,9 +22,12 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        Provider.value(value: storageService),
         ChangeNotifierProvider(create: (_) => TwelaProvider(storageService)),
         ChangeNotifierProvider(create: (_) => DebtProvider(storageService)),
         ChangeNotifierProvider(create: (_) => RoutineProvider(storageService)),
+        ChangeNotifierProvider(create: (_) => SavingsProvider(storageService)),
+        ChangeNotifierProvider(create: (_) => PersonProvider(storageService)),
       ],
       child: const TwelaApp(),
     ),
