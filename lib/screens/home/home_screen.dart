@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../theme/app_colors.dart';
 import '../../providers/twela_provider.dart';
 import '../../widgets/balance_card.dart';
 import '../../widgets/wallet_mini_card.dart';
@@ -12,26 +11,30 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {},
-          color: AppColors.primary,
+          color: theme.colorScheme.primary,
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildHeader(context),
+                _buildHeader(context, theme, isDark),
                 const SizedBox(height: 24),
                 const BalanceCard(),
                 const SizedBox(height: 20),
                 _buildWalletCards(context),
                 const SizedBox(height: 24),
-                _buildTodaySpending(context),
+                _buildTodaySpending(context, theme, isDark),
                 const SizedBox(height: 24),
-                _buildQuickActions(context),
+                _buildQuickActions(context, theme, isDark),
               ],
             ),
           ),
@@ -40,7 +43,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, ThemeData theme, bool isDark) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -49,16 +52,17 @@ class HomeScreen extends StatelessWidget {
           children: [
             Text(
               _getGreeting(),
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+              ),
             ),
             const SizedBox(height: 4),
             Text(
               'Twela',
-              style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+              style: theme.textTheme.headlineLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: theme.colorScheme.onSurface,
+              ),
             ),
           ],
         ),
@@ -66,16 +70,14 @@ class HomeScreen extends StatelessWidget {
           width: 44,
           height: 44,
           decoration: BoxDecoration(
-            color: AppColors.primarySurface,
+            color: isDark
+                ? theme.colorScheme.primary.withOpacity(0.15)
+                : const Color(0xFFECFDF5),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: AppColors.primary.withOpacity(0.1),
-              width: 1,
-            ),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.notifications_outlined,
-            color: AppColors.primary,
+            color: theme.colorScheme.primary,
             size: 22,
           ),
         ),
@@ -91,6 +93,9 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildWalletCards(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Consumer<TwelaProvider>(
       builder: (context, provider, _) {
         return Row(
@@ -100,7 +105,7 @@ class HomeScreen extends StatelessWidget {
                 title: 'كاش',
                 amount: provider.cashBalance,
                 icon: Icons.money_outlined,
-                color: AppColors.primary,
+                color: theme.colorScheme.primary,
               ),
             ),
             const SizedBox(width: 12),
@@ -109,7 +114,7 @@ class HomeScreen extends StatelessWidget {
                 title: 'مصرف',
                 amount: provider.bankBalance,
                 icon: Icons.account_balance_outlined,
-                color: AppColors.primaryLight,
+                color: const Color(0xFF10B981),
               ),
             ),
           ],
@@ -118,21 +123,20 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTodaySpending(BuildContext context) {
+  Widget _buildTodaySpending(BuildContext context, ThemeData theme, bool isDark) {
     return Consumer<TwelaProvider>(
       builder: (context, provider, _) {
         final dailyLimit = provider.budgetSettings.dailySpendingLimit;
         final todaySpent = provider.todaySpent;
+        final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
+        final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
 
         return Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: surfaceColor,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: AppColors.borderLight,
-              width: 1,
-            ),
+            border: Border.all(color: borderColor, width: 1),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,28 +150,32 @@ class HomeScreen extends StatelessWidget {
                         width: 32,
                         height: 32,
                         decoration: BoxDecoration(
-                          color: AppColors.primarySurface,
+                          color: isDark
+                              ? theme.colorScheme.primary.withOpacity(0.15)
+                              : const Color(0xFFECFDF5),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.receipt_long_outlined,
-                          color: AppColors.primary,
+                          color: theme.colorScheme.primary,
                           size: 18,
                         ),
                       ),
                       const SizedBox(width: 10),
                       Text(
                         'صرف اليوم',
-                        style: Theme.of(context).textTheme.titleMedium,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: theme.colorScheme.onSurface,
+                        ),
                       ),
                     ],
                   ),
                   Text(
                     formatLyd(todaySpent),
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w700,
-                        ),
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ],
               ),
@@ -183,13 +191,16 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     Text(
                       'الحد: ${formatLyd(dailyLimit)}',
-                      style: Theme.of(context).textTheme.bodySmall,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                      ),
                     ),
                     Text(
                       '${((todaySpent / dailyLimit) * 100).toStringAsFixed(0)}%',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                      ),
                     ),
                   ],
                 ),
@@ -201,13 +212,18 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildQuickActions(BuildContext context) {
+  Widget _buildQuickActions(BuildContext context, ThemeData theme, bool isDark) {
+    final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'إجراءات سريعة',
-          style: Theme.of(context).textTheme.headlineSmall,
+          style: theme.textTheme.headlineSmall?.copyWith(
+            color: theme.colorScheme.onSurface,
+          ),
         ),
         const SizedBox(height: 12),
         Row(
@@ -215,9 +231,11 @@ class HomeScreen extends StatelessWidget {
             Expanded(
               child: _buildQuickAction(
                 context,
+                theme: theme,
+                isDark: isDark,
                 icon: Icons.arrow_upward_rounded,
                 label: 'إضافة صرف',
-                color: AppColors.danger,
+                color: const Color(0xFFE5484D),
                 onTap: () => Navigator.pushNamed(context, '/add-transaction'),
               ),
             ),
@@ -225,9 +243,11 @@ class HomeScreen extends StatelessWidget {
             Expanded(
               child: _buildQuickAction(
                 context,
+                theme: theme,
+                isDark: isDark,
                 icon: Icons.arrow_downward_rounded,
                 label: 'إضافة دخل',
-                color: AppColors.success,
+                color: const Color(0xFF149C6D),
                 onTap: () => Navigator.pushNamed(
                   context,
                   '/add-transaction',
@@ -243,22 +263,24 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildQuickAction(
     BuildContext context, {
+    required ThemeData theme,
+    required bool isDark,
     required IconData icon,
     required String label,
     required Color color,
     required VoidCallback onTap,
   }) {
+    final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: surfaceColor,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: AppColors.borderLight,
-            width: 1,
-          ),
+          border: Border.all(color: borderColor, width: 1),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -275,9 +297,9 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               label,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: AppColors.textPrimary,
-                  ),
+              style: theme.textTheme.titleSmall?.copyWith(
+                color: theme.colorScheme.onSurface,
+              ),
             ),
           ],
         ),

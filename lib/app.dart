@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'theme/app_theme.dart';
-import 'theme/app_colors.dart';
-import 'providers/twela_provider.dart';
-import 'providers/debt_provider.dart';
-import 'providers/routine_provider.dart';
+import 'providers/theme_provider.dart';
 import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/transactions/add_transaction_screen.dart';
@@ -21,33 +18,37 @@ class TwelaApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Twela',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme(),
-      darkTheme: AppTheme.darkTheme(),
-      themeMode: ThemeMode.system,
-      locale: const Locale('ar', 'LY'),
-      initialRoute: '/onboarding',
-      routes: {
-        '/onboarding': (context) => const OnboardingScreen(),
-        '/home': (context) => const MainScreen(),
-        '/add-transaction': (context) => const AddTransactionScreen(),
-        '/history': (context) => const HistoryScreen(),
-        '/settings': (context) => const SettingsScreen(),
-        '/routine-settings': (context) => const RoutineSettingsScreen(),
-        '/debts': (context) => const DebtsScreen(),
-        '/add-debt': (context) => const AddDebtScreen(),
-        '/stats': (context) => const StatsScreen(),
-      },
-      onGenerateRoute: (settings) {
-        if (settings.name == '/debt-detail') {
-          final debt = settings.arguments as dynamic;
-          return MaterialPageRoute(
-            builder: (context) => DebtDetailScreen(debt: debt),
-          );
-        }
-        return null;
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, _) {
+        return MaterialApp(
+          title: 'Twela',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.lightTheme(),
+          darkTheme: AppTheme.darkTheme(),
+          themeMode: themeProvider.themeMode,
+          locale: const Locale('ar', 'LY'),
+          initialRoute: '/onboarding',
+          routes: {
+            '/onboarding': (context) => const OnboardingScreen(),
+            '/home': (context) => const MainScreen(),
+            '/add-transaction': (context) => const AddTransactionScreen(),
+            '/history': (context) => const HistoryScreen(),
+            '/settings': (context) => const SettingsScreen(),
+            '/routine-settings': (context) => const RoutineSettingsScreen(),
+            '/debts': (context) => const DebtsScreen(),
+            '/add-debt': (context) => const AddDebtScreen(),
+            '/stats': (context) => const StatsScreen(),
+          },
+          onGenerateRoute: (settings) {
+            if (settings.name == '/debt-detail') {
+              final debt = settings.arguments as dynamic;
+              return MaterialPageRoute(
+                builder: (context) => DebtDetailScreen(debt: debt),
+              );
+            }
+            return null;
+          },
+        );
       },
     );
   }
@@ -63,24 +64,27 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
-  final _screens = [
-    const HomeScreen(),
-    const HistoryScreen(),
-    const DebtsScreen(),
-    const StatsScreen(),
-    const SettingsScreen(),
+  final _screens = const [
+    HomeScreen(),
+    HistoryScreen(),
+    DebtsScreen(),
+    StatsScreen(),
+    SettingsScreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
       body: _screens[_currentIndex],
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: theme.colorScheme.surface,
           border: Border(
             top: BorderSide(
-              color: AppColors.borderLight,
+              color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
               width: 1,
             ),
           ),
@@ -105,11 +109,11 @@ class _MainScreenState extends State<MainScreen> {
         width: 56,
         height: 56,
         decoration: BoxDecoration(
-          color: AppColors.primary,
+          color: theme.colorScheme.primary,
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withOpacity(0.3),
+              color: theme.colorScheme.primary.withOpacity(0.3),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -132,14 +136,21 @@ class _MainScreenState extends State<MainScreen> {
     IconData activeIcon,
     String label,
   ) {
+    final theme = Theme.of(context);
     final isSelected = _currentIndex == index;
+    final primaryColor = theme.colorScheme.primary;
+    final surfaceColor = theme.colorScheme.surface;
+    final tertiaryColor = isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8);
+
     return GestureDetector(
       onTap: () => setState(() => _currentIndex = index),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primarySurface : Colors.transparent,
+          color: isSelected
+              ? primaryColor.withOpacity(isDark ? 0.15 : 0.08)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Column(
@@ -147,7 +158,7 @@ class _MainScreenState extends State<MainScreen> {
           children: [
             Icon(
               isSelected ? activeIcon : icon,
-              color: isSelected ? AppColors.primary : AppColors.textTertiary,
+              color: isSelected ? primaryColor : tertiaryColor,
               size: 22,
             ),
             const SizedBox(height: 4),
@@ -156,7 +167,7 @@ class _MainScreenState extends State<MainScreen> {
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected ? AppColors.primary : AppColors.textTertiary,
+                color: isSelected ? primaryColor : tertiaryColor,
               ),
             ),
           ],
@@ -164,4 +175,6 @@ class _MainScreenState extends State<MainScreen> {
       ),
     );
   }
+
+  bool get isDark => Theme.of(context).brightness == Brightness.dark;
 }

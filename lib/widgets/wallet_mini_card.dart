@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
 import '../utils/formatters.dart';
 
 class WalletMiniCard extends StatelessWidget {
@@ -18,15 +17,18 @@ class WalletMiniCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
+    final secondaryTextColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: surfaceColor,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: AppColors.borderLight,
-          width: 1,
-        ),
+        border: Border.all(color: borderColor, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,7 +47,7 @@ class WalletMiniCard extends StatelessWidget {
               ),
               Icon(
                 Icons.chevron_right,
-                color: AppColors.textTertiary,
+                color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
                 size: 18,
               ),
             ],
@@ -53,21 +55,24 @@ class WalletMiniCard extends StatelessWidget {
           const SizedBox(height: 14),
           Text(
             title,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textSecondary,
-                ),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: secondaryTextColor,
+            ),
           ),
           const SizedBox(height: 4),
           Text(
             formatLydShort(amount),
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: theme.colorScheme.onSurface,
+            ),
           ),
           const SizedBox(height: 2),
           Text(
             'LYD',
-            style: Theme.of(context).textTheme.labelSmall,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: secondaryTextColor,
+            ),
           ),
         ],
       ),

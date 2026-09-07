@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../theme/app_colors.dart';
 import '../../providers/twela_provider.dart';
 import '../../models/wallet_settings.dart';
 
@@ -38,59 +37,71 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     Navigator.pushReplacementNamed(context, '/home');
   }
 
+  String get _logoAsset {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return isDark ? 'assets/logo/twela_logo_mono.png' : 'assets/logo/twela_logo.png';
+  }
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: PageView(
           controller: _pageController,
           onPageChanged: (index) => setState(() => _currentPage = index),
           children: [
-            _buildWelcomePage(),
-            _buildBalancePage(),
+            _buildWelcomePage(theme, isDark),
+            _buildBalancePage(theme, isDark),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildWelcomePage() {
+  Widget _buildWelcomePage(ThemeData theme, bool isDark) {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: 100,
-            height: 100,
+            width: 120,
+            height: 120,
             decoration: BoxDecoration(
-              color: AppColors.primarySurface,
+              color: isDark
+                  ? theme.colorScheme.primary.withOpacity(0.1)
+                  : const Color(0xFFECFDF5),
               shape: BoxShape.circle,
-              border: Border.all(
-                color: AppColors.primary.withOpacity(0.1),
-                width: 2,
-              ),
             ),
-            child: const Icon(
-              Icons.account_balance_wallet_outlined,
-              size: 48,
-              color: AppColors.primary,
+            child: ClipOval(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Image.asset(
+                  _logoAsset,
+                  fit: BoxFit.contain,
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 32),
           Text(
             'مرحباً بك في Twela',
-            style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+            style: theme.textTheme.displaySmall?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: theme.colorScheme.onSurface,
+            ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 12),
           Text(
             'تتبع مصاريفك بسهولة\nبالدينار الليبي',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: AppColors.textSecondary,
-                ),
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+            ),
             textAlign: TextAlign.center,
           ),
           const Spacer(),
@@ -112,7 +123,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _buildBalancePage() {
+  Widget _buildBalancePage(ThemeData theme, bool isDark) {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -120,30 +131,35 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           Text(
             'الرصيد الابتدائي',
-            style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+            style: theme.textTheme.displaySmall?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: theme.colorScheme.onSurface,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
             'أدخل رصيدك الحالي لكل محفظة',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary,
-                ),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+            ),
           ),
           const SizedBox(height: 40),
           _buildBalanceField(
+            theme: theme,
+            isDark: isDark,
             controller: _cashController,
             icon: Icons.money_outlined,
             label: 'محفظة الكاش',
-            color: AppColors.primary,
+            color: theme.colorScheme.primary,
           ),
           const SizedBox(height: 16),
           _buildBalanceField(
+            theme: theme,
+            isDark: isDark,
             controller: _bankController,
             icon: Icons.account_balance_outlined,
             label: 'محفظة المصرف',
-            color: AppColors.primaryLight,
+            color: const Color(0xFF10B981),
           ),
           const Spacer(),
           SizedBox(
@@ -160,20 +176,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Widget _buildBalanceField({
+    required ThemeData theme,
+    required bool isDark,
     required TextEditingController controller,
     required IconData icon,
     required String label,
     required Color color,
   }) {
+    final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: surfaceColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.borderLight,
-          width: 1,
-        ),
+        border: Border.all(color: borderColor, width: 1),
       ),
       child: Row(
         children: [
@@ -193,16 +211,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               children: [
                 Text(
                   label,
-                  style: Theme.of(context).textTheme.titleSmall,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                  ),
                 ),
                 const SizedBox(height: 4),
                 TextField(
                   controller: controller,
                   keyboardType: TextInputType.number,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                  decoration: const InputDecoration(
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                  decoration: InputDecoration(
                     hintText: '0.00',
                     suffixText: 'LYD',
                     isDense: true,
@@ -210,6 +231,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     enabledBorder: InputBorder.none,
                     focusedBorder: InputBorder.none,
                     contentPadding: EdgeInsets.zero,
+                    hintStyle: TextStyle(
+                      color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                    ),
                   ),
                 ),
               ],
