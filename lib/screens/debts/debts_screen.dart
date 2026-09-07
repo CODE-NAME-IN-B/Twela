@@ -51,20 +51,30 @@ class DebtsScreen extends StatelessWidget {
                       height: 80,
                       decoration: BoxDecoration(
                         color: isDark
-                            ? theme.colorScheme.primary.withOpacity(0.15)
+                            ? const Color(0xFF1E293B)
                             : const Color(0xFFECFDF5),
                         shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isDark
+                              ? const Color(0xFF334155)
+                              : const Color(0xFFE2E8F0),
+                          width: 1,
+                        ),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.people_outline,
                         size: 36,
-                        color: AppColors.primary,
+                        color: isDark
+                            ? const Color(0xFF64748B)
+                            : AppColors.primary,
                       ),
                     ),
                     const SizedBox(height: 20),
                     Text(
                       'لا توجد ديون',
-                      style: theme.textTheme.headlineSmall,
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        color: theme.colorScheme.onSurface,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Text(

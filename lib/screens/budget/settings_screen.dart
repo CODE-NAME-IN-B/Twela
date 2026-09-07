@@ -194,11 +194,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     double progress = 0;
     String status = 'جاري التحميل...';
 
+    late void Function(VoidCallback) dialogSetState;
+
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) {
+          dialogSetState = setDialogState;
           return AlertDialog(
             backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
             shape: RoundedRectangleBorder(
@@ -269,10 +272,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
       updateInfo,
       context,
       onProgress: (newProgress, newStatus) {
-        progress = newProgress;
-        status = newStatus;
+        dialogSetState(() {
+          progress = newProgress;
+          status = newStatus;
+        });
       },
-    );
+    ).then((_) {
+      if (mounted && Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('تم التحميل. جاري فتح المثبت...')),
+        );
+      }
+    }).catchError((e) {
+      if (mounted && Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('فشل التحميل: $e')),
+        );
+      }
+    });
   }
 
   @override

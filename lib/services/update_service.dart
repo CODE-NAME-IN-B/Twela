@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 
 class UpdateInfo {
   final String version;
@@ -90,12 +91,19 @@ class UpdateService {
     BuildContext context, {
     Function(double progress, String status)? onProgress,
   }) async {
-    if (updateInfo.downloadUrl.isEmpty) return;
+    if (updateInfo.downloadUrl.isEmpty) {
+      throw Exception('No APK download URL available');
+    }
 
     try {
       final dir = await getTemporaryDirectory();
       final filePath = '${dir.path}/twela_update.apk';
       final file = File(filePath);
+
+      // Delete old update file if exists
+      if (await file.exists()) {
+        await file.delete();
+      }
 
       final dio = Dio();
 
@@ -113,12 +121,23 @@ class UpdateService {
 
       onProgress?.call(1.0, 'جاري التثبيت...');
 
+      // Check install permission on Android 8+
+      if (Platform.isAndroid) {
+        final androidInfo = await DeviceInfoPlugin().androidInfo;
+        if (androidInfo.version.sdkInt >= 26) {
+          // On Android 8+, user must enable "Install unknown apps"
+          // We just try to open and handle the result
+        }
+      }
+
       final result = await OpenFilex.open(filePath);
       if (result.type != ResultType.done) {
         debugPrint('Error opening APK: ${result.message}');
+        throw Exception('Failed to open APK: ${result.message}');
       }
     } catch (e) {
       debugPrint('Error downloading update: $e');
+      rethrow;
     }
   }
 }
