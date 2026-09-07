@@ -532,7 +532,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        suffixText: 'LYD',
+        suffixText: 'د.ل',
         prefixIcon: Icon(icon, size: 20),
         labelStyle: TextStyle(
           color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
@@ -907,7 +907,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             description: 'تطبيق تتبع المصاريف بالدينار الليبي',
             icon: Icons.account_balance_wallet_outlined,
             color: primaryColor,
-            version: 'v1.0.4',
+            version: 'v1.0.6',
           ),
           const SizedBox(height: 8),
           _buildProjectItem(

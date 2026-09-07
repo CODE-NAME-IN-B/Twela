@@ -16,6 +16,16 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
   final _personController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _amountController = TextEditingController();
+  bool _isGiven = true;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    if (args != null && args['type'] == 'received') {
+      _isGiven = false;
+    }
+  }
 
   @override
   void dispose() {
@@ -43,6 +53,7 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
       itemDescription: description,
       totalAmount: amount,
       date: DateTime.now(),
+      isGiven: _isGiven,
     );
 
     context.read<DebtProvider>().addDebt(debt);
@@ -57,7 +68,7 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('إضافة دين جديد'),
+        title: Text(_isGiven ? 'أعطيت مالًا لشخص' : 'استلمت مالًا من شخص'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),

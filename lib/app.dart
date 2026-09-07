@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'theme/app_theme.dart';
 import 'providers/theme_provider.dart';
+import 'services/storage_service.dart';
 import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/transactions/add_transaction_screen.dart';
@@ -21,6 +22,9 @@ class TwelaApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final storage = context.read<StorageService>();
+    final onboardingComplete = storage.getOnboardingComplete();
+
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, _) {
         return MaterialApp(
@@ -30,7 +34,7 @@ class TwelaApp extends StatelessWidget {
           darkTheme: AppTheme.darkTheme(),
           themeMode: themeProvider.themeMode,
           locale: const Locale('ar', 'LY'),
-          initialRoute: '/onboarding',
+          initialRoute: onboardingComplete ? '/home' : '/onboarding',
           routes: {
             '/onboarding': (context) => const OnboardingScreen(),
             '/home': (context) => const MainScreen(),
@@ -74,7 +78,7 @@ class _MainScreenState extends State<MainScreen> {
     HomeScreen(),
     HistoryScreen(),
     SizedBox(),
-    StatsScreen(),
+    DebtsScreen(),
     SettingsScreen(),
   ];
 
@@ -266,7 +270,7 @@ class _BottomNavBar extends StatelessWidget {
               _buildItem(context, 0, Icons.home_outlined, Icons.home, 'الرئيسية', primaryColor, tertiaryColor, isDark),
               _buildItem(context, 1, Icons.receipt_long_outlined, Icons.receipt_long, 'السجل', primaryColor, tertiaryColor, isDark),
               _buildCenterAdd(context, primaryColor, isDark),
-              _buildItem(context, 3, Icons.bar_chart_outlined, Icons.bar_chart, 'الإحصائيات', primaryColor, tertiaryColor, isDark),
+              _buildItem(context, 3, Icons.people_outline, Icons.people, 'الديون', primaryColor, tertiaryColor, isDark),
               _buildItem(context, 4, Icons.settings_outlined, Icons.settings, 'الإعدادات', primaryColor, tertiaryColor, isDark),
             ],
           ),

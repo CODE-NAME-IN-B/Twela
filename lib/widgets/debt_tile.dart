@@ -69,7 +69,7 @@ class DebtTile extends StatelessWidget {
                 ),
                 decoration: InputDecoration(
                   hintText: '0.00',
-                  suffixText: 'LYD',
+                  suffixText: 'د.ل',
                   suffixStyle: theme.textTheme.titleMedium?.copyWith(
                     color: isDark
                         ? const Color(0xFF94A3B8)

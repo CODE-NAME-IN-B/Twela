@@ -314,7 +314,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                   style: theme.textTheme.bodyMedium,
                   decoration: const InputDecoration(
                     hintText: 'المبلغ',
-                    suffixText: 'LYD',
+                    suffixText: 'د.ل',
                   ),
                 ),
               ),

@@ -229,6 +229,6 @@ class TwelaProvider extends ChangeNotifier {
   }
 
   String formatLyd(double amount) {
-    return '${amount.toStringAsFixed(2)} LYD';
+    return '${amount.toStringAsFixed(2)} د.ل';
   }
 }

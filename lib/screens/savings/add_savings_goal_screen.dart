@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/savings_provider.dart';
 import '../../models/savings_goal.dart';
+import '../../utils/formatters.dart';
 
 class AddSavingsGoalScreen extends StatefulWidget {
   const AddSavingsGoalScreen({super.key});
@@ -123,7 +124,7 @@ class _AddSavingsGoalScreenState extends State<AddSavingsGoalScreen> {
                           ),
                         ),
                         Text(
-                          '${targetAmount.toStringAsFixed(2)} LYD خلال $duration يوم',
+                          '${formatLydShort(targetAmount)} خلال $duration يوم',
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w700,
                             color: theme.colorScheme.primary,

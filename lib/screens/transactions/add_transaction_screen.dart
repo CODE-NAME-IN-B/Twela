@@ -237,7 +237,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             ),
             decoration: InputDecoration(
               hintText: '0.00',
-              suffixText: 'LYD',
+              suffixText: 'د.ل',
               suffixStyle: theme.textTheme.titleMedium?.copyWith(
                 color: secondaryColor,
               ),

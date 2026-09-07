@@ -4,6 +4,10 @@ class NotificationService {
   static final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
 
+  static const String _channelId = 'twela_notifications';
+  static const String _channelName = 'Twela Notifications';
+  static const String _channelDesc = 'إشعارات تطبيق Twela';
+
   static Future<void> init() async {
     const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosSettings = DarwinInitializationSettings(
@@ -16,6 +20,21 @@ class NotificationService {
       iOS: iosSettings,
     );
     await _plugin.initialize(settings);
+
+    // Create Android notification channel
+    final androidPlugin = _plugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    if (androidPlugin != null) {
+      await androidPlugin.createNotificationChannel(
+        const AndroidNotificationChannel(
+          _channelId,
+          _channelName,
+          description: _channelDesc,
+          importance: Importance.high,
+          enableVibration: true,
+        ),
+      );
+    }
   }
 
   static Future<void> showNotification({
@@ -24,11 +43,12 @@ class NotificationService {
     required String body,
   }) async {
     const androidDetails = AndroidNotificationDetails(
-      'twela_channel',
-      'Twela Notifications',
-      channelDescription: 'Notifications for Twela app',
+      _channelId,
+      _channelName,
+      channelDescription: _channelDesc,
       importance: Importance.high,
       priority: Priority.high,
+      enableVibration: true,
     );
     const details = NotificationDetails(
       android: androidDetails,

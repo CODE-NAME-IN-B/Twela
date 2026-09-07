@@ -69,7 +69,7 @@ class WalletMiniCard extends StatelessWidget {
           ),
           const SizedBox(height: 2),
           Text(
-            'LYD',
+            'د.ل',
             style: theme.textTheme.labelSmall?.copyWith(
               color: secondaryTextColor,
             ),

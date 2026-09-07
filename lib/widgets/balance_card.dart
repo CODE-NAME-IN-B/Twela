@@ -96,7 +96,7 @@ class _BalanceCardState extends State<BalanceCard>
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              'LYD',
+                              'د.ل',
                               style: Theme.of(context)
                                   .textTheme
                                   .labelSmall

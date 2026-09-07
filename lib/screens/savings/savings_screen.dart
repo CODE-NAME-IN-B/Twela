@@ -215,7 +215,7 @@ class SavingsScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '${formatLyd(goal.dailyTarget)} / يوم',
+                  '${formatLydShort(goal.dailyTarget)} / يوم',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                   ),
@@ -348,7 +348,7 @@ class SavingsScreen extends StatelessWidget {
           autofocus: true,
           decoration: const InputDecoration(
             hintText: 'المبلغ',
-            suffixText: 'LYD',
+            suffixText: 'د.ل',
           ),
         ),
         actions: [

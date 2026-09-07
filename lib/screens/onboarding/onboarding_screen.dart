@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import '../../providers/twela_provider.dart';
+import '../../services/storage_service.dart';
+import '../../services/notification_service.dart';
 import '../../models/wallet_settings.dart';
 import '../../utils/formatters.dart';
 
@@ -25,7 +28,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     super.dispose();
   }
 
-  void _completeOnboarding() {
+  Future<void> _requestPermissions() async {
+    if (await Permission.notification.isDenied) {
+      await Permission.notification.request();
+    }
+    if (await Permission.notification.isPermanentlyDenied) {
+      await openAppSettings();
+    }
+  }
+
+  void _completeOnboarding() async {
     final cash = double.tryParse(_cashController.text) ?? 0;
     final bank = double.tryParse(_bankController.text) ?? 0;
 
@@ -35,7 +47,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       initialBankBalance: bank,
     ));
 
-    Navigator.pushReplacementNamed(context, '/home');
+    final storage = context.read<StorageService>();
+    await storage.setOnboardingComplete(true);
+
+    await _requestPermissions();
+    await NotificationService.init();
+
+    if (mounted) {
+      Navigator.pushReplacementNamed(context, '/home');
+    }
   }
 
   String get _logoAsset {
@@ -226,7 +246,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                   decoration: InputDecoration(
                     hintText: '0.00',
-                    suffixText: 'LYD',
+                    suffixText: 'د.ل',
                     isDense: true,
                     border: InputBorder.none,
                     enabledBorder: InputBorder.none,
