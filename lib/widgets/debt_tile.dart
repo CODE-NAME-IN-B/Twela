@@ -36,7 +36,9 @@ class DebtTile extends StatelessWidget {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1),
+                    color: isDark
+                        ? const Color(0xFF475569)
+                        : const Color(0xFFCBD5E1),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -52,7 +54,9 @@ class DebtTile extends StatelessWidget {
               Text(
                 'المتبقي: ${formatLyd(debt.remaining)}',
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                  color: isDark
+                      ? const Color(0xFF94A3B8)
+                      : const Color(0xFF64748B),
                 ),
               ),
               const SizedBox(height: 20),
@@ -67,7 +71,9 @@ class DebtTile extends StatelessWidget {
                   hintText: '0.00',
                   suffixText: 'LYD',
                   suffixStyle: theme.textTheme.titleMedium?.copyWith(
-                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                    color: isDark
+                        ? const Color(0xFF94A3B8)
+                        : const Color(0xFF64748B),
                   ),
                 ),
               ),
@@ -79,13 +85,15 @@ class DebtTile extends StatelessWidget {
                     final amount = double.tryParse(controller.text);
                     if (amount == null || amount <= 0) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('يرجى إدخال مبلغ صحيح')),
+                        const SnackBar(
+                            content: Text('يرجى إدخال مبلغ صحيح')),
                       );
                       return;
                     }
                     if (amount > debt.remaining) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('المبلغ أكبر من المتبقي')),
+                        const SnackBar(
+                            content: Text('المبلغ أكبر من المتبقي')),
                       );
                       return;
                     }
@@ -124,7 +132,8 @@ class DebtTile extends StatelessWidget {
           color: isDark ? const Color(0xFF1E293B) : Colors.white,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+            color:
+                isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
             width: 1,
           ),
         ),
@@ -183,59 +192,61 @@ class DebtTile extends StatelessWidget {
                       ),
                     ],
                   ),
-              ),
-              if (!debt.isPaidOff)
-                GestureDetector(
-                  onTap: () => _showPayBottomSheet(context),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                ),
+                if (!debt.isPaidOff)
+                  GestureDetector(
+                    onTap: () => _showPayBottomSheet(context),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? theme.colorScheme.primary.withOpacity(0.15)
+                            : const Color(0xFFECFDF5),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.payment_outlined,
+                            color: theme.colorScheme.primary,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'سداد',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                else
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: isDark
-                          ? theme.colorScheme.primary.withOpacity(0.15)
+                          ? const Color(0xFF149C6D).withOpacity(0.1)
                           : const Color(0xFFECFDF5),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(6),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.payment_outlined,
-                          color: theme.colorScheme.primary,
-                          size: 16,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          'سداد',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: theme.colorScheme.primary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      'تم',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: AppColors.success,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
-                )
-              else
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? const Color(0xFF149C6D).withOpacity(0.1)
-                        : const Color(0xFFECFDF5),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    'تم',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: AppColors.success,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-            ],
+              ],
+            ),
             const SizedBox(height: 14),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -262,8 +273,9 @@ class DebtTile extends StatelessWidget {
               borderRadius: BorderRadius.circular(4),
               child: LinearProgressIndicator(
                 value: progress,
-                backgroundColor:
-                    isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                backgroundColor: isDark
+                    ? const Color(0xFF334155)
+                    : const Color(0xFFF1F5F9),
                 valueColor: AlwaysStoppedAnimation<Color>(
                   debt.isPaidOff ? AppColors.success : AppColors.primary,
                 ),
