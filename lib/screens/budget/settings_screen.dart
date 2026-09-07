@@ -178,12 +178,99 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              UpdateService.downloadAndInstall(updateInfo);
+              _showDownloadProgress(updateInfo);
             },
             child: const Text('تحديث الآن'),
           ),
         ],
       ),
+    );
+  }
+
+  void _showDownloadProgress(UpdateInfo updateInfo) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    double progress = 0;
+    String status = 'جاري التحميل...';
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          return AlertDialog(
+            backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? theme.colorScheme.primary.withOpacity(0.15)
+                        : const Color(0xFFECFDF5),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.system_update_outlined,
+                    color: theme.colorScheme.primary,
+                    size: 30,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'جاري تحديث التطبيق',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  status,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 6,
+                    backgroundColor: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                    valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '${(progress * 100).toStringAsFixed(0)}%',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+
+    UpdateService.downloadAndInstall(
+      updateInfo,
+      context,
+      onProgress: (newProgress, newStatus) {
+        progress = newProgress;
+        status = newStatus;
+      },
     );
   }
 

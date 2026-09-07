@@ -13,6 +13,8 @@ class LimitProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final progress = limit > 0 ? current / limit : 0.0;
     final clampedProgress = progress.clamp(0.0, 1.0);
 
@@ -26,7 +28,8 @@ class LimitProgressBar extends StatelessWidget {
       borderRadius: BorderRadius.circular(4),
       child: LinearProgressIndicator(
         value: clampedProgress,
-        backgroundColor: AppColors.borderLight,
+        backgroundColor:
+            isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
         valueColor: AlwaysStoppedAnimation<Color>(getColor()),
         minHeight: 6,
       ),

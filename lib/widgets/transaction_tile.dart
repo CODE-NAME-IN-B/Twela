@@ -12,6 +12,8 @@ class TransactionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final provider = context.read<TwelaProvider>();
     final category = provider.getCategoryById(transaction.categoryId);
     final isExpense = transaction.type == TransactionType.expense;
@@ -20,10 +22,10 @@ class TransactionTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.borderLight,
+          color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
           width: 1,
         ),
       ),
@@ -33,12 +35,19 @@ class TransactionTile extends StatelessWidget {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: (category?.color ?? AppColors.textTertiary).withOpacity(0.1),
+              color: (category?.color ??
+                      (isDark
+                          ? const Color(0xFF64748B)
+                          : const Color(0xFF94A3B8)))
+                  .withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               category?.icon ?? Icons.receipt_outlined,
-              color: category?.color ?? AppColors.textTertiary,
+              color: category?.color ??
+                  (isDark
+                      ? const Color(0xFF64748B)
+                      : const Color(0xFF94A3B8)),
               size: 20,
             ),
           ),
@@ -49,13 +58,13 @@ class TransactionTile extends StatelessWidget {
               children: [
                 Text(
                   category?.name ?? 'حركة',
-                  style: Theme.of(context).textTheme.titleSmall,
+                  style: theme.textTheme.titleSmall,
                 ),
                 if (transaction.note.isNotEmpty) ...[
                   const SizedBox(height: 2),
                   Text(
                     transaction.note,
-                    style: Theme.of(context).textTheme.bodySmall,
+                    style: theme.textTheme.bodySmall,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -68,7 +77,7 @@ class TransactionTile extends StatelessWidget {
             children: [
               Text(
                 '${isExpense ? '-' : '+'}${formatLydShort(transaction.amount)}',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                style: theme.textTheme.titleSmall?.copyWith(
                       color: isExpense ? AppColors.danger : AppColors.success,
                       fontWeight: FontWeight.w700,
                     ),
@@ -76,7 +85,7 @@ class TransactionTile extends StatelessWidget {
               const SizedBox(height: 2),
               Text(
                 formatDate(transaction.date),
-                style: Theme.of(context).textTheme.labelSmall,
+                style: theme.textTheme.labelSmall,
               ),
             ],
           ),

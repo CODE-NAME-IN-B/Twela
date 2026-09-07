@@ -51,7 +51,11 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('إضافة دين جديد'),
       ),
@@ -66,6 +70,8 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
               label: 'اسم الشخص',
               hint: 'أدخل اسم الشخص',
               icon: Icons.person_outline,
+              isDark: isDark,
+              theme: theme,
             ),
             const SizedBox(height: 16),
             _buildField(
@@ -74,6 +80,8 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
               label: 'وصف الدين',
               hint: 'أدخل وصف الدين',
               icon: Icons.description_outlined,
+              isDark: isDark,
+              theme: theme,
             ),
             const SizedBox(height: 16),
             _buildField(
@@ -83,6 +91,8 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
               hint: 'أدخل المبلغ',
               icon: Icons.money_outlined,
               keyboardType: TextInputType.number,
+              isDark: isDark,
+              theme: theme,
             ),
             const SizedBox(height: 32),
             SizedBox(
@@ -104,15 +114,17 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
     required String label,
     required String hint,
     required IconData icon,
+    required bool isDark,
+    required ThemeData theme,
     TextInputType? keyboardType,
   }) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: AppColors.borderLight,
+          color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
           width: 1,
         ),
       ),
@@ -121,13 +133,13 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
         children: [
           Text(
             label,
-            style: Theme.of(context).textTheme.titleSmall,
+            style: theme.textTheme.titleSmall,
           ),
           const SizedBox(height: 8),
           TextField(
             controller: controller,
             keyboardType: keyboardType,
-            style: Theme.of(context).textTheme.bodyMedium,
+            style: theme.textTheme.bodyMedium,
             decoration: InputDecoration(
               hintText: hint,
               prefixIcon: Icon(icon, size: 20),

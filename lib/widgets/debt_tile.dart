@@ -10,16 +10,19 @@ class DebtTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final progress = debt.totalAmount > 0 ? debt.paidAmount / debt.totalAmount : 0.0;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final progress =
+        debt.totalAmount > 0 ? debt.paidAmount / debt.totalAmount : 0.0;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: AppColors.borderLight,
+          color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
           width: 1,
         ),
       ),
@@ -37,15 +40,21 @@ class DebtTile extends StatelessWidget {
                       height: 40,
                       decoration: BoxDecoration(
                         color: debt.isPaidOff
-                            ? AppColors.successSurface
-                            : AppColors.warningSurface,
+                            ? (isDark
+                                ? const Color(0xFF149C6D).withOpacity(0.1)
+                                : const Color(0xFFECFDF5))
+                            : (isDark
+                                ? const Color(0xFFF5A524).withOpacity(0.1)
+                                : const Color(0xFFFFFBEB)),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Icon(
                         debt.isPaidOff
                             ? Icons.check_circle_outline
                             : Icons.person_outline,
-                        color: debt.isPaidOff ? AppColors.success : AppColors.warning,
+                        color: debt.isPaidOff
+                            ? AppColors.success
+                            : AppColors.warning,
                         size: 20,
                       ),
                     ),
@@ -56,14 +65,14 @@ class DebtTile extends StatelessWidget {
                         children: [
                           Text(
                             debt.personName,
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            style: theme.textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.w600,
                                 ),
                           ),
                           const SizedBox(height: 2),
                           Text(
                             debt.itemDescription,
-                            style: Theme.of(context).textTheme.bodySmall,
+                            style: theme.textTheme.bodySmall,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -74,18 +83,25 @@ class DebtTile extends StatelessWidget {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: debt.isPaidOff
-                      ? AppColors.successSurface
-                      : AppColors.warningSurface,
+                      ? (isDark
+                          ? const Color(0xFF149C6D).withOpacity(0.1)
+                          : const Color(0xFFECFDF5))
+                      : (isDark
+                          ? const Color(0xFFF5A524).withOpacity(0.1)
+                          : const Color(0xFFFFFBEB)),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
                   debt.isPaidOff ? 'تم' : 'متبقي',
                   style: TextStyle(
                     fontSize: 11,
-                    color: debt.isPaidOff ? AppColors.success : AppColors.warning,
+                    color: debt.isPaidOff
+                        ? AppColors.success
+                        : AppColors.warning,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -98,14 +114,16 @@ class DebtTile extends StatelessWidget {
             children: [
               Text(
                 formatLyd(debt.remaining),
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w700,
-                      color: debt.isPaidOff ? AppColors.success : AppColors.textPrimary,
+                      color: debt.isPaidOff
+                          ? AppColors.success
+                          : theme.colorScheme.onSurface,
                     ),
               ),
               Text(
                 '${(progress * 100).toStringAsFixed(0)}%',
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                style: theme.textTheme.labelMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
               ),
@@ -116,7 +134,8 @@ class DebtTile extends StatelessWidget {
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
               value: progress,
-              backgroundColor: AppColors.borderLight,
+              backgroundColor:
+                  isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
               valueColor: AlwaysStoppedAnimation<Color>(
                 debt.isPaidOff ? AppColors.success : AppColors.primary,
               ),

@@ -79,87 +79,103 @@ class _MainScreenState extends State<MainScreen> {
 
     return Scaffold(
       body: _screens[_currentIndex],
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
-          border: Border(
-            top: BorderSide(
-              color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
-              width: 1,
-            ),
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildNavItem(0, Icons.home_outlined, Icons.home, 'الرئيسية'),
-                _buildNavItem(1, Icons.receipt_long_outlined, Icons.receipt_long, 'السجل'),
-                _buildNavItem(2, Icons.people_outline, Icons.people, 'الديون'),
-                _buildNavItem(3, Icons.bar_chart_outlined, Icons.bar_chart, 'الإحصائيات'),
-                _buildNavItem(4, Icons.settings_outlined, Icons.settings, 'الإعدادات'),
-              ],
-            ),
+      bottomNavigationBar: _BottomNavBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          if (index == 2) {
+            Navigator.pushNamed(context, '/add-transaction');
+          } else {
+            setState(() {
+              _currentIndex = index > 2 ? index : index;
+            });
+          }
+        },
+      ),
+    );
+  }
+}
+
+class _BottomNavBar extends StatelessWidget {
+  final int currentIndex;
+  final ValueChanged<int> onTap;
+
+  const _BottomNavBar({
+    required this.currentIndex,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primaryColor = theme.colorScheme.primary;
+    final surfaceColor = theme.colorScheme.surface;
+    final onSurfaceColor = theme.colorScheme.onSurface;
+    final tertiaryColor = isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        border: Border(
+          top: BorderSide(
+            color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+            width: 1,
           ),
         ),
       ),
-      floatingActionButton: Container(
-        width: 56,
-        height: 56,
-        decoration: BoxDecoration(
-          color: theme.colorScheme.primary,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: theme.colorScheme.primary.withOpacity(0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: FloatingActionButton(
-          onPressed: () => Navigator.pushNamed(context, '/add-transaction'),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          child: const Icon(Icons.add, color: Colors.white, size: 28),
+      child: SafeArea(
+        child: SizedBox(
+          height: 64,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildItem(context, 0, Icons.home_outlined, Icons.home, 'الرئيسية', primaryColor, tertiaryColor, isDark),
+              _buildItem(context, 1, Icons.receipt_long_outlined, Icons.receipt_long, 'السجل', primaryColor, tertiaryColor, isDark),
+              _buildCenterAdd(context, primaryColor, isDark),
+              _buildItem(context, 3, Icons.bar_chart_outlined, Icons.bar_chart, 'الإحصائيات', primaryColor, tertiaryColor, isDark),
+              _buildItem(context, 4, Icons.settings_outlined, Icons.settings, 'الإعدادات', primaryColor, tertiaryColor, isDark),
+            ],
+          ),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
-  Widget _buildNavItem(
+  Widget _buildItem(
+    BuildContext context,
     int index,
     IconData icon,
     IconData activeIcon,
     String label,
+    Color primaryColor,
+    Color tertiaryColor,
+    bool isDark,
   ) {
-    final theme = Theme.of(context);
-    final isSelected = _currentIndex == index;
-    final primaryColor = theme.colorScheme.primary;
-    final surfaceColor = theme.colorScheme.surface;
-    final tertiaryColor = isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8);
+    final isSelected = currentIndex == index;
+    final displayIndex = index > 2 ? index : index;
 
     return GestureDetector(
-      onTap: () => setState(() => _currentIndex = index),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? primaryColor.withOpacity(isDark ? 0.15 : 0.08)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(10),
-        ),
+      onTap: () => onTap(displayIndex),
+      behavior: HitTestBehavior.opaque,
+      child: SizedBox(
+        width: 64,
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              isSelected ? activeIcon : icon,
-              color: isSelected ? primaryColor : tertiaryColor,
-              size: 22,
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? primaryColor.withOpacity(isDark ? 0.15 : 0.08)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                isSelected ? activeIcon : icon,
+                color: isSelected ? primaryColor : tertiaryColor,
+                size: 22,
+              ),
             ),
             const SizedBox(height: 4),
             Text(
@@ -176,5 +192,44 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  bool get isDark => Theme.of(context).brightness == Brightness.dark;
+  Widget _buildCenterAdd(BuildContext context, Color primaryColor, bool isDark) {
+    return GestureDetector(
+      onTap: () => onTap(2),
+      behavior: HitTestBehavior.opaque,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: primaryColor,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: primaryColor.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: const Icon(
+              Icons.add,
+              color: Colors.white,
+              size: 26,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'إضافة',
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: primaryColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

@@ -9,7 +9,11 @@ class DebtsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('الديون'),
         actions: [
@@ -17,7 +21,9 @@ class DebtsScreen extends StatelessWidget {
             padding: const EdgeInsets.only(left: 16),
             child: Container(
               decoration: BoxDecoration(
-                color: AppColors.primarySurface,
+                color: isDark
+                    ? theme.colorScheme.primary.withOpacity(0.15)
+                    : const Color(0xFFECFDF5),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: IconButton(
@@ -44,7 +50,9 @@ class DebtsScreen extends StatelessWidget {
                       width: 80,
                       height: 80,
                       decoration: BoxDecoration(
-                        color: AppColors.primarySurface,
+                        color: isDark
+                            ? theme.colorScheme.primary.withOpacity(0.15)
+                            : const Color(0xFFECFDF5),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -56,13 +64,15 @@ class DebtsScreen extends StatelessWidget {
                     const SizedBox(height: 20),
                     Text(
                       'لا توجد ديون',
-                      style: Theme.of(context).textTheme.headlineSmall,
+                      style: theme.textTheme.headlineSmall,
                     ),
                     const SizedBox(height: 8),
                     Text(
                       'أضف دين جديد للبدء في التتبع',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppColors.textSecondary,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                            color: isDark
+                                ? const Color(0xFF94A3B8)
+                                : const Color(0xFF64748B),
                           ),
                       textAlign: TextAlign.center,
                     ),
@@ -80,7 +90,7 @@ class DebtsScreen extends StatelessWidget {
                 if (activeDebts.isNotEmpty) ...[
                   Text(
                     'نشطة',
-                    style: Theme.of(context).textTheme.headlineSmall,
+                    style: theme.textTheme.headlineSmall,
                   ),
                   const SizedBox(height: 12),
                   ...activeDebts.map((debt) => DebtTile(debt: debt)),
@@ -89,8 +99,10 @@ class DebtsScreen extends StatelessWidget {
                   const SizedBox(height: 28),
                   Text(
                     'تم السداد',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          color: AppColors.textSecondary,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                          color: isDark
+                              ? const Color(0xFF94A3B8)
+                              : const Color(0xFF64748B),
                         ),
                   ),
                   const SizedBox(height: 12),

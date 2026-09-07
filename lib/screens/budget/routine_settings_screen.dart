@@ -9,7 +9,11 @@ class RoutineSettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('إعدادات الروتين'),
       ),
@@ -20,7 +24,7 @@ class RoutineSettingsScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildEnableSwitch(context, provider),
+                _buildEnableSwitch(context, provider, isDark, theme),
                 const SizedBox(height: 24),
                 if (provider.isEnabled) ...[
                   _buildPatternSection(
@@ -28,6 +32,8 @@ class RoutineSettingsScreen extends StatelessWidget {
                     'اقتراحات',
                     provider.suggestingPatterns,
                     provider,
+                    isDark,
+                    theme,
                   ),
                   const SizedBox(height: 20),
                   _buildPatternSection(
@@ -35,6 +41,8 @@ class RoutineSettingsScreen extends StatelessWidget {
                     'تم التفعيل تلقائياً',
                     provider.autoConfirmedPatterns,
                     provider,
+                    isDark,
+                    theme,
                   ),
                   const SizedBox(height: 20),
                   _buildPatternSection(
@@ -42,6 +50,8 @@ class RoutineSettingsScreen extends StatelessWidget {
                     'قيد التعلم',
                     provider.learningPatterns,
                     provider,
+                    isDark,
+                    theme,
                   ),
                 ],
               ],
@@ -52,14 +62,15 @@ class RoutineSettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEnableSwitch(BuildContext context, RoutineProvider provider) {
+  Widget _buildEnableSwitch(
+      BuildContext context, RoutineProvider provider, bool isDark, ThemeData theme) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: AppColors.borderLight,
+          color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
           width: 1,
         ),
       ),
@@ -72,14 +83,14 @@ class RoutineSettingsScreen extends StatelessWidget {
               children: [
                 Text(
                   'يتعلم منك',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   'اكتشاف الأنماط المتكررة واقتراحها',
-                  style: Theme.of(context).textTheme.bodySmall,
+                  style: theme.textTheme.bodySmall,
                 ),
               ],
             ),
@@ -99,37 +110,42 @@ class RoutineSettingsScreen extends StatelessWidget {
     String title,
     List<RoutinePattern> patterns,
     RoutineProvider provider,
+    bool isDark,
+    ThemeData theme,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
-          style: Theme.of(context).textTheme.headlineSmall,
+          style: theme.textTheme.headlineSmall,
         ),
         const SizedBox(height: 12),
         if (patterns.isEmpty)
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: AppColors.surface,
+              color: isDark ? const Color(0xFF1E293B) : Colors.white,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: AppColors.borderLight,
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
                 width: 1,
               ),
             ),
             child: Center(
               child: Text(
                 'لا توجد أنماط',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textSecondary,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                      color: isDark
+                          ? const Color(0xFF94A3B8)
+                          : const Color(0xFF64748B),
                     ),
               ),
             ),
           )
         else
-          ...patterns.map((pattern) => _buildPatternTile(context, pattern, provider)),
+          ...patterns.map((pattern) =>
+              _buildPatternTile(context, pattern, provider, isDark, theme)),
       ],
     );
   }
@@ -138,15 +154,17 @@ class RoutineSettingsScreen extends StatelessWidget {
     BuildContext context,
     RoutinePattern pattern,
     RoutineProvider provider,
+    bool isDark,
+    ThemeData theme,
   ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.borderLight,
+          color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
           width: 1,
         ),
       ),
@@ -156,7 +174,9 @@ class RoutineSettingsScreen extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: AppColors.primarySurface,
+              color: isDark
+                  ? theme.colorScheme.primary.withOpacity(0.15)
+                  : const Color(0xFFECFDF5),
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Icon(
@@ -172,11 +192,11 @@ class RoutineSettingsScreen extends StatelessWidget {
               children: [
                 Text(
                   'نمط متكرر',
-                  style: Theme.of(context).textTheme.titleSmall,
+                  style: theme.textTheme.titleSmall,
                 ),
                 Text(
                   '${pattern.occurrenceCount} مرات',
-                  style: Theme.of(context).textTheme.bodySmall,
+                  style: theme.textTheme.bodySmall,
                 ),
               ],
             ),

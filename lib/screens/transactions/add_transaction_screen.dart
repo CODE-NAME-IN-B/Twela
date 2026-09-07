@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
-import '../../theme/app_colors.dart';
 import '../../providers/twela_provider.dart';
 import '../../models/transaction.dart';
 import '../../widgets/wallet_toggle.dart';
@@ -60,13 +59,23 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text(_type == TransactionType.expense ? 'إضافة صرف' : 'إضافة دخل'),
+        title: Text(
+          _type == TransactionType.expense ? 'إضافة صرف' : 'إضافة دخل',
+          style: TextStyle(color: theme.colorScheme.onSurface),
+        ),
         actions: [
           TextButton(
             onPressed: _saveTransaction,
-            child: const Text('حفظ'),
+            child: Text(
+              'حفظ',
+              style: TextStyle(color: theme.colorScheme.primary),
+            ),
           ),
         ],
       ),
@@ -75,19 +84,21 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildTypeSelector(),
+            _buildTypeSelector(theme, isDark),
             const SizedBox(height: 24),
             WalletToggle(
               selected: _walletType,
               onChanged: (type) => setState(() => _walletType = type),
             ),
             const SizedBox(height: 24),
-            _buildAmountField(),
+            _buildAmountField(theme, isDark),
             const SizedBox(height: 20),
             if (_type == TransactionType.expense) ...[
               Text(
                 'التصنيف',
-                style: Theme.of(context).textTheme.titleMedium,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: theme.colorScheme.onSurface,
+                ),
               ),
               const SizedBox(height: 12),
               CategoryPicker(
@@ -96,7 +107,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               ),
               const SizedBox(height: 20),
             ],
-            _buildNoteField(),
+            _buildNoteField(theme, isDark),
             const SizedBox(height: 32),
             SizedBox(
               width: double.infinity,
@@ -111,16 +122,17 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     );
   }
 
-  Widget _buildTypeSelector() {
+  Widget _buildTypeSelector(ThemeData theme, bool isDark) {
+    final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+    final secondaryColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: AppColors.background,
+        color: surfaceColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: AppColors.border,
-          width: 1,
-        ),
+        border: Border.all(color: borderColor, width: 1),
       ),
       child: Row(
         children: [
@@ -132,7 +144,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: _type == TransactionType.expense
-                      ? AppColors.danger
+                      ? const Color(0xFFE5484D)
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -143,7 +155,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       Icons.arrow_upward_rounded,
                       color: _type == TransactionType.expense
                           ? Colors.white
-                          : AppColors.textSecondary,
+                          : secondaryColor,
                       size: 18,
                     ),
                     const SizedBox(width: 6),
@@ -152,7 +164,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       style: TextStyle(
                         color: _type == TransactionType.expense
                             ? Colors.white
-                            : AppColors.textSecondary,
+                            : secondaryColor,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -169,7 +181,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: _type == TransactionType.income
-                      ? AppColors.success
+                      ? const Color(0xFF149C6D)
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -180,7 +192,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       Icons.arrow_downward_rounded,
                       color: _type == TransactionType.income
                           ? Colors.white
-                          : AppColors.textSecondary,
+                          : secondaryColor,
                       size: 18,
                     ),
                     const SizedBox(width: 6),
@@ -189,7 +201,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       style: TextStyle(
                         color: _type == TransactionType.income
                             ? Colors.white
-                            : AppColors.textSecondary,
+                            : secondaryColor,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -203,37 +215,41 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     );
   }
 
-  Widget _buildAmountField() {
+  Widget _buildAmountField(ThemeData theme, bool isDark) {
+    final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
+    final secondaryColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: surfaceColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.borderLight,
-          width: 1,
-        ),
+        border: Border.all(color: borderColor, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'المبلغ',
-            style: Theme.of(context).textTheme.titleMedium,
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: theme.colorScheme.onSurface,
+            ),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _amountController,
             keyboardType: TextInputType.number,
-            style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+            style: theme.textTheme.displaySmall?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: theme.colorScheme.onSurface,
+            ),
             decoration: InputDecoration(
               hintText: '0.00',
               suffixText: 'LYD',
-              suffixStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+              suffixStyle: theme.textTheme.titleMedium?.copyWith(
+                color: secondaryColor,
+              ),
               border: InputBorder.none,
               enabledBorder: InputBorder.none,
               focusedBorder: InputBorder.none,
@@ -245,32 +261,36 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     );
   }
 
-  Widget _buildNoteField() {
+  Widget _buildNoteField(ThemeData theme, bool isDark) {
+    final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
+    final secondaryColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: surfaceColor,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: AppColors.borderLight,
-          width: 1,
-        ),
+        border: Border.all(color: borderColor, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'ملاحظة (اختياري)',
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  color: AppColors.textSecondary,
-                ),
+            style: theme.textTheme.titleSmall?.copyWith(
+              color: secondaryColor,
+            ),
           ),
           const SizedBox(height: 8),
           TextField(
             controller: _noteController,
-            style: Theme.of(context).textTheme.bodyMedium,
-            decoration: const InputDecoration(
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurface,
+            ),
+            decoration: InputDecoration(
               hintText: 'أضف ملاحظة...',
+              hintStyle: TextStyle(color: secondaryColor),
               border: InputBorder.none,
               enabledBorder: InputBorder.none,
               focusedBorder: InputBorder.none,

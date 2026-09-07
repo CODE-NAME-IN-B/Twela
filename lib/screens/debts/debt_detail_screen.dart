@@ -41,7 +41,11 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(widget.debt.personName),
         actions: [
@@ -49,7 +53,9 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
             padding: const EdgeInsets.only(left: 16),
             child: Container(
               decoration: BoxDecoration(
-                color: AppColors.dangerSurface,
+                color: isDark
+                    ? const Color(0xFFE5484D).withOpacity(0.1)
+                    : const Color(0xFFFEF2F2),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: IconButton(
@@ -72,9 +78,9 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildDebtSummary(context, debt),
+                _buildDebtSummary(context, debt, isDark, theme),
                 const SizedBox(height: 24),
-                _buildPaymentSection(context, debt),
+                _buildPaymentSection(context, debt, isDark, theme),
               ],
             ),
           );
@@ -83,16 +89,17 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
     );
   }
 
-  Widget _buildDebtSummary(BuildContext context, Debt debt) {
+  Widget _buildDebtSummary(
+      BuildContext context, Debt debt, bool isDark, ThemeData theme) {
     final progress = debt.totalAmount > 0 ? debt.paidAmount / debt.totalAmount : 0.0;
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.borderLight,
+          color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
           width: 1,
         ),
       ),
@@ -105,7 +112,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
               Expanded(
                 child: Text(
                   debt.personName,
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  style: theme.textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
                 ),
@@ -114,8 +121,12 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
                   color: debt.isPaidOff
-                      ? AppColors.successSurface
-                      : AppColors.warningSurface,
+                      ? (isDark
+                          ? const Color(0xFF149C6D).withOpacity(0.1)
+                          : const Color(0xFFECFDF5))
+                      : (isDark
+                          ? const Color(0xFFF5A524).withOpacity(0.1)
+                          : const Color(0xFFFFFBEB)),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -132,8 +143,10 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
           const SizedBox(height: 8),
           Text(
             debt.itemDescription,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary,
+            style: theme.textTheme.bodyMedium?.copyWith(
+                  color: isDark
+                      ? const Color(0xFF94A3B8)
+                      : const Color(0xFF64748B),
                 ),
           ),
           const SizedBox(height: 24),
@@ -144,7 +157,9 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                   context,
                   'الإجمالي',
                   debt.totalAmount,
-                  AppColors.textPrimary,
+                  theme.colorScheme.onSurface,
+                  isDark,
+                  theme,
                 ),
               ),
               const SizedBox(width: 12),
@@ -154,6 +169,8 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                   'المدفوع',
                   debt.paidAmount,
                   AppColors.success,
+                  isDark,
+                  theme,
                 ),
               ),
               const SizedBox(width: 12),
@@ -163,6 +180,8 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                   'المتبقي',
                   debt.remaining,
                   AppColors.danger,
+                  isDark,
+                  theme,
                 ),
               ),
             ],
@@ -172,7 +191,8 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
               value: progress,
-              backgroundColor: AppColors.borderLight,
+              backgroundColor:
+                  isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
               valueColor: AlwaysStoppedAnimation<Color>(
                 debt.isPaidOff ? AppColors.success : AppColors.primary,
               ),
@@ -185,11 +205,11 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
             children: [
               Text(
                 '${(progress * 100).toStringAsFixed(0)}% مكتمل',
-                style: Theme.of(context).textTheme.bodySmall,
+                style: theme.textTheme.bodySmall,
               ),
               Text(
                 formatDate(debt.date),
-                style: Theme.of(context).textTheme.bodySmall,
+                style: theme.textTheme.bodySmall,
               ),
             ],
           ),
@@ -203,6 +223,8 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
     String label,
     double amount,
     Color color,
+    bool isDark,
+    ThemeData theme,
   ) {
     return Container(
       padding: const EdgeInsets.all(12),
@@ -214,14 +236,14 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
         children: [
           Text(
             label,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            style: theme.textTheme.bodySmall?.copyWith(
                   color: color,
                 ),
           ),
           const SizedBox(height: 4),
           Text(
             formatLydShort(amount),
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+            style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: color,
                 ),
@@ -231,12 +253,15 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
     );
   }
 
-  Widget _buildPaymentSection(BuildContext context, Debt debt) {
+  Widget _buildPaymentSection(
+      BuildContext context, Debt debt, bool isDark, ThemeData theme) {
     if (debt.isPaidOff) {
       return Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: AppColors.successSurface,
+          color: isDark
+              ? const Color(0xFF149C6D).withOpacity(0.1)
+              : const Color(0xFFECFDF5),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: AppColors.success.withOpacity(0.2),
@@ -250,7 +275,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
             const SizedBox(width: 8),
             Text(
               'تم سداد الدين بالكامل',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              style: theme.textTheme.titleMedium?.copyWith(
                     color: AppColors.success,
                     fontWeight: FontWeight.w600,
                   ),
@@ -263,10 +288,10 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: AppColors.borderLight,
+          color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
           width: 1,
         ),
       ),
@@ -275,7 +300,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
         children: [
           Text(
             'إضافة دفعة',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
           ),
@@ -286,7 +311,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                 child: TextField(
                   controller: _paymentController,
                   keyboardType: TextInputType.number,
-                  style: Theme.of(context).textTheme.bodyMedium,
+                  style: theme.textTheme.bodyMedium,
                   decoration: const InputDecoration(
                     hintText: 'المبلغ',
                     suffixText: 'LYD',

@@ -11,7 +11,11 @@ class StatsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('الإحصائيات'),
       ),
@@ -33,7 +37,9 @@ class StatsScreen extends StatelessWidget {
                       width: 80,
                       height: 80,
                       decoration: BoxDecoration(
-                        color: AppColors.primarySurface,
+                        color: isDark
+                            ? theme.colorScheme.primary.withOpacity(0.15)
+                            : const Color(0xFFECFDF5),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -45,13 +51,15 @@ class StatsScreen extends StatelessWidget {
                     const SizedBox(height: 20),
                     Text(
                       'لا توجد بيانات كافية',
-                      style: Theme.of(context).textTheme.headlineSmall,
+                      style: theme.textTheme.headlineSmall,
                     ),
                     const SizedBox(height: 8),
                     Text(
                       'ابدأ بتسجيل مصاريفك لرؤية الإحصائيات',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppColors.textSecondary,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                            color: isDark
+                                ? const Color(0xFF94A3B8)
+                                : const Color(0xFF64748B),
                           ),
                       textAlign: TextAlign.center,
                     ),
@@ -66,11 +74,13 @@ class StatsScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildMonthlySummary(context, provider),
+                _buildMonthlySummary(context, provider, isDark, theme),
                 const SizedBox(height: 20),
-                _buildCategoryChart(context, provider, expenses),
+                _buildCategoryChart(
+                    context, provider, expenses, isDark, theme),
                 const SizedBox(height: 20),
-                _buildTopCategories(context, provider, expenses),
+                _buildTopCategories(
+                    context, provider, expenses, isDark, theme),
               ],
             ),
           );
@@ -79,14 +89,15 @@ class StatsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMonthlySummary(BuildContext context, TwelaProvider provider) {
+  Widget _buildMonthlySummary(
+      BuildContext context, TwelaProvider provider, bool isDark, ThemeData theme) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.borderLight,
+          color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
           width: 1,
         ),
       ),
@@ -95,7 +106,7 @@ class StatsScreen extends StatelessWidget {
         children: [
           Text(
             'ملخص الشهر',
-            style: Theme.of(context).textTheme.headlineSmall,
+            style: theme.textTheme.headlineSmall,
           ),
           const SizedBox(height: 20),
           Row(
@@ -107,6 +118,8 @@ class StatsScreen extends StatelessWidget {
                   formatLyd(provider.totalBalance),
                   AppColors.primary,
                   Icons.account_balance_wallet_outlined,
+                  isDark,
+                  theme,
                 ),
               ),
               const SizedBox(width: 12),
@@ -117,6 +130,8 @@ class StatsScreen extends StatelessWidget {
                   formatLyd(provider.monthSpent),
                   AppColors.danger,
                   Icons.arrow_upward_rounded,
+                  isDark,
+                  theme,
                 ),
               ),
             ],
@@ -132,6 +147,8 @@ class StatsScreen extends StatelessWidget {
     String value,
     Color color,
     IconData icon,
+    bool isDark,
+    ThemeData theme,
   ) {
     return Container(
       padding: const EdgeInsets.all(14),
@@ -148,7 +165,7 @@ class StatsScreen extends StatelessWidget {
               const SizedBox(width: 6),
               Text(
                 label,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                style: theme.textTheme.bodySmall?.copyWith(
                       color: color,
                     ),
               ),
@@ -157,7 +174,7 @@ class StatsScreen extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             value,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+            style: theme.textTheme.headlineSmall?.copyWith(
                   color: color,
                   fontWeight: FontWeight.w700,
                 ),
@@ -172,6 +189,8 @@ class StatsScreen extends StatelessWidget {
     BuildContext context,
     TwelaProvider provider,
     List<TwelaTransaction> expenses,
+    bool isDark,
+    ThemeData theme,
   ) {
     final categorySpending = <String, double>{};
     for (final expense in expenses) {
@@ -184,10 +203,10 @@ class StatsScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.borderLight,
+          color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
           width: 1,
         ),
       ),
@@ -196,7 +215,7 @@ class StatsScreen extends StatelessWidget {
         children: [
           Text(
             'التوزيع حسب التصنيف',
-            style: Theme.of(context).textTheme.headlineSmall,
+            style: theme.textTheme.headlineSmall,
           ),
           const SizedBox(height: 20),
           SizedBox(
@@ -205,11 +224,15 @@ class StatsScreen extends StatelessWidget {
               PieChartData(
                 sections: categorySpending.entries.map((entry) {
                   final category = provider.getCategoryById(entry.key);
-                  final percentage = totalSpent > 0 ? entry.value / totalSpent : 0.0;
+                  final percentage =
+                      totalSpent > 0 ? entry.value / totalSpent : 0.0;
 
                   return PieChartSectionData(
                     value: entry.value,
-                    color: category?.color ?? AppColors.textTertiary,
+                    color: category?.color ??
+                        (isDark
+                            ? const Color(0xFF64748B)
+                            : const Color(0xFF94A3B8)),
                     radius: 90,
                     title: '${(percentage * 100).toStringAsFixed(0)}%',
                     titleStyle: const TextStyle(
@@ -237,14 +260,17 @@ class StatsScreen extends StatelessWidget {
                     width: 10,
                     height: 10,
                     decoration: BoxDecoration(
-                      color: category?.color ?? AppColors.textTertiary,
+                      color: category?.color ??
+                          (isDark
+                              ? const Color(0xFF64748B)
+                              : const Color(0xFF94A3B8)),
                       shape: BoxShape.circle,
                     ),
                   ),
                   const SizedBox(width: 6),
                   Text(
                     category?.name ?? 'غير معروف',
-                    style: Theme.of(context).textTheme.bodySmall,
+                    style: theme.textTheme.bodySmall,
                   ),
                 ],
               );
@@ -259,6 +285,8 @@ class StatsScreen extends StatelessWidget {
     BuildContext context,
     TwelaProvider provider,
     List<TwelaTransaction> expenses,
+    bool isDark,
+    ThemeData theme,
   ) {
     final categorySpending = <String, double>{};
     for (final expense in expenses) {
@@ -272,10 +300,10 @@ class StatsScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.borderLight,
+          color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
           width: 1,
         ),
       ),
@@ -284,7 +312,7 @@ class StatsScreen extends StatelessWidget {
         children: [
           Text(
             'أكبر المصروفات',
-            style: Theme.of(context).textTheme.headlineSmall,
+            style: theme.textTheme.headlineSmall,
           ),
           const SizedBox(height: 16),
           ...sortedCategories.take(5).map((entry) {
@@ -293,7 +321,7 @@ class StatsScreen extends StatelessWidget {
               margin: const EdgeInsets.only(bottom: 8),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.background,
+                color: theme.scaffoldBackgroundColor,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Row(
@@ -302,12 +330,19 @@ class StatsScreen extends StatelessWidget {
                     width: 36,
                     height: 36,
                     decoration: BoxDecoration(
-                      color: (category?.color ?? AppColors.textTertiary).withOpacity(0.1),
+                      color: (category?.color ??
+                              (isDark
+                                  ? const Color(0xFF64748B)
+                                  : const Color(0xFF94A3B8)))
+                          .withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
                       category?.icon ?? Icons.category_outlined,
-                      color: category?.color ?? AppColors.textTertiary,
+                      color: category?.color ??
+                          (isDark
+                              ? const Color(0xFF64748B)
+                              : const Color(0xFF94A3B8)),
                       size: 18,
                     ),
                   ),
@@ -315,12 +350,12 @@ class StatsScreen extends StatelessWidget {
                   Expanded(
                     child: Text(
                       category?.name ?? 'غير معروف',
-                      style: Theme.of(context).textTheme.titleSmall,
+                      style: theme.textTheme.titleSmall,
                     ),
                   ),
                   Text(
                     formatLyd(entry.value),
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    style: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w700,
                         ),
                   ),

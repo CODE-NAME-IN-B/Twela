@@ -1,8 +1,12 @@
-import 'dart:convert';
+import 'dart:async';
+import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:open_filex/open_filex.dart';
 
 class UpdateInfo {
   final String version;
@@ -81,11 +85,40 @@ class UpdateService {
     return false;
   }
 
-  static Future<void> downloadAndInstall(UpdateInfo updateInfo) async {
+  static Future<void> downloadAndInstall(
+    UpdateInfo updateInfo,
+    BuildContext context, {
+    Function(double progress, String status)? onProgress,
+  }) async {
     if (updateInfo.downloadUrl.isEmpty) return;
-    final uri = Uri.parse(updateInfo.downloadUrl);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+
+    try {
+      final dir = await getTemporaryDirectory();
+      final filePath = '${dir.path}/twela_update.apk';
+      final file = File(filePath);
+
+      final dio = Dio();
+
+      await dio.download(
+        updateInfo.downloadUrl,
+        filePath,
+        onReceiveProgress: (received, total) {
+          if (total > 0) {
+            final progress = received / total;
+            final percentage = (progress * 100).toStringAsFixed(0);
+            onProgress?.call(progress, 'جاري التحميل... $percentage%');
+          }
+        },
+      );
+
+      onProgress?.call(1.0, 'جاري التثبيت...');
+
+      final result = await OpenFilex.open(filePath);
+      if (result.type != ResultType.done) {
+        debugPrint('Error opening APK: ${result.message}');
+      }
+    } catch (e) {
+      debugPrint('Error downloading update: $e');
     }
   }
 }

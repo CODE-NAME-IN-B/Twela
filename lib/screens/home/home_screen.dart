@@ -44,57 +44,124 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildHeader(BuildContext context, ThemeData theme, bool isDark) {
+    final logoAsset = isDark ? 'assets/logo/twela_logo_mono.png' : 'assets/logo/twela_logo.png';
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        Row(
           children: [
-            Text(
-              _getGreeting(),
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: isDark
+                    ? theme.colorScheme.primary.withOpacity(0.1)
+                    : const Color(0xFFECFDF5),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.asset(
+                  logoAsset,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Icon(
+                      Icons.account_balance_wallet_outlined,
+                      color: theme.colorScheme.primary,
+                      size: 22,
+                    );
+                  },
+                ),
               ),
             ),
-            const SizedBox(height: 4),
-            Text(
-              'Twela',
-              style: theme.textTheme.headlineLarge?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: theme.colorScheme.onSurface,
-              ),
+            const SizedBox(width: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _getGreeting(),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Twela',
+                  style: theme.textTheme.headlineLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
-        Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            color: isDark
-                ? theme.colorScheme.primary.withOpacity(0.15)
-                : const Color(0xFFECFDF5),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(
-            Icons.notifications_outlined,
-            color: theme.colorScheme.primary,
-            size: 22,
-          ),
-        ),
+        _buildNotificationButton(context, theme, isDark),
       ],
     );
   }
 
   String _getGreeting() {
     final hour = DateTime.now().hour;
-    if (hour < 12) return 'صباح الخير';
-    if (hour < 17) return 'مساء الخير';
-    return 'مساء الخير';
+    final minute = DateTime.now().minute;
+
+    if (hour >= 5 && hour < 7) {
+      return 'الفجر يناديك ☀️';
+    } else if (hour >= 7 && hour < 12) {
+      return 'صباح النشاط 💪';
+    } else if (hour >= 12 && hour < 14) {
+      return 'ظهيرة مثالية ☀️';
+    } else if (hour >= 14 && hour < 17) {
+      return 'مساء اله쉘 🌤️';
+    } else if (hour >= 17 && hour < 19) {
+      return 'وقت الراحة 🌅';
+    } else if (hour >= 19 && hour < 22) {
+      return 'مساء جميل 🌙';
+    } else {
+      return 'مساء الخير ✨';
+    }
+  }
+
+  Widget _buildNotificationButton(BuildContext context, ThemeData theme, bool isDark) {
+    return GestureDetector(
+      onTap: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'لا توجد إشعارات جديدة',
+              style: TextStyle(
+                color: isDark ? const Color(0xFFF1F5F9) : Colors.white,
+              ),
+            ),
+            backgroundColor: isDark ? const Color(0xFF334155) : const Color(0xFF334155),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        );
+      },
+      child: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: isDark
+              ? theme.colorScheme.primary.withOpacity(0.15)
+              : const Color(0xFFECFDF5),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Icon(
+          Icons.notifications_outlined,
+          color: theme.colorScheme.primary,
+          size: 22,
+        ),
+      ),
+    );
   }
 
   Widget _buildWalletCards(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return Consumer<TwelaProvider>(
       builder: (context, provider, _) {
@@ -213,9 +280,6 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildQuickActions(BuildContext context, ThemeData theme, bool isDark) {
-    final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

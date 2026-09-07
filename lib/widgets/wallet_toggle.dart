@@ -14,13 +14,16 @@ class WalletToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: AppColors.background,
+        color: theme.scaffoldBackgroundColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.border,
+          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
           width: 1,
         ),
       ),
@@ -45,7 +48,9 @@ class WalletToggle extends StatelessWidget {
                       Icons.money_outlined,
                       color: selected == WalletType.cash
                           ? Colors.white
-                          : AppColors.textSecondary,
+                          : (isDark
+                              ? const Color(0xFF94A3B8)
+                              : const Color(0xFF64748B)),
                       size: 18,
                     ),
                     const SizedBox(width: 6),
@@ -54,7 +59,9 @@ class WalletToggle extends StatelessWidget {
                       style: TextStyle(
                         color: selected == WalletType.cash
                             ? Colors.white
-                            : AppColors.textSecondary,
+                            : (isDark
+                                ? const Color(0xFF94A3B8)
+                                : const Color(0xFF64748B)),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -82,7 +89,9 @@ class WalletToggle extends StatelessWidget {
                       Icons.account_balance_outlined,
                       color: selected == WalletType.bank
                           ? Colors.white
-                          : AppColors.textSecondary,
+                          : (isDark
+                              ? const Color(0xFF94A3B8)
+                              : const Color(0xFF64748B)),
                       size: 18,
                     ),
                     const SizedBox(width: 6),
@@ -91,7 +100,9 @@ class WalletToggle extends StatelessWidget {
                       style: TextStyle(
                         color: selected == WalletType.bank
                             ? Colors.white
-                            : AppColors.textSecondary,
+                            : (isDark
+                                ? const Color(0xFF94A3B8)
+                                : const Color(0xFF64748B)),
                         fontWeight: FontWeight.w600,
                       ),
                     ),

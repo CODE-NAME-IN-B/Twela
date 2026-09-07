@@ -9,7 +9,11 @@ class HistoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('السجل'),
       ),
@@ -28,7 +32,9 @@ class HistoryScreen extends StatelessWidget {
                       width: 80,
                       height: 80,
                       decoration: BoxDecoration(
-                        color: AppColors.primarySurface,
+                        color: isDark
+                            ? theme.colorScheme.primary.withOpacity(0.15)
+                            : const Color(0xFFECFDF5),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -40,13 +46,15 @@ class HistoryScreen extends StatelessWidget {
                     const SizedBox(height: 20),
                     Text(
                       'لا توجد حركات بعد',
-                      style: Theme.of(context).textTheme.headlineSmall,
+                      style: theme.textTheme.headlineSmall,
                     ),
                     const SizedBox(height: 8),
                     Text(
                       'ابدأ بتسجيل أول صرف أو دخل',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppColors.textSecondary,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                            color: isDark
+                                ? const Color(0xFF94A3B8)
+                                : const Color(0xFF64748B),
                           ),
                       textAlign: TextAlign.center,
                     ),
