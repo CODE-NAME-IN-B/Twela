@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:share_plus/share_plus.dart';
+import 'dart:convert';
 import 'dart:io';
 import '../../theme/app_colors.dart';
 import '../../services/storage_service.dart';
@@ -242,19 +243,18 @@ class _DataExportScreenState extends State<DataExportScreen> {
     try {
       final storage = context.read<StorageService>();
       final jsonStr = await DataExportService.exportToJson(storage);
-      final file = await DataExportService.saveExportToFile(jsonStr);
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final bytes = Uint8List.fromList(utf8.encode(jsonStr));
 
-      if (mounted) {
+      final savedPath = await FilePicker.platform.saveFile(
+        dialogTitle: 'اختر مكان حفظ النسخة الاحتياطية',
+        fileName: 'twela_backup_$timestamp.json',
+        bytes: bytes,
+      );
+
+      if (savedPath != null && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('تم التصدير: ${file.path.split('/').last}'),
-            action: SnackBarAction(
-              label: 'فتح',
-              onPressed: () async {
-                await Share.shareXFiles([XFile(file.path)]);
-              },
-            ),
-          ),
+          SnackBar(content: Text('تم الحفظ: $savedPath')),
         );
       }
     } catch (e) {

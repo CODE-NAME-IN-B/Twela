@@ -77,31 +77,84 @@ class _MainScreenState extends State<MainScreen> {
   final _screens = const [
     HomeScreen(),
     HistoryScreen(),
-    SizedBox(),
     DebtsScreen(),
+    StatsScreen(),
     SettingsScreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primaryColor = theme.colorScheme.primary;
+
     return Scaffold(
       body: _screens[_currentIndex],
-      bottomNavigationBar: _BottomNavBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          if (index == 2) {
-            _showActionSheet(context);
-          } else {
-            setState(() {
-              _currentIndex = index > 2 ? index : index;
-            });
-          }
-        },
+      bottomNavigationBar: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface,
+              border: Border(
+                top: BorderSide(
+                  color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                  width: 1,
+                ),
+              ),
+            ),
+            child: SafeArea(
+              child: SizedBox(
+                height: 64,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildItem(context, 0, Icons.home_outlined, Icons.home, 'الرئيسية', primaryColor, isDark),
+                    _buildItem(context, 1, Icons.receipt_long_outlined, Icons.receipt_long, 'السجل', primaryColor, isDark),
+                    _buildItem(context, 2, Icons.people_outline, Icons.people, 'الديون', primaryColor, isDark),
+                    _buildItem(context, 3, Icons.bar_chart_outlined, Icons.bar_chart, 'الإحصائيات', primaryColor, isDark),
+                    _buildItem(context, 4, Icons.settings_outlined, Icons.settings, 'الإعدادات', primaryColor, isDark),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: -24,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: GestureDetector(
+                onTap: _showActionSheet,
+                child: Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: primaryColor,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: primaryColor.withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.add,
+                    color: Colors.white,
+                    size: 28,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  void _showActionSheet(BuildContext context) {
+  void _showActionSheet() {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
@@ -190,6 +243,56 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
+  Widget _buildItem(
+    BuildContext context,
+    int index,
+    IconData icon,
+    IconData activeIcon,
+    String label,
+    Color primaryColor,
+    bool isDark,
+  ) {
+    final isSelected = _currentIndex == index;
+    final tertiaryColor = isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8);
+
+    return GestureDetector(
+      onTap: () => setState(() => _currentIndex = index),
+      behavior: HitTestBehavior.opaque,
+      child: SizedBox(
+        width: 64,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? primaryColor.withOpacity(isDark ? 0.15 : 0.08)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                isSelected ? activeIcon : icon,
+                color: isSelected ? primaryColor : tertiaryColor,
+                size: 22,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                color: isSelected ? primaryColor : tertiaryColor,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildActionItem(
     BuildContext context, {
     required IconData icon,
@@ -229,143 +332,6 @@ class _MainScreenState extends State<MainScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _BottomNavBar extends StatelessWidget {
-  final int currentIndex;
-  final ValueChanged<int> onTap;
-
-  const _BottomNavBar({
-    required this.currentIndex,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final primaryColor = theme.colorScheme.primary;
-    final surfaceColor = theme.colorScheme.surface;
-    final tertiaryColor = isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8);
-
-    return Container(
-      decoration: BoxDecoration(
-        color: surfaceColor,
-        border: Border(
-          top: BorderSide(
-            color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
-            width: 1,
-          ),
-        ),
-      ),
-      child: SafeArea(
-        child: SizedBox(
-          height: 64,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildItem(context, 0, Icons.home_outlined, Icons.home, 'الرئيسية', primaryColor, tertiaryColor, isDark),
-              _buildItem(context, 1, Icons.receipt_long_outlined, Icons.receipt_long, 'السجل', primaryColor, tertiaryColor, isDark),
-              _buildCenterAdd(context, primaryColor, isDark),
-              _buildItem(context, 3, Icons.people_outline, Icons.people, 'الديون', primaryColor, tertiaryColor, isDark),
-              _buildItem(context, 4, Icons.settings_outlined, Icons.settings, 'الإعدادات', primaryColor, tertiaryColor, isDark),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildItem(
-    BuildContext context,
-    int index,
-    IconData icon,
-    IconData activeIcon,
-    String label,
-    Color primaryColor,
-    Color tertiaryColor,
-    bool isDark,
-  ) {
-    final isSelected = currentIndex == index;
-
-    return GestureDetector(
-      onTap: () => onTap(index),
-      behavior: HitTestBehavior.opaque,
-      child: SizedBox(
-        width: 64,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? primaryColor.withOpacity(isDark ? 0.15 : 0.08)
-                    : Colors.transparent,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(
-                isSelected ? activeIcon : icon,
-                color: isSelected ? primaryColor : tertiaryColor,
-                size: 22,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected ? primaryColor : tertiaryColor,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCenterAdd(BuildContext context, Color primaryColor, bool isDark) {
-    return GestureDetector(
-      onTap: () => onTap(2),
-      behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: primaryColor,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: primaryColor.withOpacity(0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: const Icon(
-              Icons.add,
-              color: Colors.white,
-              size: 26,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'إضافة',
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-              color: primaryColor,
-            ),
-          ),
-        ],
       ),
     );
   }

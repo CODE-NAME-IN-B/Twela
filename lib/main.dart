@@ -24,9 +24,17 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         Provider.value(value: storageService),
         ChangeNotifierProvider(create: (_) => TwelaProvider(storageService)),
-        ChangeNotifierProvider(create: (_) => DebtProvider(storageService)),
+        ChangeNotifierProxyProvider<TwelaProvider, DebtProvider>(
+          create: (_) => DebtProvider(storageService),
+          update: (_, twelaProvider, debtProvider) =>
+              debtProvider!..attachLedger(twelaProvider),
+        ),
         ChangeNotifierProvider(create: (_) => RoutineProvider(storageService)),
-        ChangeNotifierProvider(create: (_) => SavingsProvider(storageService)),
+        ChangeNotifierProxyProvider<TwelaProvider, SavingsProvider>(
+          create: (_) => SavingsProvider(storageService),
+          update: (_, twelaProvider, savingsProvider) =>
+              savingsProvider!..attachLedger(twelaProvider),
+        ),
         ChangeNotifierProvider(create: (_) => PersonProvider(storageService)),
       ],
       child: const TwelaApp(),

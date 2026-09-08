@@ -46,7 +46,19 @@ class TwelaProvider extends ChangeNotifier {
     final expense = _transactions
         .where((t) => t.type == TransactionType.expense && t.walletType == WalletType.cash)
         .fold(0.0, (sum, t) => sum + t.amount);
-    return _walletSettings.initialCashBalance + income - expense;
+    final debtGiven = _transactions
+        .where((t) => t.type == TransactionType.debtGiven && t.walletType == WalletType.cash)
+        .fold(0.0, (sum, t) => sum + t.amount);
+    final debtReceived = _transactions
+        .where((t) => t.type == TransactionType.debtReceived && t.walletType == WalletType.cash)
+        .fold(0.0, (sum, t) => sum + t.amount);
+    final debtPayment = _transactions
+        .where((t) => t.type == TransactionType.debtPayment && t.walletType == WalletType.cash)
+        .fold(0.0, (sum, t) => sum + t.amount);
+    final savings = _transactions
+        .where((t) => t.type == TransactionType.savings && t.walletType == WalletType.cash)
+        .fold(0.0, (sum, t) => sum + t.amount);
+    return _walletSettings.initialCashBalance + income - expense - debtGiven + debtReceived - debtPayment - savings;
   }
 
   double get bankBalance {
@@ -56,7 +68,19 @@ class TwelaProvider extends ChangeNotifier {
     final expense = _transactions
         .where((t) => t.type == TransactionType.expense && t.walletType == WalletType.bank)
         .fold(0.0, (sum, t) => sum + t.amount);
-    return _walletSettings.initialBankBalance + income - expense;
+    final debtGiven = _transactions
+        .where((t) => t.type == TransactionType.debtGiven && t.walletType == WalletType.bank)
+        .fold(0.0, (sum, t) => sum + t.amount);
+    final debtReceived = _transactions
+        .where((t) => t.type == TransactionType.debtReceived && t.walletType == WalletType.bank)
+        .fold(0.0, (sum, t) => sum + t.amount);
+    final debtPayment = _transactions
+        .where((t) => t.type == TransactionType.debtPayment && t.walletType == WalletType.bank)
+        .fold(0.0, (sum, t) => sum + t.amount);
+    final savings = _transactions
+        .where((t) => t.type == TransactionType.savings && t.walletType == WalletType.bank)
+        .fold(0.0, (sum, t) => sum + t.amount);
+    return _walletSettings.initialBankBalance + income - expense - debtGiven + debtReceived - debtPayment - savings;
   }
 
   double get totalBalance => cashBalance + bankBalance;

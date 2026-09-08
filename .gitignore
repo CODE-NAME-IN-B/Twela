@@ -63,3 +63,7 @@ app.*.map.json
 
 # Build
 build/
+
+# Signing
+*.jks
+key.properties

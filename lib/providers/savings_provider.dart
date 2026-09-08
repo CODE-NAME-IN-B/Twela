@@ -1,18 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 import '../models/savings_goal.dart';
 import '../models/savings_entry.dart';
+import '../models/transaction.dart';
+import '../providers/twela_provider.dart';
 import '../services/storage_service.dart';
 
 class SavingsProvider extends ChangeNotifier {
   final StorageService _storage;
+  static const _uuid = Uuid();
 
   List<SavingsGoal> _goals = [];
   List<SavingsEntry> _entries = [];
+  TwelaProvider? _ledger;
 
   SavingsProvider(this._storage) {
     _goals = _storage.getSavingsGoals();
     _entries = _storage.getSavingsEntries();
   }
+
+  void attachLedger(TwelaProvider ledger) => _ledger = ledger;
 
   List<SavingsGoal> get goals => _goals;
   List<SavingsEntry> get entries => _entries;
@@ -70,6 +77,18 @@ class SavingsProvider extends ChangeNotifier {
       );
       await _storage.saveSavingsGoals(_goals);
     }
+
+    // Record savings transaction on the balance
+    await _ledger?.addTransaction(TwelaTransaction(
+      id: _uuid.v4(),
+      amount: entry.amount,
+      type: TransactionType.savings,
+      walletType: WalletType.cash,
+      categoryId: '',
+      note: 'ادخار: ${_goals.firstWhere((g) => g.id == entry.savingsGoalId, orElse: () => _goals.first).name}',
+      date: entry.date,
+      relatedId: entry.savingsGoalId,
+    ));
 
     notifyListeners();
   }
