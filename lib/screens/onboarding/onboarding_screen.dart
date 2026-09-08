@@ -6,6 +6,7 @@ import '../../services/storage_service.dart';
 import '../../services/notification_service.dart';
 import '../../models/wallet_settings.dart';
 import '../../utils/formatters.dart';
+import '../../utils/motivational_messages.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -84,6 +85,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Widget _buildWelcomePage(ThemeData theme, bool isDark) {
+    final message = getRandomMotivationalMessage();
+
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -97,6 +100,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ? theme.colorScheme.primary.withOpacity(0.1)
                   : const Color(0xFFECFDF5),
               shape: BoxShape.circle,
+              border: Border.all(
+                color: theme.colorScheme.primary.withOpacity(0.15),
+                width: 1,
+              ),
             ),
             child: ClipOval(
               child: Padding(
@@ -124,6 +131,29 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
             ),
             textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 24),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: isDark
+                  ? theme.colorScheme.primary.withOpacity(0.06)
+                  : theme.colorScheme.primary.withOpacity(0.04),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: theme.colorScheme.primary.withOpacity(0.12),
+                width: 1,
+              ),
+            ),
+            child: Text(
+              message,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                fontStyle: FontStyle.italic,
+              ),
+              textAlign: TextAlign.center,
+            ),
           ),
           const Spacer(),
           SizedBox(

@@ -37,6 +37,9 @@ class _BalanceCardState extends State<BalanceCard>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Consumer<TwelaProvider>(
       builder: (context, provider, _) {
         return GestureDetector(
@@ -58,15 +61,17 @@ class _BalanceCardState extends State<BalanceCard>
               width: double.infinity,
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                gradient: AppColors.primaryGradient,
+                color: isDark
+                    ? AppColors.darkSurface.withOpacity(0.5)
+                    : Colors.white.withOpacity(0.6),
                 borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primary.withOpacity(0.25),
-                    blurRadius: 16,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
+                border: Border.all(
+                  color: isDark
+                      ? AppColors.darkBorder.withOpacity(0.6)
+                      : AppColors.border.withOpacity(0.8),
+                  width: 1,
+                  strokeAlign: BorderSide.strokeAlignInside,
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,34 +81,43 @@ class _BalanceCardState extends State<BalanceCard>
                     children: [
                       Text(
                         'الرصيد الإجمالي',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Colors.white.withOpacity(0.8),
-                            ),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.textSecondary,
+                        ),
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.15),
+                          color: isDark
+                              ? AppColors.primary.withOpacity(0.1)
+                              : AppColors.primary.withOpacity(0.08),
                           borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: AppColors.primary.withOpacity(0.2),
+                            width: 1,
+                          ),
                         ),
                         child: Row(
                           children: [
                             Icon(
                               Icons.visibility_outlined,
-                              color: Colors.white.withOpacity(0.9),
+                              color: isDark
+                                  ? AppColors.darkTextSecondary
+                                  : AppColors.textSecondary,
                               size: 14,
                             ),
                             const SizedBox(width: 4),
                             Text(
                               'د.ل',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .labelSmall
-                                  ?.copyWith(
-                                    color: Colors.white.withOpacity(0.9),
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors.textSecondary,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ],
                         ),
@@ -113,10 +127,12 @@ class _BalanceCardState extends State<BalanceCard>
                   const SizedBox(height: 16),
                   Text(
                     formatLyd(provider.totalBalance),
-                    style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                        ),
+                    style: theme.textTheme.displayMedium?.copyWith(
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.textPrimary,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                   const SizedBox(height: 20),
                   AnimatedSize(
@@ -125,7 +141,7 @@ class _BalanceCardState extends State<BalanceCard>
                     child: _isExpanded
                         ? Column(
                             children: [
-                              _buildExpandedStats(context, provider),
+                              _buildExpandedStats(context, provider, isDark),
                               const SizedBox(height: 16),
                             ],
                           )
@@ -138,6 +154,7 @@ class _BalanceCardState extends State<BalanceCard>
                         'اليوم',
                         formatLyd(provider.todaySpent),
                         Icons.today_outlined,
+                        isDark,
                       ),
                       const SizedBox(width: 16),
                       _buildMiniStat(
@@ -145,6 +162,7 @@ class _BalanceCardState extends State<BalanceCard>
                         'الشهر',
                         formatLyd(provider.monthSpent),
                         Icons.calendar_month_outlined,
+                        isDark,
                       ),
                     ],
                   ),
@@ -157,37 +175,53 @@ class _BalanceCardState extends State<BalanceCard>
     );
   }
 
-  Widget _buildExpandedStats(BuildContext context, TwelaProvider provider) {
+  Widget _buildExpandedStats(
+      BuildContext context, TwelaProvider provider, bool isDark) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: isDark
+            ? AppColors.darkBorder.withOpacity(0.3)
+            : AppColors.borderLight.withOpacity(0.5),
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark
+              ? AppColors.darkBorder.withOpacity(0.5)
+              : AppColors.border.withOpacity(0.5),
+          width: 1,
+        ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildStatItem(context, 'كاش', formatLyd(provider.cashBalance)),
-          _buildStatItem(context, 'مصرف', formatLyd(provider.bankBalance)),
+          _buildStatItem(
+              context, 'كاش', formatLyd(provider.cashBalance), isDark),
+          _buildStatItem(
+              context, 'مصرف', formatLyd(provider.bankBalance), isDark),
         ],
       ),
     );
   }
 
-  Widget _buildStatItem(BuildContext context, String label, String value) {
+  Widget _buildStatItem(
+      BuildContext context, String label, String value, bool isDark) {
     return Column(
       children: [
         Text(
           label,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.white.withOpacity(0.7),
+                color: isDark
+                    ? AppColors.darkTextTertiary
+                    : AppColors.textTertiary,
               ),
         ),
         const SizedBox(height: 4),
         Text(
           value,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: Colors.white,
+                color: isDark
+                    ? AppColors.darkTextPrimary
+                    : AppColors.textPrimary,
                 fontWeight: FontWeight.w600,
               ),
         ),
@@ -200,19 +234,30 @@ class _BalanceCardState extends State<BalanceCard>
     String label,
     String value,
     IconData icon,
+    bool isDark,
   ) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.1),
+          color: isDark
+              ? AppColors.darkBorder.withOpacity(0.3)
+              : AppColors.borderLight.withOpacity(0.5),
           borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isDark
+                ? AppColors.darkBorder.withOpacity(0.4)
+                : AppColors.border.withOpacity(0.4),
+            width: 1,
+          ),
         ),
         child: Row(
           children: [
             Icon(
               icon,
-              color: Colors.white.withOpacity(0.7),
+              color: isDark
+                  ? AppColors.darkTextTertiary
+                  : AppColors.textTertiary,
               size: 16,
             ),
             const SizedBox(width: 8),
@@ -223,7 +268,9 @@ class _BalanceCardState extends State<BalanceCard>
                   Text(
                     label,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.white.withOpacity(0.7),
+                          color: isDark
+                              ? AppColors.darkTextTertiary
+                              : AppColors.textTertiary,
                           fontSize: 11,
                         ),
                   ),
@@ -231,7 +278,9 @@ class _BalanceCardState extends State<BalanceCard>
                   Text(
                     value,
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          color: Colors.white,
+                          color: isDark
+                              ? AppColors.darkTextPrimary
+                              : AppColors.textPrimary,
                           fontWeight: FontWeight.w600,
                         ),
                     overflow: TextOverflow.ellipsis,

@@ -118,7 +118,7 @@ class AppTheme {
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: AppColors.borderLight, width: 1),
+          side: const BorderSide(color: AppColors.border, width: 1),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(

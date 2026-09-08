@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/routine_pattern.dart';
 import '../services/storage_service.dart';
 import '../services/routine_detection_service.dart';
@@ -7,12 +8,20 @@ import '../services/routine_detection_service.dart';
 class RoutineProvider extends ChangeNotifier {
   final StorageService _storage;
   static const _uuid = Uuid();
+  static const _isEnabledKey = 'routine_is_enabled';
 
   List<RoutinePattern> _patterns = [];
   bool _isEnabled = true;
 
   RoutineProvider(this._storage) {
     _patterns = _storage.getPatterns();
+    _loadIsEnabled();
+  }
+
+  Future<void> _loadIsEnabled() async {
+    final prefs = await SharedPreferences.getInstance();
+    _isEnabled = prefs.getBool(_isEnabledKey) ?? true;
+    notifyListeners();
   }
 
   List<RoutinePattern> get patterns => _patterns;
@@ -40,8 +49,10 @@ class RoutineProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void toggleEnabled() {
+  Future<void> toggleEnabled() async {
     _isEnabled = !_isEnabled;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_isEnabledKey, _isEnabled);
     notifyListeners();
   }
 }

@@ -5,9 +5,23 @@ import '../../widgets/balance_card.dart';
 import '../../widgets/wallet_mini_card.dart';
 import '../../widgets/limit_progress_bar.dart';
 import '../../utils/formatters.dart';
+import '../../utils/motivational_messages.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  late final String _motivationalMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _motivationalMessage = getRandomMotivationalMessage();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +41,8 @@ class HomeScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildHeader(context, theme, isDark),
+                const SizedBox(height: 6),
+                _buildMotivationalMessage(context, theme, isDark),
                 const SizedBox(height: 24),
                 const BalanceCard(),
                 const SizedBox(height: 20),
@@ -59,6 +75,10 @@ class HomeScreen extends StatelessWidget {
                     ? theme.colorScheme.primary.withOpacity(0.1)
                     : const Color(0xFFECFDF5),
                 borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: theme.colorScheme.primary.withOpacity(0.15),
+                  width: 1,
+                ),
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10),
@@ -102,24 +122,49 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildMotivationalMessage(BuildContext context, ThemeData theme, bool isDark) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: isDark
+            ? theme.colorScheme.primary.withOpacity(0.06)
+            : theme.colorScheme.primary.withOpacity(0.04),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: theme.colorScheme.primary.withOpacity(0.12),
+          width: 1,
+        ),
+      ),
+      child: Text(
+        _motivationalMessage,
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+          fontStyle: FontStyle.italic,
+          height: 1.4,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
   String _getGreeting() {
     final hour = DateTime.now().hour;
-    final minute = DateTime.now().minute;
 
     if (hour >= 5 && hour < 7) {
-      return 'الفجر يناديك ☀️';
+      return 'الفجر يناديك';
     } else if (hour >= 7 && hour < 12) {
-      return 'صباح النشاط 💪';
+      return 'صباح النشاط';
     } else if (hour >= 12 && hour < 14) {
-      return 'ظهيرة مثالية ☀️';
+      return 'ظهيرة مثالية';
     } else if (hour >= 14 && hour < 17) {
-      return 'مساء اله쉘 🌤️';
+      return 'مساء النشاط';
     } else if (hour >= 17 && hour < 19) {
-      return 'وقت الراحة 🌅';
+      return 'وقت الراحة';
     } else if (hour >= 19 && hour < 22) {
-      return 'مساء جميل 🌙';
+      return 'مساء جميل';
     } else {
-      return 'مساء الخير ✨';
+      return 'مساء الخير';
     }
   }
 
@@ -147,9 +192,13 @@ class HomeScreen extends StatelessWidget {
         height: 44,
         decoration: BoxDecoration(
           color: isDark
-              ? theme.colorScheme.primary.withOpacity(0.15)
+              ? theme.colorScheme.primary.withOpacity(0.1)
               : const Color(0xFFECFDF5),
           borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: theme.colorScheme.primary.withOpacity(0.12),
+            width: 1,
+          ),
         ),
         child: Icon(
           Icons.notifications_outlined,
@@ -221,6 +270,10 @@ class HomeScreen extends StatelessWidget {
                               ? theme.colorScheme.primary.withOpacity(0.15)
                               : const Color(0xFFECFDF5),
                           borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: theme.colorScheme.primary.withOpacity(0.12),
+                            width: 1,
+                          ),
                         ),
                         child: Icon(
                           Icons.receipt_long_outlined,
@@ -355,6 +408,10 @@ class HomeScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: color.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: color.withOpacity(0.15),
+                  width: 1,
+                ),
               ),
               child: Icon(icon, color: color, size: 16),
             ),

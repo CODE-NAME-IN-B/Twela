@@ -19,8 +19,12 @@ class WalletMiniCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
+    final surfaceColor = isDark
+        ? const Color(0xFF1E293B).withOpacity(0.5)
+        : Colors.white.withOpacity(0.6);
+    final borderColor = isDark
+        ? const Color(0xFF334155).withOpacity(0.6)
+        : const Color(0xFFE2E8F0).withOpacity(0.8);
     final secondaryTextColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
 
     return Container(
@@ -42,6 +46,10 @@ class WalletMiniCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: color.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: color.withOpacity(0.15),
+                    width: 1,
+                  ),
                 ),
                 child: Icon(icon, color: color, size: 18),
               ),

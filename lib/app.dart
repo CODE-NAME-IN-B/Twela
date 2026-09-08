@@ -130,19 +130,16 @@ class _MainScreenState extends State<MainScreen> {
                   width: 56,
                   height: 56,
                   decoration: BoxDecoration(
-                    color: primaryColor,
+                    color: isDark ? const Color(0xFF0F172A) : Colors.white,
                     shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: primaryColor.withOpacity(0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+                    border: Border.all(
+                      color: primaryColor.withOpacity(0.6),
+                      width: 1.5,
+                    ),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.add,
-                    color: Colors.white,
+                    color: primaryColor,
                     size: 28,
                   ),
                 ),
@@ -263,20 +260,10 @@ class _MainScreenState extends State<MainScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? primaryColor.withOpacity(isDark ? 0.15 : 0.08)
-                    : Colors.transparent,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(
-                isSelected ? activeIcon : icon,
-                color: isSelected ? primaryColor : tertiaryColor,
-                size: 22,
-              ),
+            Icon(
+              isSelected ? activeIcon : icon,
+              color: isSelected ? primaryColor : tertiaryColor,
+              size: 22,
             ),
             const SizedBox(height: 4),
             Text(
@@ -285,6 +272,16 @@ class _MainScreenState extends State<MainScreen> {
                 fontSize: 10,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 color: isSelected ? primaryColor : tertiaryColor,
+              ),
+            ),
+            const SizedBox(height: 3),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: isSelected ? 5 : 0,
+              height: isSelected ? 5 : 0,
+              decoration: BoxDecoration(
+                color: primaryColor,
+                shape: BoxShape.circle,
               ),
             ),
           ],

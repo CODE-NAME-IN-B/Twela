@@ -17,22 +17,30 @@ class LimitProgressBar extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
     final progress = limit > 0 ? current / limit : 0.0;
     final clampedProgress = progress.clamp(0.0, 1.0);
+    final totalDots = 10;
+    final filledDots = (clampedProgress * totalDots).ceil();
 
-    Color getColor() {
-      if (clampedProgress >= 1.0) return AppColors.danger;
-      if (clampedProgress >= 0.8) return AppColors.warning;
-      return AppColors.primary;
+    Color getColor(int dotIndex) {
+      if (dotIndex < filledDots) {
+        if (clampedProgress >= 1.0) return AppColors.danger;
+        if (clampedProgress >= 0.8) return AppColors.warning;
+        return AppColors.primary;
+      }
+      return isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
     }
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(4),
-      child: LinearProgressIndicator(
-        value: clampedProgress,
-        backgroundColor:
-            isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
-        valueColor: AlwaysStoppedAnimation<Color>(getColor()),
-        minHeight: 6,
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: List.generate(totalDots, (index) {
+        return Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(
+            color: getColor(index),
+            shape: BoxShape.circle,
+          ),
+        );
+      }),
     );
   }
 }
