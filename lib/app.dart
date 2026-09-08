@@ -111,7 +111,7 @@ class _MainScreenState extends State<MainScreen> {
                   children: [
                     Expanded(child: _buildItem(context, 0, Icons.home_outlined, Icons.home, 'الرئيسية', primaryColor, isDark)),
                     Expanded(child: _buildItem(context, 1, Icons.receipt_long_outlined, Icons.receipt_long, 'السجل', primaryColor, isDark)),
-                    const SizedBox(width: 56),
+                    const SizedBox(width: 64),
                     Expanded(child: _buildItem(context, 2, Icons.people_outline, Icons.people, 'الديون', primaryColor, isDark)),
                     Expanded(child: _buildItem(context, 3, Icons.bar_chart_outlined, Icons.bar_chart, 'الإحصائيات', primaryColor, isDark)),
                     Expanded(child: _buildItem(context, 4, Icons.settings_outlined, Icons.settings, 'الإعدادات', primaryColor, isDark)),
@@ -121,27 +121,30 @@ class _MainScreenState extends State<MainScreen> {
             ),
           ),
           Positioned(
-            top: -24,
+            top: 4,
             left: 0,
             right: 0,
             child: Center(
               child: GestureDetector(
                 onTap: _showActionSheet,
                 child: Container(
-                  width: 56,
-                  height: 56,
+                  width: 52,
+                  height: 52,
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF0F172A) : Colors.white,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: primaryColor.withOpacity(0.6),
-                      width: 1.5,
-                    ),
-                  ),
-                  child: Icon(
-                    Icons.add,
                     color: primaryColor,
-                    size: 28,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: primaryColor.withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.add,
+                    color: Colors.white,
+                    size: 26,
                   ),
                 ),
               ),
