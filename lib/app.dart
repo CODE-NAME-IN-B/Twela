@@ -108,13 +108,13 @@ class _MainScreenState extends State<MainScreen> {
               child: SizedBox(
                 height: 64,
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _buildItem(context, 0, Icons.home_outlined, Icons.home, 'الرئيسية', primaryColor, isDark),
-                    _buildItem(context, 1, Icons.receipt_long_outlined, Icons.receipt_long, 'السجل', primaryColor, isDark),
-                    _buildItem(context, 2, Icons.people_outline, Icons.people, 'الديون', primaryColor, isDark),
-                    _buildItem(context, 3, Icons.bar_chart_outlined, Icons.bar_chart, 'الإحصائيات', primaryColor, isDark),
-                    _buildItem(context, 4, Icons.settings_outlined, Icons.settings, 'الإعدادات', primaryColor, isDark),
+                    Expanded(child: _buildItem(context, 0, Icons.home_outlined, Icons.home, 'الرئيسية', primaryColor, isDark)),
+                    Expanded(child: _buildItem(context, 1, Icons.receipt_long_outlined, Icons.receipt_long, 'السجل', primaryColor, isDark)),
+                    const SizedBox(width: 56),
+                    Expanded(child: _buildItem(context, 2, Icons.people_outline, Icons.people, 'الديون', primaryColor, isDark)),
+                    Expanded(child: _buildItem(context, 3, Icons.bar_chart_outlined, Icons.bar_chart, 'الإحصائيات', primaryColor, isDark)),
+                    Expanded(child: _buildItem(context, 4, Icons.settings_outlined, Icons.settings, 'الإعدادات', primaryColor, isDark)),
                   ],
                 ),
               ),
