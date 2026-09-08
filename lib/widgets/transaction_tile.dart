@@ -10,6 +10,145 @@ class TransactionTile extends StatelessWidget {
 
   const TransactionTile({super.key, required this.transaction});
 
+  void _showOptionsSheet(BuildContext context) {
+    final provider = context.read<TwelaProvider>();
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primaryColor = theme.colorScheme.primary;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'خيارات المعاملة',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildOptionTile(
+              context,
+              theme: theme,
+              isDark: isDark,
+              icon: Icons.edit_outlined,
+              label: 'تعديل الملاحظة',
+              onTap: () {
+                Navigator.pop(ctx);
+                _showEditDialog(context);
+              },
+            ),
+            const SizedBox(height: 4),
+            _buildOptionTile(
+              context,
+              theme: theme,
+              isDark: isDark,
+              icon: Icons.delete_outline,
+              label: 'حذف المعاملة',
+              color: AppColors.danger,
+              onTap: () {
+                Navigator.pop(ctx);
+                _confirmDelete(context, provider);
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOptionTile(
+    BuildContext context, {
+    required ThemeData theme,
+    required bool isDark,
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    Color? color,
+  }) {
+    final itemColor = color ?? (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B));
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFB),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: itemColor, size: 20),
+            const SizedBox(width: 12),
+            Text(
+              label,
+              style: theme.textTheme.titleSmall?.copyWith(
+                color: itemColor,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _confirmDelete(BuildContext context, TwelaProvider provider) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: const Text('حذف المعاملة'),
+        content: const Text('هل أنت متأكد من حذف هذه المعاملة؟'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('إلغاء'),
+          ),
+          TextButton(
+            onPressed: () {
+              provider.removeTransaction(transaction.id);
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('تم حذف المعاملة')),
+              );
+            },
+            child: const Text(
+              'حذف',
+              style: TextStyle(color: AppColors.danger),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showEditDialog(BuildContext context) {
     final provider = context.read<TwelaProvider>();
     final noteController = TextEditingController(text: transaction.note);
@@ -219,6 +358,25 @@ class TransactionTile extends StatelessWidget {
                     style: theme.textTheme.labelSmall,
                   ),
                 ],
+              ),
+              const SizedBox(width: 4),
+              GestureDetector(
+                onTap: () => _showOptionsSheet(context),
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? const Color(0xFF334155).withOpacity(0.5)
+                        : const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.more_vert,
+                    size: 16,
+                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                  ),
+                ),
               ),
             ],
           ),

@@ -33,13 +33,23 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: () async {},
-          color: theme.colorScheme.primary,
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
-            child: Column(
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topRight,
+              end: Alignment.bottomLeft,
+              colors: isDark
+                  ? [const Color(0xFF1E1B4B), const Color(0xFF0F172A)]
+                  : [theme.colorScheme.primary.withOpacity(0.08), Colors.white],
+            ),
+          ),
+          child: RefreshIndicator(
+            onRefresh: () async {},
+            color: theme.colorScheme.primary,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
+              child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildHeader(context, theme, isDark),
@@ -60,6 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
+        ),
         ),
       ),
     );
