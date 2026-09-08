@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'theme/app_theme.dart';
 import 'providers/theme_provider.dart';
+import 'providers/app_settings_provider.dart';
 import 'services/storage_service.dart';
 import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/home/home_screen.dart';
@@ -25,13 +26,13 @@ class TwelaApp extends StatelessWidget {
     final storage = context.read<StorageService>();
     final onboardingComplete = storage.getOnboardingComplete();
 
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, _) {
+    return Consumer2<ThemeProvider, AppSettingsProvider>(
+      builder: (context, themeProvider, appSettings, _) {
         return MaterialApp(
           title: 'Twela',
           debugShowCheckedModeBanner: false,
-          theme: AppTheme.lightTheme(),
-          darkTheme: AppTheme.darkTheme(),
+          theme: AppTheme.lightTheme(accentColor: appSettings.accentColor),
+          darkTheme: AppTheme.darkTheme(accentColor: appSettings.accentColor),
           themeMode: themeProvider.themeMode,
           locale: const Locale('ar', 'LY'),
           initialRoute: onboardingComplete ? '/home' : '/onboarding',

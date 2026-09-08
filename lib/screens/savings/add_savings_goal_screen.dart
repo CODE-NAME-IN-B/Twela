@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../providers/savings_provider.dart';
+import '../../providers/app_settings_provider.dart';
 import '../../models/savings_goal.dart';
 import '../../utils/formatters.dart';
 
@@ -43,6 +45,11 @@ class _AddSavingsGoalScreenState extends State<AddSavingsGoalScreen> {
     );
 
     context.read<SavingsProvider>().addGoal(goal);
+
+    if (context.read<AppSettingsProvider>().hapticFeedback) {
+      HapticFeedback.mediumImpact();
+    }
+
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('تم إنشاء الحصالة')),

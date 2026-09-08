@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import '../../providers/twela_provider.dart';
+import '../../providers/app_settings_provider.dart';
 import '../../models/transaction.dart';
 import '../../widgets/wallet_toggle.dart';
 import '../../widgets/category_picker.dart';
@@ -54,6 +56,11 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     );
 
     context.read<TwelaProvider>().addTransaction(transaction);
+
+    if (context.read<AppSettingsProvider>().hapticFeedback) {
+      HapticFeedback.mediumImpact();
+    }
+
     Navigator.pop(context);
   }
 

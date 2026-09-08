@@ -1,7 +1,9 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../theme/app_colors.dart';
 import '../providers/twela_provider.dart';
+import '../providers/app_settings_provider.dart';
 import '../utils/formatters.dart';
 
 class BalanceCard extends StatefulWidget {
@@ -39,8 +41,9 @@ class _BalanceCardState extends State<BalanceCard>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final glassMode = context.watch<AppSettingsProvider>().glassMode;
 
-    return Consumer<TwelaProvider>(
+    Widget card = Consumer<TwelaProvider>(
       builder: (context, provider, _) {
         return GestureDetector(
           onTapDown: (_) => _controller.forward(),
@@ -61,9 +64,13 @@ class _BalanceCardState extends State<BalanceCard>
               width: double.infinity,
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: isDark
-                    ? AppColors.darkSurface.withOpacity(0.5)
-                    : Colors.white.withOpacity(0.6),
+                color: glassMode
+                    ? (isDark
+                        ? AppColors.darkSurface.withOpacity(0.3)
+                        : Colors.white.withOpacity(0.3))
+                    : (isDark
+                        ? AppColors.darkSurface.withOpacity(0.5)
+                        : Colors.white.withOpacity(0.6)),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
                   color: isDark
@@ -173,6 +180,18 @@ class _BalanceCardState extends State<BalanceCard>
         );
       },
     );
+
+    if (glassMode) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: card,
+        ),
+      );
+    }
+
+    return card;
   }
 
   Widget _buildExpandedStats(

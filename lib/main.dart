@@ -9,6 +9,7 @@ import 'providers/routine_provider.dart';
 import 'providers/theme_provider.dart';
 import 'providers/savings_provider.dart';
 import 'providers/person_provider.dart';
+import 'providers/app_settings_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,6 +37,7 @@ void main() async {
               savingsProvider!..attachLedger(twelaProvider),
         ),
         ChangeNotifierProvider(create: (_) => PersonProvider(storageService)),
+        ChangeNotifierProvider(create: (_) => AppSettingsProvider(storageService)),
       ],
       child: const TwelaApp(),
     ),

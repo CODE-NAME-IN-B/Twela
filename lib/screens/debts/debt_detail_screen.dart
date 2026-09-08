@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../theme/app_colors.dart';
 import '../../providers/debt_provider.dart';
+import '../../providers/app_settings_provider.dart';
 import '../../models/debt.dart';
 import '../../utils/formatters.dart';
 
@@ -33,6 +35,11 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
     }
 
     context.read<DebtProvider>().addPayment(widget.debt.id, amount);
+
+    if (context.read<AppSettingsProvider>().hapticFeedback) {
+      HapticFeedback.mediumImpact();
+    }
+
     _paymentController.clear();
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('تم إضافة الدفعة')),

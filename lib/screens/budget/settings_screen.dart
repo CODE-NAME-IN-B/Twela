@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../providers/twela_provider.dart';
 import '../../providers/theme_provider.dart';
+import '../../providers/app_settings_provider.dart';
 import '../../models/budget_settings.dart';
+import '../../models/app_settings.dart';
 import '../../services/update_service.dart';
 import '../../utils/formatters.dart';
 import '../data/data_export_screen.dart';
@@ -320,6 +323,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             _buildAppearanceSection(context, theme, isDark),
             const SizedBox(height: 16),
+            _buildFeaturesSection(context, theme, isDark),
+            const SizedBox(height: 16),
             _buildSection(
               context,
               theme,
@@ -497,6 +502,179 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 color: primaryColor,
                 size: 20,
               ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFeaturesSection(BuildContext context, ThemeData theme, bool isDark) {
+    final appSettings = context.watch<AppSettingsProvider>();
+    final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
+    final secondaryTextColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+    final primaryColor = theme.colorScheme.primary;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: borderColor, width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'الميزات',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 16),
+          _buildFeatureToggle(
+            context,
+            theme: theme,
+            isDark: isDark,
+            icon: Icons.vibration,
+            label: 'اهتزاز عند الحفظ',
+            description: 'نبضة خفيفة عند إضافة أي عملية',
+            value: appSettings.hapticFeedback,
+            onChanged: () => appSettings.toggleHapticFeedback(),
+          ),
+          const SizedBox(height: 8),
+          _buildFeatureToggle(
+            context,
+            theme: theme,
+            isDark: isDark,
+            icon: Icons.blur_on_outlined,
+            label: 'وضع الزجاج',
+            description: 'خلفيات شبه شفافة للبطاقات',
+            value: appSettings.glassMode,
+            onChanged: () => appSettings.toggleGlassMode(),
+          ),
+          const SizedBox(height: 8),
+          _buildFeatureToggle(
+            context,
+            theme: theme,
+            isDark: isDark,
+            icon: Icons.bar_chart_outlined,
+            label: 'شريط Glyph',
+            description: 'معلومة سريعة أعلى الرصيد',
+            value: appSettings.showGlyphBar,
+            onChanged: () => appSettings.toggleGlyphBar(),
+          ),
+          const SizedBox(height: 8),
+          _buildFeatureToggle(
+            context,
+            theme: theme,
+            isDark: isDark,
+            icon: Icons.location_on_outlined,
+            label: 'اكتشاف العملة بالموقع',
+            description: 'تحديد العملة تلقائيًا حسب موقعك',
+            value: appSettings.gpsCurrency,
+            onChanged: () => appSettings.toggleGpsCurrency(),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'لون التمييز',
+            style: theme.textTheme.titleSmall?.copyWith(
+              color: secondaryTextColor,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: List.generate(AppSettings.accentOptions.length, (index) {
+              final color = AppSettings.accentOptions[index];
+              final isSelected = appSettings.accentColor.value == color.value;
+              return GestureDetector(
+                onTap: () => appSettings.setAccentColor(color),
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  margin: const EdgeInsets.only(left: 8),
+                  decoration: BoxDecoration(
+                    color: color,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: isSelected ? theme.colorScheme.onSurface : Colors.transparent,
+                      width: 2,
+                    ),
+                  ),
+                  child: isSelected
+                      ? const Icon(Icons.check, color: Colors.white, size: 18)
+                      : null,
+                ),
+              );
+            }),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFeatureToggle(
+    BuildContext context, {
+    required ThemeData theme,
+    required bool isDark,
+    required IconData icon,
+    required String label,
+    required String description,
+    required bool value,
+    required VoidCallback onChanged,
+  }) {
+    final secondaryTextColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+    final primaryColor = theme.colorScheme.primary;
+
+    return GestureDetector(
+      onTap: onChanged,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        decoration: BoxDecoration(
+          color: value
+              ? primaryColor.withOpacity(isDark ? 0.1 : 0.05)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(10),
+          border: value
+              ? Border.all(color: primaryColor.withOpacity(0.2), width: 1)
+              : null,
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: value ? primaryColor : secondaryTextColor,
+              size: 20,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      color: value ? primaryColor : theme.colorScheme.onSurface,
+                      fontWeight: value ? FontWeight.w600 : FontWeight.w400,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    description,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: secondaryTextColor,
+                      fontSize: 11,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Switch(
+              value: value,
+              onChanged: (_) => onChanged(),
+              activeColor: primaryColor,
+            ),
           ],
         ),
       ),

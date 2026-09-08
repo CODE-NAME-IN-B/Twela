@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import '../../theme/app_colors.dart';
 import '../../providers/debt_provider.dart';
+import '../../providers/app_settings_provider.dart';
 import '../../models/debt.dart';
 
 class AddDebtScreen extends StatefulWidget {
@@ -57,6 +59,11 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
     );
 
     context.read<DebtProvider>().addDebt(debt);
+
+    if (context.read<AppSettingsProvider>().hapticFeedback) {
+      HapticFeedback.mediumImpact();
+    }
+
     Navigator.pop(context);
   }
 

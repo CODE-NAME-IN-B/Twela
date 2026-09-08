@@ -3,13 +3,15 @@ import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
 class AppTheme {
-  static ThemeData lightTheme() {
+  static ThemeData lightTheme({Color? accentColor}) {
+    final primary = accentColor ?? AppColors.primary;
+
     return ThemeData(
       brightness: Brightness.light,
-      primaryColor: AppColors.primary,
+      primaryColor: primary,
       scaffoldBackgroundColor: AppColors.background,
-      colorScheme: const ColorScheme.light(
-        primary: AppColors.primary,
+      colorScheme: ColorScheme.light(
+        primary: primary,
         onPrimary: Colors.white,
         secondary: AppColors.primaryLight,
         surface: AppColors.surface,
@@ -203,13 +205,15 @@ class AppTheme {
     );
   }
 
-  static ThemeData darkTheme() {
+  static ThemeData darkTheme({Color? accentColor}) {
+    final primary = accentColor ?? AppColors.primary;
+
     return ThemeData(
       brightness: Brightness.dark,
-      primaryColor: AppColors.primary,
+      primaryColor: primary,
       scaffoldBackgroundColor: AppColors.darkBackground,
-      colorScheme: const ColorScheme.dark(
-        primary: AppColors.primary,
+      colorScheme: ColorScheme.dark(
+        primary: primary,
         onPrimary: Colors.white,
         secondary: AppColors.primaryLight,
         surface: AppColors.darkSurface,

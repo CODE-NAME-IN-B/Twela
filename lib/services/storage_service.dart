@@ -9,6 +9,7 @@ import '../models/person.dart';
 import '../models/savings_goal.dart';
 import '../models/savings_entry.dart';
 import '../models/routine_pattern.dart';
+import '../models/app_settings.dart';
 
 class StorageService {
   static const String _categoriesKey = 'categories';
@@ -22,6 +23,7 @@ class StorageService {
   static const String _patternsKey = 'patterns';
   static const String _onboardingCompleteKey = 'onboarding_complete';
   static const String _dbVersionKey = 'db_version';
+  static const String _appSettingsKey = 'app_settings';
 
   late SharedPreferences _prefs;
 
@@ -161,6 +163,17 @@ class StorageService {
     await _prefs.setString(_patternsKey, jsonEncode(data));
   }
 
+  // App Settings
+  AppSettings getAppSettings() {
+    final data = _prefs.getString(_appSettingsKey);
+    if (data == null) return const AppSettings();
+    return AppSettings.fromJson(jsonDecode(data));
+  }
+
+  Future<void> saveAppSettings(AppSettings settings) async {
+    await _prefs.setString(_appSettingsKey, jsonEncode(settings.toJson()));
+  }
+
   // Export all data as JSON
   Map<String, dynamic> exportAllData() {
     return {
@@ -175,6 +188,7 @@ class StorageService {
       'savingsGoals': getSavingsGoals().map((e) => e.toJson()).toList(),
       'savingsEntries': getSavingsEntries().map((e) => e.toJson()).toList(),
       'patterns': getPatterns().map((e) => e.toJson()).toList(),
+      'appSettings': getAppSettings().toJson(),
       'onboardingComplete': getOnboardingComplete(),
     };
   }
@@ -215,6 +229,9 @@ class StorageService {
       final patterns = (data['patterns'] as List).map((e) => RoutinePattern.fromJson(e)).toList();
       await savePatterns(patterns);
     }
+    if (data.containsKey('appSettings')) {
+      await saveAppSettings(AppSettings.fromJson(data['appSettings']));
+    }
     if (data.containsKey('onboardingComplete')) {
       await setOnboardingComplete(data['onboardingComplete'] as bool);
     }
@@ -231,6 +248,7 @@ class StorageService {
     await _prefs.remove(_savingsGoalsKey);
     await _prefs.remove(_savingsEntriesKey);
     await _prefs.remove(_patternsKey);
+    await _prefs.remove(_appSettingsKey);
     await _prefs.remove(_onboardingCompleteKey);
   }
 }

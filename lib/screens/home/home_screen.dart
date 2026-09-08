@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/twela_provider.dart';
+import '../../providers/app_settings_provider.dart';
 import '../../widgets/balance_card.dart';
 import '../../widgets/wallet_mini_card.dart';
 import '../../widgets/limit_progress_bar.dart';
@@ -27,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final appSettings = context.watch<AppSettingsProvider>();
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -43,6 +45,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 _buildHeader(context, theme, isDark),
                 const SizedBox(height: 6),
                 _buildMotivationalMessage(context, theme, isDark),
+                if (appSettings.showGlyphBar) ...[
+                  const SizedBox(height: 12),
+                  _buildGlyphBar(context, theme, isDark),
+                ],
                 const SizedBox(height: 24),
                 const BalanceCard(),
                 const SizedBox(height: 20),
@@ -206,6 +212,73 @@ class _HomeScreenState extends State<HomeScreen> {
           size: 22,
         ),
       ),
+    );
+  }
+
+  Widget _buildGlyphBar(BuildContext context, ThemeData theme, bool isDark) {
+    return Consumer<TwelaProvider>(
+      builder: (context, provider, _) {
+        final now = DateTime.now();
+        final daysInMonth = DateTime(now.year, now.month + 1, 0).day;
+        final daysLeft = daysInMonth - now.day;
+        final monthlyBudget = provider.budgetSettings.monthlyBudgetTotal;
+        final monthSpent = provider.monthSpent;
+
+        String message;
+        IconData icon;
+
+        if (monthlyBudget != null && monthlyBudget > 0) {
+          final percent = ((monthSpent / monthlyBudget) * 100).round();
+          if (percent >= 100) {
+            message = 'تجاوزت ميزانيتك الشهرية';
+            icon = Icons.warning_amber_outlined;
+          } else if (percent >= 80) {
+            message = 'وصلت $percent% من ميزانيتك';
+            icon = Icons.info_outline;
+          } else {
+            message = 'صرفت $percent% من ميزانيتك';
+            icon = Icons.check_circle_outline;
+          }
+        } else {
+          message = 'بقي $daysLeft يوم على نهاية الشهر';
+          icon = Icons.calendar_today_outlined;
+        }
+
+        final surfaceColor = isDark
+            ? const Color(0xFF1E293B).withOpacity(0.5)
+            : Colors.white.withOpacity(0.6);
+        final borderColor = isDark
+            ? const Color(0xFF334155).withOpacity(0.5)
+            : const Color(0xFFE2E8F0).withOpacity(0.7);
+
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            color: surfaceColor,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: borderColor, width: 1),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                size: 16,
+                color: theme.colorScheme.primary,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  message,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
