@@ -244,19 +244,15 @@ class _DataExportScreenState extends State<DataExportScreen> {
       final storage = context.read<StorageService>();
       final jsonStr = await DataExportService.exportToJson(storage);
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final bytes = Uint8List.fromList(utf8.encode(jsonStr));
 
-      final savedPath = await FilePicker.platform.saveFile(
-        dialogTitle: 'اختر مكان حفظ النسخة الاحتياطية',
-        fileName: 'twela_backup_$timestamp.json',
-        bytes: bytes,
+      final tempDir = Directory.systemTemp;
+      final file = File('${tempDir.path}/twela_backup_$timestamp.json');
+      await file.writeAsString(jsonStr);
+
+      await Share.shareXFiles(
+        [XFile(file.path)],
+        text: 'نسخة احتياطية من Twela',
       );
-
-      if (savedPath != null && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('تم الحفظ: $savedPath')),
-        );
-      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
