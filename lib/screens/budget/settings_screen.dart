@@ -1,7 +1,4 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -746,7 +743,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _detectCurrency(BuildContext context, AppSettingsProvider appSettings) async {
-    final permission = await Permission.location.request();
+    final permission = await Permission.locationWhenInUse.request();
 
     if (!permission.isGranted) {
       if (!context.mounted) return;
@@ -756,46 +753,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
       return;
     }
 
-    try {
-      final position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.low,
-          timeLimit: Duration(seconds: 10),
-        ),
-      );
+    appSettings.toggleGpsCurrency();
 
-      // Libya: lat ~19-33, lon ~9-25
-      String detectedCurrency;
-      String country;
-      if (position.latitude >= 19.5 &&
-          position.latitude <= 33.5 &&
-          position.longitude >= 9.0 &&
-          position.longitude <= 25.5) {
-        detectedCurrency = 'LYD';
-        country = 'ليبيا';
-      } else {
-        detectedCurrency = 'LYD';
-        country = 'ليبيا';
-      }
-
-      appSettings.toggleGpsCurrency();
-
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('تم اكتشاف: $country — عملتك: $detectedCurrency'),
-          action: SnackBarAction(
-            label: 'تم',
-            onPressed: () {},
-          ),
-        ),
-      );
-    } catch (e) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تعذر تحديد الموقع — تأكد من تفعيل GPS')),
-      );
-    }
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(appSettings.gpsCurrency ? 'تم تفعيل اكتشاف العملة بالموقع' : 'تم تعطيل اكتشاف العملة بالموقع')),
+    );
   }
 
   Widget _buildSection(
