@@ -34,6 +34,13 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
       return;
     }
 
+    if (amount > widget.debt.remaining) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('المبلغ أكبر من المتبقي')),
+      );
+      return;
+    }
+
     context.read<DebtProvider>().addPayment(widget.debt.id, amount);
 
     if (context.read<AppSettingsProvider>().hapticFeedback) {
@@ -43,6 +50,40 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
     _paymentController.clear();
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('تم إضافة الدفعة')),
+    );
+  }
+
+  void _confirmDelete(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: const Text('حذف الدين'),
+        content: const Text('هل أنت متأكد من حذف هذا الدين؟'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('إلغاء'),
+          ),
+          TextButton(
+            onPressed: () {
+              context.read<DebtProvider>().removeDebt(widget.debt.id);
+              Navigator.pop(ctx);
+              Navigator.pop(context);
+            },
+            child: const Text(
+              'حذف',
+              style: TextStyle(color: AppColors.danger),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -68,8 +109,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
               child: IconButton(
                 icon: const Icon(Icons.delete_outline, color: AppColors.danger),
                 onPressed: () {
-                  context.read<DebtProvider>().removeDebt(widget.debt.id);
-                  Navigator.pop(context);
+                  _confirmDelete(context);
                 },
               ),
             ),
@@ -117,11 +157,38 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
-                child: Text(
-                  debt.personName,
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      debt.personName,
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                    ),
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: debt.isGiven
+                            ? (isDark
+                                ? const Color(0xFFE5484D).withOpacity(0.1)
+                                : const Color(0xFFFEF2F2))
+                            : (isDark
+                                ? const Color(0xFF149C6D).withOpacity(0.1)
+                                : const Color(0xFFECFDF5)),
+                        borderRadius: BorderRadius.circular(6),
                       ),
+                      child: Text(
+                        debt.isGiven ? 'أنا أديت له' : 'هو أديت لي',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: debt.isGiven ? AppColors.danger : AppColors.success,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Container(

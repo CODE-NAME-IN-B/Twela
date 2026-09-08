@@ -170,15 +170,42 @@ class DebtTile extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      Expanded(
+                        Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              debt.personName,
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w600,
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    debt.personName,
+                                    style: theme.textTheme.titleMedium?.copyWith(
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                   ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: debt.isGiven
+                                        ? (isDark
+                                            ? const Color(0xFFE5484D).withOpacity(0.1)
+                                            : const Color(0xFFFEF2F2))
+                                        : (isDark
+                                            ? const Color(0xFF149C6D).withOpacity(0.1)
+                                            : const Color(0xFFECFDF5)),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    debt.isGiven ? 'أديت له' : 'أديت لي',
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.w600,
+                                      color: debt.isGiven ? AppColors.danger : AppColors.success,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                             const SizedBox(height: 2),
                             Text(

@@ -86,6 +86,12 @@ class DebtsScreen extends StatelessWidget {
                           ),
                       textAlign: TextAlign.center,
                     ),
+                    const SizedBox(height: 24),
+                    ElevatedButton.icon(
+                      onPressed: () => Navigator.pushNamed(context, '/add-debt'),
+                      icon: const Icon(Icons.add, size: 18),
+                      label: const Text('إضافة دين'),
+                    ),
                   ],
                 ),
               ),

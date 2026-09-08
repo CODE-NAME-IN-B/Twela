@@ -1188,7 +1188,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             description: 'تطبيق تتبع المصاريف بالدينار الليبي',
             icon: Icons.account_balance_wallet_outlined,
             color: primaryColor,
-            version: _currentVersion.isNotEmpty ? 'v$_currentVersion' : 'v1.0.8',
+            version: _currentVersion.isNotEmpty ? 'v$_currentVersion' : 'v1.1.2',
           ),
           const SizedBox(height: 8),
           _buildProjectItem(
