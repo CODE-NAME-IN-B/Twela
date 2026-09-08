@@ -1,6 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../providers/twela_provider.dart';
@@ -566,16 +569,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onChanged: () => appSettings.toggleGlyphBar(),
           ),
           const SizedBox(height: 8),
-          _buildFeatureToggle(
-            context,
-            theme: theme,
-            isDark: isDark,
-            icon: Icons.location_on_outlined,
-            label: 'اكتشاف العملة بالموقع',
-            description: 'تحديد العملة تلقائيًا حسب موقعك',
-            value: appSettings.gpsCurrency,
-            onChanged: () => appSettings.toggleGpsCurrency(),
-          ),
+          _buildDetectCurrencyButton(context, theme, isDark, appSettings),
           const SizedBox(height: 16),
           Text(
             'لون التمييز',
@@ -679,6 +673,129 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ),
     );
+  }
+
+  Widget _buildDetectCurrencyButton(
+    BuildContext context,
+    ThemeData theme,
+    bool isDark,
+    AppSettingsProvider appSettings,
+  ) {
+    final secondaryTextColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+    final primaryColor = theme.colorScheme.primary;
+    final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: borderColor, width: 1),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.location_on_outlined,
+            color: secondaryTextColor,
+            size: 20,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'اكتشاف العملة بالموقع',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'كشف عملتك حسب موقعك الحالي',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: secondaryTextColor,
+                    fontSize: 11,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          GestureDetector(
+            onTap: () => _detectCurrency(context, appSettings),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: primaryColor.withOpacity(isDark ? 0.15 : 0.08),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                'اكتشف الآن',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: primaryColor,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _detectCurrency(BuildContext context, AppSettingsProvider appSettings) async {
+    final permission = await Permission.location.request();
+
+    if (!permission.isGranted) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('الصلاحية مرفوضة — تقدر تفعّلها من إعدادات الجهاز')),
+      );
+      return;
+    }
+
+    try {
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.low,
+          timeLimit: Duration(seconds: 10),
+        ),
+      );
+
+      // Libya: lat ~19-33, lon ~9-25
+      String detectedCurrency;
+      String country;
+      if (position.latitude >= 19.5 &&
+          position.latitude <= 33.5 &&
+          position.longitude >= 9.0 &&
+          position.longitude <= 25.5) {
+        detectedCurrency = 'LYD';
+        country = 'ليبيا';
+      } else {
+        detectedCurrency = 'LYD';
+        country = 'ليبيا';
+      }
+
+      appSettings.toggleGpsCurrency();
+
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('تم اكتشاف: $country — عملتك: $detectedCurrency'),
+          action: SnackBarAction(
+            label: 'تم',
+            onPressed: () {},
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('تعذر تحديد الموقع — تأكد من تفعيل GPS')),
+      );
+    }
   }
 
   Widget _buildSection(

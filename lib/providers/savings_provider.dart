@@ -85,7 +85,7 @@ class SavingsProvider extends ChangeNotifier {
       type: TransactionType.savings,
       walletType: WalletType.cash,
       categoryId: '',
-      note: 'ادخار: ${_goals.firstWhere((g) => g.id == entry.savingsGoalId, orElse: () => _goals.first).name}',
+      note: 'ادخار: ${_goals.where((g) => g.id == entry.savingsGoalId).map((g) => g.name).firstOrNull ?? "ادخار"}',
       date: entry.date,
       relatedId: entry.savingsGoalId,
     ));

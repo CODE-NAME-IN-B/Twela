@@ -105,7 +105,7 @@ class StatsScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'ملخص الشهر',
+            'ملخص شهر ${formatMonthYear(DateTime.now())}',
             style: theme.textTheme.headlineSmall,
           ),
           const SizedBox(height: 20),
