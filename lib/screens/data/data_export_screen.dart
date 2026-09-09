@@ -8,6 +8,9 @@ import 'dart:io';
 import '../../theme/app_colors.dart';
 import '../../services/storage_service.dart';
 import '../../services/data_export_service.dart';
+import '../../providers/twela_provider.dart';
+import '../../providers/debt_provider.dart';
+import '../../providers/savings_provider.dart';
 
 class DataExportScreen extends StatefulWidget {
   const DataExportScreen({super.key});
@@ -312,6 +315,12 @@ class _DataExportScreenState extends State<DataExportScreen> {
         if (confirmed == true) {
           final storage = context.read<StorageService>();
           await DataExportService.restoreData(storage, data);
+          // Refresh all provider in-memory state after import
+          if (mounted) {
+            context.read<TwelaProvider>().reloadData();
+            context.read<DebtProvider>().reloadData();
+            context.read<SavingsProvider>().reloadData();
+          }
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('تم الاستيراد بنجاح')),

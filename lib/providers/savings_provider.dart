@@ -12,14 +12,19 @@ class SavingsProvider extends ChangeNotifier {
 
   List<SavingsGoal> _goals = [];
   List<SavingsEntry> _entries = [];
-  TwelaProvider? _ledger;
+  final TwelaProvider ledger;
 
-  SavingsProvider(this._storage) {
+  SavingsProvider(this._storage, this.ledger) {
     _goals = _storage.getSavingsGoals();
     _entries = _storage.getSavingsEntries();
   }
 
-  void attachLedger(TwelaProvider ledger) => _ledger = ledger;
+  /// Reload savings data from storage. Call after import to refresh in-memory state.
+  void reloadData() {
+    _goals = _storage.getSavingsGoals();
+    _entries = _storage.getSavingsEntries();
+    notifyListeners();
+  }
 
   List<SavingsGoal> get goals => _goals;
   List<SavingsEntry> get entries => _entries;
@@ -38,6 +43,10 @@ class SavingsProvider extends ChangeNotifier {
         .fold(0.0, (sum, e) => sum + e.amount);
   }
 
+  WalletType _walletFromString(String walletType) {
+    return walletType == 'bank' ? WalletType.bank : WalletType.cash;
+  }
+
   Future<void> addGoal(SavingsGoal goal) async {
     _goals.insert(0, goal);
     await _storage.saveSavingsGoals(_goals);
@@ -54,6 +63,18 @@ class SavingsProvider extends ChangeNotifier {
   }
 
   Future<void> deleteGoal(String id) async {
+    final entriesToRemove = _entries.where((e) => e.savingsGoalId == id).toList();
+
+    // Reverse savings transactions for all entries
+    for (final _ in entriesToRemove) {
+      final txsToRemove = ledger.transactions
+          .where((t) => t.relatedId == id && t.type == TransactionType.savings)
+          .toList();
+      for (final tx in txsToRemove) {
+        await ledger.removeTransaction(tx.id);
+      }
+    }
+
     _goals.removeWhere((g) => g.id == id);
     _entries.removeWhere((e) => e.savingsGoalId == id);
     await _storage.saveSavingsGoals(_goals);
@@ -78,12 +99,12 @@ class SavingsProvider extends ChangeNotifier {
       await _storage.saveSavingsGoals(_goals);
     }
 
-    // Record savings transaction on the balance
-    await _ledger?.addTransaction(TwelaTransaction(
+    // Record savings transaction on the balance using the entry's wallet type
+    await ledger.addTransaction(TwelaTransaction(
       id: _uuid.v4(),
       amount: entry.amount,
       type: TransactionType.savings,
-      walletType: WalletType.cash,
+      walletType: _walletFromString(entry.walletType),
       categoryId: '',
       note: 'ادخار: ${_goals.where((g) => g.id == entry.savingsGoalId).map((g) => g.name).firstOrNull ?? "ادخار"}',
       date: entry.date,

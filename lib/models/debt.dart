@@ -6,6 +6,7 @@ class Debt {
   final double paidAmount;
   final DateTime date;
   final bool isGiven;
+  final String walletType;
 
   const Debt({
     required this.id,
@@ -15,6 +16,7 @@ class Debt {
     this.paidAmount = 0,
     required this.date,
     this.isGiven = true,
+    this.walletType = 'cash',
   });
 
   double get remaining => totalAmount - paidAmount;
@@ -28,6 +30,7 @@ class Debt {
     double? paidAmount,
     DateTime? date,
     bool? isGiven,
+    String? walletType,
   }) {
     return Debt(
       id: id ?? this.id,
@@ -37,6 +40,7 @@ class Debt {
       paidAmount: paidAmount ?? this.paidAmount,
       date: date ?? this.date,
       isGiven: isGiven ?? this.isGiven,
+      walletType: walletType ?? this.walletType,
     );
   }
 
@@ -49,6 +53,7 @@ class Debt {
       'paidAmount': paidAmount,
       'date': date.toIso8601String(),
       'isGiven': isGiven,
+      'walletType': walletType,
     };
   }
 
@@ -61,6 +66,7 @@ class Debt {
       paidAmount: (json['paidAmount'] as num?)?.toDouble() ?? 0,
       date: DateTime.parse(json['date'] as String),
       isGiven: json['isGiven'] as bool? ?? true,
+      walletType: json['walletType'] as String? ?? 'cash',
     );
   }
 }

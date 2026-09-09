@@ -59,7 +59,7 @@ class RoutineDetectionService {
                 minute: transaction.date.minute,
               ),
               timeWindowEnd: TimeOfDay(
-                hour: transaction.date.hour + 1,
+                hour: (transaction.date.hour + 1) % 24,
                 minute: transaction.date.minute,
               ),
               occurrenceCount: matches.length,

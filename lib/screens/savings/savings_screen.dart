@@ -141,8 +141,7 @@ class SavingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildGoalCard(BuildContext context, dynamic goal, ThemeData theme, bool isDark) {
-    final provider = context.read<SavingsProvider>();
+  Widget _buildGoalCard(BuildContext context, SavingsGoal goal, ThemeData theme, bool isDark) {
     final progress = goal.progress.clamp(0.0, 1.0);
 
     return GestureDetector(
@@ -244,7 +243,7 @@ class SavingsScreen extends StatelessWidget {
     );
   }
 
-  void _showGoalDetails(BuildContext context, dynamic goal, ThemeData theme, bool isDark) {
+  void _showGoalDetails(BuildContext context, SavingsGoal goal, ThemeData theme, bool isDark) {
     final provider = context.read<SavingsProvider>();
     final entries = provider.getEntriesForGoal(goal.id);
 
@@ -343,7 +342,7 @@ class SavingsScreen extends StatelessWidget {
     );
   }
 
-  void _showSaveDialog(BuildContext context, dynamic goal, ThemeData theme, bool isDark) {
+  void _showSaveDialog(BuildContext context, SavingsGoal goal, ThemeData theme, bool isDark) {
     final controller = TextEditingController(text: goal.dailyTarget.toString());
 
     showDialog(

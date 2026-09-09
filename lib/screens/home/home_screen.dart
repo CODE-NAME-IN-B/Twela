@@ -400,7 +400,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     Text(
-                      '${((todaySpent / dailyLimit) * 100).toStringAsFixed(0)}%',
+                      dailyLimit > 0 ? '${((todaySpent / dailyLimit) * 100).toStringAsFixed(0)}%' : '0%',
                       style: theme.textTheme.bodySmall?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),

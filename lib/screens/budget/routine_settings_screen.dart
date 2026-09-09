@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../theme/app_colors.dart';
 import '../../providers/routine_provider.dart';
+import '../../providers/twela_provider.dart';
 import '../../models/routine_pattern.dart';
+import '../../utils/formatters.dart';
 
 class RoutineSettingsScreen extends StatelessWidget {
   const RoutineSettingsScreen({super.key});
@@ -157,6 +159,10 @@ class RoutineSettingsScreen extends StatelessWidget {
     bool isDark,
     ThemeData theme,
   ) {
+    final twelaProvider = context.read<TwelaProvider>();
+    final category = twelaProvider.getCategoryById(pattern.categoryId);
+    final categoryName = category?.name ?? 'غير محدد';
+
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(14),
@@ -179,8 +185,8 @@ class RoutineSettingsScreen extends StatelessWidget {
                   : const Color(0xFFECFDF5),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Icon(
-              Icons.autorenew,
+            child: Icon(
+              category?.icon ?? Icons.autorenew,
               color: AppColors.primary,
               size: 18,
             ),
@@ -191,11 +197,11 @@ class RoutineSettingsScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'نمط متكرر',
+                  categoryName,
                   style: theme.textTheme.titleSmall,
                 ),
                 Text(
-                  '${pattern.occurrenceCount} مرات',
+                  '${formatLydShort(pattern.approxAmount)} - ${pattern.occurrenceCount} مرات',
                   style: theme.textTheme.bodySmall,
                 ),
               ],

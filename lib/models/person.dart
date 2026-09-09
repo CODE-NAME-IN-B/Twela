@@ -1,7 +1,5 @@
 import 'package:uuid/uuid.dart';
 
-enum DebtType { gave, received }
-
 class Person {
   final String id;
   final String name;

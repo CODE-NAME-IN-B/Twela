@@ -6,6 +6,8 @@ import '../../theme/app_colors.dart';
 import '../../providers/debt_provider.dart';
 import '../../providers/app_settings_provider.dart';
 import '../../models/debt.dart';
+import '../../models/transaction.dart';
+import '../../widgets/wallet_toggle.dart';
 
 class AddDebtScreen extends StatefulWidget {
   const AddDebtScreen({super.key});
@@ -19,6 +21,7 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
   final _descriptionController = TextEditingController();
   final _amountController = TextEditingController();
   bool _isGiven = true;
+  WalletType _walletType = WalletType.cash;
 
   @override
   void didChangeDependencies() {
@@ -56,6 +59,7 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
       totalAmount: amount,
       date: DateTime.now(),
       isGiven: _isGiven,
+      walletType: _walletType == WalletType.bank ? 'bank' : 'cash',
     );
 
     context.read<DebtProvider>().addDebt(debt);
@@ -111,6 +115,11 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
               keyboardType: TextInputType.number,
               isDark: isDark,
               theme: theme,
+            ),
+            const SizedBox(height: 16),
+            WalletToggle(
+              selected: _walletType,
+              onChanged: (type) => setState(() => _walletType = type),
             ),
             const SizedBox(height: 32),
             SizedBox(

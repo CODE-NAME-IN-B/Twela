@@ -21,23 +21,18 @@ void main() async {
 
   await NotificationService.init();
 
+  // Create TwelaProvider first so it can be injected into dependent providers
+  final twelaProvider = TwelaProvider(storageService);
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         Provider.value(value: storageService),
-        ChangeNotifierProvider(create: (_) => TwelaProvider(storageService)),
-        ChangeNotifierProxyProvider<TwelaProvider, DebtProvider>(
-          create: (_) => DebtProvider(storageService),
-          update: (_, twelaProvider, debtProvider) =>
-              debtProvider!..attachLedger(twelaProvider),
-        ),
+        ChangeNotifierProvider.value(value: twelaProvider),
+        ChangeNotifierProvider(create: (_) => DebtProvider(storageService, twelaProvider)),
         ChangeNotifierProvider(create: (_) => RoutineProvider(storageService)),
-        ChangeNotifierProxyProvider<TwelaProvider, SavingsProvider>(
-          create: (_) => SavingsProvider(storageService),
-          update: (_, twelaProvider, savingsProvider) =>
-              savingsProvider!..attachLedger(twelaProvider),
-        ),
+        ChangeNotifierProvider(create: (_) => SavingsProvider(storageService, twelaProvider)),
         ChangeNotifierProvider(create: (_) => PersonProvider(storageService)),
         ChangeNotifierProvider(create: (_) => AppSettingsProvider(storageService)),
       ],

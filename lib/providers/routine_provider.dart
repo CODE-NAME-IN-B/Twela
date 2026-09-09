@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/routine_pattern.dart';
 import '../services/storage_service.dart';
-import '../services/routine_detection_service.dart';
 
 class RoutineProvider extends ChangeNotifier {
   final StorageService _storage;
-  static const _uuid = Uuid();
   static const _isEnabledKey = 'routine_is_enabled';
 
   List<RoutinePattern> _patterns = [];

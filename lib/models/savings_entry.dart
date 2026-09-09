@@ -7,6 +7,7 @@ class SavingsEntry {
   final DateTime date;
   final String note;
   final DateTime createdAt;
+  final String walletType;
 
   const SavingsEntry({
     required this.id,
@@ -15,12 +16,14 @@ class SavingsEntry {
     required this.date,
     this.note = '',
     required this.createdAt,
+    this.walletType = 'cash',
   });
 
   factory SavingsEntry.create({
     required String savingsGoalId,
     required double amount,
     String? note,
+    String walletType = 'cash',
   }) {
     final now = DateTime.now();
     return SavingsEntry(
@@ -30,6 +33,7 @@ class SavingsEntry {
       date: now,
       note: note ?? '',
       createdAt: now,
+      walletType: walletType,
     );
   }
 
@@ -41,6 +45,7 @@ class SavingsEntry {
       'date': date.toIso8601String(),
       'note': note,
       'createdAt': createdAt.toIso8601String(),
+      'walletType': walletType,
     };
   }
 
@@ -52,6 +57,7 @@ class SavingsEntry {
       date: DateTime.parse(json['date'] as String),
       note: json['note'] as String? ?? '',
       createdAt: DateTime.parse(json['createdAt'] as String),
+      walletType: json['walletType'] as String? ?? 'cash',
     );
   }
 }

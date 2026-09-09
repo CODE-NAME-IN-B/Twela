@@ -17,6 +17,7 @@ import 'screens/stats/stats_screen.dart';
 import 'screens/savings/savings_screen.dart';
 import 'screens/savings/add_savings_goal_screen.dart';
 import 'screens/data/data_export_screen.dart';
+import 'models/debt.dart';
 
 class TwelaApp extends StatelessWidget {
   const TwelaApp({super.key});
@@ -52,7 +53,7 @@ class TwelaApp extends StatelessWidget {
           },
           onGenerateRoute: (settings) {
             if (settings.name == '/debt-detail') {
-              final debt = settings.arguments as dynamic;
+              final debt = settings.arguments as Debt;
               return MaterialPageRoute(
                 builder: (context) => DebtDetailScreen(debt: debt),
               );
@@ -106,12 +107,12 @@ class _MainScreenState extends State<MainScreen> {
             ),
             child: SafeArea(
               child: SizedBox(
-                height: 64,
+                height: 60,
                 child: Row(
                   children: [
                     Expanded(child: _buildItem(context, 0, Icons.home_outlined, Icons.home, 'الرئيسية', primaryColor, isDark)),
                     Expanded(child: _buildItem(context, 1, Icons.receipt_long_outlined, Icons.receipt_long, 'السجل', primaryColor, isDark)),
-                    const SizedBox(width: 64),
+                    const SizedBox(width: 72),
                     Expanded(child: _buildItem(context, 2, Icons.people_outline, Icons.people, 'الديون', primaryColor, isDark)),
                     Expanded(child: _buildItem(context, 3, Icons.bar_chart_outlined, Icons.bar_chart, 'الإحصائيات', primaryColor, isDark)),
                     Expanded(child: _buildItem(context, 4, Icons.settings_outlined, Icons.settings, 'الإعدادات', primaryColor, isDark)),
@@ -121,30 +122,30 @@ class _MainScreenState extends State<MainScreen> {
             ),
           ),
           Positioned(
-            top: 4,
+            top: -24,
             left: 0,
             right: 0,
             child: Center(
               child: GestureDetector(
                 onTap: _showActionSheet,
                 child: Container(
-                  width: 52,
-                  height: 52,
+                  width: 56,
+                  height: 56,
                   decoration: BoxDecoration(
                     color: primaryColor,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
                         color: primaryColor.withOpacity(0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
                       ),
                     ],
                   ),
                   child: const Icon(
                     Icons.add,
                     color: Colors.white,
-                    size: 26,
+                    size: 28,
                   ),
                 ),
               ),
@@ -263,22 +264,25 @@ class _MainScreenState extends State<MainScreen> {
         width: 64,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               isSelected ? activeIcon : icon,
               color: isSelected ? primaryColor : tertiaryColor,
               size: 22,
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Text(
               label,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 color: isSelected ? primaryColor : tertiaryColor,
               ),
             ),
-            const SizedBox(height: 3),
+            const SizedBox(height: 2),
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               width: isSelected ? 5 : 0,

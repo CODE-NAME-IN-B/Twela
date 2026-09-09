@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
 import '../models/category.dart';
 import '../models/transaction.dart';
 import '../models/wallet_settings.dart';
@@ -8,10 +7,10 @@ import '../services/storage_service.dart';
 import '../services/notification_service.dart';
 import '../services/routine_detection_service.dart';
 import '../models/routine_pattern.dart';
+import '../utils/formatters.dart' as fmt;
 
 class TwelaProvider extends ChangeNotifier {
   final StorageService _storage;
-  static const _uuid = Uuid();
 
   List<ExpenseCategory> _categories = [];
   List<TwelaTransaction> _transactions = [];
@@ -30,6 +29,11 @@ class TwelaProvider extends ChangeNotifier {
     _budgetSettings = _storage.getBudgetSettings();
     _patterns = _storage.getPatterns();
     notifyListeners();
+  }
+
+  /// Reload all data from storage. Call after import to refresh in-memory state.
+  void reloadData() {
+    _loadData();
   }
 
   // Getters
@@ -91,7 +95,7 @@ class TwelaProvider extends ChangeNotifier {
     return _transactions
         .where((t) =>
             t.type == TransactionType.expense &&
-            t.date.isAfter(today))
+            !t.date.isBefore(today))
         .fold(0.0, (sum, t) => sum + t.amount);
   }
 
@@ -101,7 +105,7 @@ class TwelaProvider extends ChangeNotifier {
     return _transactions
         .where((t) =>
             t.type == TransactionType.expense &&
-            t.date.isAfter(monthStart))
+            !t.date.isBefore(monthStart))
         .fold(0.0, (sum, t) => sum + t.amount);
   }
 
@@ -112,7 +116,7 @@ class TwelaProvider extends ChangeNotifier {
         .where((t) =>
             t.type == TransactionType.expense &&
             t.categoryId == categoryId &&
-            t.date.isAfter(monthStart))
+            !t.date.isBefore(monthStart))
         .fold(0.0, (sum, t) => sum + t.amount);
   }
 
@@ -221,7 +225,7 @@ class TwelaProvider extends ChangeNotifier {
     if (_budgetSettings.dailySpendingLimit != null) {
       if (todaySpent > _budgetSettings.dailySpendingLimit!) {
         await NotificationService.showDailyLimitWarning(
-          'لقد تجاوزت الحد اليومي (${formatLyd(todaySpent)} / ${formatLyd(_budgetSettings.dailySpendingLimit!)})',
+          'لقد تجاوزت الحد اليومي (${fmt.formatLyd(todaySpent)} / ${fmt.formatLyd(_budgetSettings.dailySpendingLimit!)})',
         );
       }
     }
@@ -246,13 +250,9 @@ class TwelaProvider extends ChangeNotifier {
     if (_budgetSettings.lowBalanceThreshold != null) {
       if (totalBalance < _budgetSettings.lowBalanceThreshold!) {
         await NotificationService.showLowBalanceWarning(
-          'الرصيد الإجمالي منخفض (${formatLyd(totalBalance)})',
+          'الرصيد الإجمالي منخفض (${fmt.formatLyd(totalBalance)})',
         );
       }
     }
-  }
-
-  String formatLyd(double amount) {
-    return '${amount.toStringAsFixed(2)} د.ل';
   }
 }
