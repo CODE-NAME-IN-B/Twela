@@ -14,7 +14,6 @@ class TransactionTile extends StatelessWidget {
     final provider = context.read<TwelaProvider>();
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final primaryColor = theme.colorScheme.primary;
 
     showModalBottomSheet(
       context: context,

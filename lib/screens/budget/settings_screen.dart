@@ -6,6 +6,7 @@ import '../../providers/twela_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../providers/app_settings_provider.dart';
 import '../../models/budget_settings.dart';
+import '../../models/app_settings.dart';
 import '../../services/update_service.dart';
 import '../data/data_export_screen.dart';
 

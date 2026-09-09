@@ -1,4 +1,4 @@
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:twela/models/transaction.dart';
 
 /// Tests for the boundary conditions that were fixed.

@@ -5,7 +5,6 @@ import '../../providers/twela_provider.dart';
 import '../../services/storage_service.dart';
 import '../../services/notification_service.dart';
 import '../../models/wallet_settings.dart';
-import '../../utils/formatters.dart';
 import '../../utils/motivational_messages.dart';
 
 class OnboardingScreen extends StatefulWidget {
