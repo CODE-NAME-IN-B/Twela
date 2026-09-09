@@ -114,7 +114,8 @@ class AppTheme {
         ),
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
       ),
-      cardTheme: CardThemeData(
+      // ignore: deprecated_member_use
+      cardTheme: CardTheme(
         color: AppColors.card,
         elevation: 0,
         margin: EdgeInsets.zero,
@@ -316,7 +317,8 @@ class AppTheme {
         ),
         iconTheme: const IconThemeData(color: AppColors.darkTextPrimary),
       ),
-      cardTheme: CardThemeData(
+      // ignore: deprecated_member_use
+      cardTheme: CardTheme(
         color: AppColors.darkCard,
         elevation: 0,
         margin: EdgeInsets.zero,
