@@ -1,4 +1,6 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'theme/app_theme.dart';
 import 'providers/theme_provider.dart';
@@ -89,69 +91,81 @@ class _MainScreenState extends State<MainScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final primaryColor = theme.colorScheme.primary;
+    final glassMode = context.watch<AppSettingsProvider>().glassMode;
 
     return Scaffold(
+      extendBody: true,
       body: _screens[_currentIndex],
-      bottomNavigationBar: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surface,
-              border: Border(
-                top: BorderSide(
-                  color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
-                  width: 1,
-                ),
-              ),
-            ),
-            child: SafeArea(
-              child: SizedBox(
-                height: 60,
-                child: Row(
-                  children: [
-                    Expanded(child: _buildItem(context, 0, Icons.home_outlined, Icons.home, 'الرئيسية', primaryColor, isDark)),
-                    Expanded(child: _buildItem(context, 1, Icons.receipt_long_outlined, Icons.receipt_long, 'السجل', primaryColor, isDark)),
-                    const SizedBox(width: 72),
-                    Expanded(child: _buildItem(context, 2, Icons.people_outline, Icons.people, 'الديون', primaryColor, isDark)),
-                    Expanded(child: _buildItem(context, 3, Icons.bar_chart_outlined, Icons.bar_chart, 'الإحصائيات', primaryColor, isDark)),
-                    Expanded(child: _buildItem(context, 4, Icons.settings_outlined, Icons.settings, 'الإعدادات', primaryColor, isDark)),
-                  ],
-                ),
-              ),
-            ),
+
+      floatingActionButton: GestureDetector(
+        onTap: _showActionSheet,
+        child: Container(
+          width: 52,
+          height: 52,
+          decoration: BoxDecoration(
+            color: theme.scaffoldBackgroundColor,
+            shape: BoxShape.circle,
           ),
-          Positioned(
-            top: -24,
-            left: 0,
-            right: 0,
+          child: CustomPaint(
+            painter: _DashedRingPainter(primaryColor),
             child: Center(
-              child: GestureDetector(
-                onTap: _showActionSheet,
-                child: Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: primaryColor,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: primaryColor.withOpacity(0.3),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.add,
-                    color: Colors.white,
-                    size: 28,
-                  ),
-                ),
-              ),
+              child: Icon(Icons.add, color: primaryColor, size: 24),
             ),
           ),
-        ],
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+
+      bottomNavigationBar: _buildBar(context, theme, isDark, primaryColor, glassMode),
+    );
+  }
+
+  Widget _buildBar(BuildContext context, ThemeData theme, bool isDark, Color primaryColor, bool glassMode) {
+    final border = Border(
+      top: BorderSide(
+        color: isDark
+            // ignore: deprecated_member_use
+            ? Colors.white.withOpacity(0.08)
+            // ignore: deprecated_member_use
+            : Colors.black.withOpacity(0.06),
+        width: 0.5,
+      ),
+    );
+
+    final barContent = SafeArea(
+      child: SizedBox(
+        height: 60,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildItem(context, 0, Icons.home_outlined, Icons.home, 'الرئيسية', primaryColor, isDark),
+            _buildItem(context, 1, Icons.receipt_long_outlined, Icons.receipt_long, 'السجل', primaryColor, isDark),
+            _buildItem(context, 2, Icons.people_outline, Icons.people, 'الديون', primaryColor, isDark),
+            _buildItem(context, 3, Icons.bar_chart_outlined, Icons.bar_chart, 'الإحصائيات', primaryColor, isDark),
+            _buildItem(context, 4, Icons.settings_outlined, Icons.settings, 'الإعدادات', primaryColor, isDark),
+          ],
+        ),
+      ),
+    );
+
+    if (!glassMode) {
+      return Container(
+        decoration: BoxDecoration(color: theme.colorScheme.surface, border: border),
+        child: barContent,
+      );
+    }
+
+    return ClipRRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: Container(
+          decoration: BoxDecoration(
+            // ignore: deprecated_member_use
+            color: theme.colorScheme.surface.withOpacity(0.65),
+            border: border,
+          ),
+          child: barContent,
+        ),
       ),
     );
   }
@@ -255,38 +269,40 @@ class _MainScreenState extends State<MainScreen> {
     bool isDark,
   ) {
     final isSelected = _currentIndex == index;
-    final tertiaryColor = isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8);
+    final mutedColor = isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8);
 
     return GestureDetector(
-      onTap: () => setState(() => _currentIndex = index),
+      onTap: () {
+        if (context.read<AppSettingsProvider>().hapticFeedback) {
+          HapticFeedback.selectionClick();
+        }
+        setState(() => _currentIndex = index);
+      },
       behavior: HitTestBehavior.opaque,
       child: SizedBox(
-        width: 64,
+        width: 60,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               isSelected ? activeIcon : icon,
-              color: isSelected ? primaryColor : tertiaryColor,
+              color: isSelected ? primaryColor : mutedColor,
               size: 22,
             ),
-            const SizedBox(height: 2),
+            const SizedBox(height: 4),
             Text(
               label,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected ? primaryColor : tertiaryColor,
+                color: isSelected ? primaryColor : mutedColor,
               ),
             ),
-            const SizedBox(height: 2),
+            const SizedBox(height: 3),
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              width: isSelected ? 5 : 0,
-              height: isSelected ? 5 : 0,
+              width: isSelected ? 4 : 0,
+              height: isSelected ? 4 : 0,
               decoration: BoxDecoration(
                 color: primaryColor,
                 shape: BoxShape.circle,
@@ -323,6 +339,7 @@ class _MainScreenState extends State<MainScreen> {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
+                // ignore: deprecated_member_use
                 color: color.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -340,4 +357,36 @@ class _MainScreenState extends State<MainScreen> {
       ),
     );
   }
+}
+
+class _DashedRingPainter extends CustomPainter {
+  final Color color;
+  _DashedRingPainter(this.color);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1.6
+      ..style = PaintingStyle.stroke;
+
+    const dashCount = 24;
+    final radius = size.width / 2;
+    final center = Offset(radius, radius);
+
+    for (int i = 0; i < dashCount; i++) {
+      final startAngle = (i / dashCount) * 2 * 3.14159;
+      final sweep = (2 * 3.14159 / dashCount) * 0.5;
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius - 1),
+        startAngle,
+        sweep,
+        false,
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

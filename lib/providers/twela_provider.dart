@@ -128,6 +128,12 @@ class TwelaProvider extends ChangeNotifier {
     }
   }
 
+  int get daysSinceFirstUse {
+    if (_transactions.isEmpty) return 0;
+    final earliest = _transactions.reduce((a, b) => a.date.isBefore(b.date) ? a : b);
+    return DateTime.now().difference(earliest.date).inDays;
+  }
+
   // Category operations
   Future<void> addCategory(ExpenseCategory category) async {
     _categories.add(category);
