@@ -8,6 +8,7 @@ import '../../utils/daftar_number_style.dart';
 import '../../providers/twela_provider.dart';
 import '../../models/transaction.dart';
 import '../../utils/formatters.dart';
+import '../../widgets/twela_design_system.dart';
 
 class StatsScreen extends StatelessWidget {
   const StatsScreen({super.key});
@@ -18,76 +19,43 @@ class StatsScreen extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
       appBar: AppBar(
         title: const Text('الإحصائيات'),
       ),
-      body: Consumer<TwelaProvider>(
-        builder: (context, provider, _) {
-          final transactions = provider.transactions;
-          final expenses = transactions
-              .where((t) => t.type == TransactionType.expense)
-              .toList();
+      body: SafeArea(
+        child: Consumer<TwelaProvider>(
+          builder: (context, provider, _) {
+            final transactions = provider.transactions;
+            final expenses = transactions
+                .where((t) => t.type == TransactionType.expense)
+                .toList();
 
-          if (expenses.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(40),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? DaftarTheme.darkSurface
-                            : DaftarTheme.lightSurface,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.bar_chart_outlined,
-                        size: 36,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      'لا توجد بيانات كافية',
-                      style: theme.textTheme.headlineSmall,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'ابدأ بتسجيل مصاريفك لرؤية الإحصائيات',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                            color: isDark
-                                ? const Color(0xFF94A3B8)
-                                : const Color(0xFF64748B),
-                          ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
+            if (expenses.isEmpty) {
+              return TwelaEmptyState(
+                icon: Icons.bar_chart_outlined,
+                title: 'لا توجد بيانات كافية',
+                subtitle: 'ابدأ بتسجيل مصاريفك لرؤية الإحصائيات',
+              );
+            }
+
+            return SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildMonthlySummary(context, provider, isDark, theme),
+                  const SizedBox(height: 20),
+                  _buildCategoryChart(
+                      context, provider, expenses, isDark, theme),
+                  const SizedBox(height: 20),
+                  _buildTopCategories(
+                      context, provider, expenses, isDark, theme),
+                ],
               ),
             );
-          }
-
-          return SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildMonthlySummary(context, provider, isDark, theme),
-                const SizedBox(height: 20),
-                _buildCategoryChart(
-                    context, provider, expenses, isDark, theme),
-                const SizedBox(height: 20),
-                _buildTopCategories(
-                    context, provider, expenses, isDark, theme),
-              ],
-            ),
-          );
-        },
+          },
+        ),
       ),
     );
   }
@@ -111,7 +79,7 @@ class StatsScreen extends StatelessWidget {
                   context,
                   'الإجمالي',
                   formatLyd(provider.totalBalance),
-                  AppColors.primary,
+                  AppColors.info,
                   Icons.account_balance_wallet_outlined,
                   isDark,
                   theme,
@@ -123,7 +91,7 @@ class StatsScreen extends StatelessWidget {
                   context,
                   'المصروفات',
                   formatLyd(provider.monthSpent),
-                  DaftarTheme.danger,
+                  AppColors.expense,
                   Icons.arrow_upward_rounded,
                   isDark,
                   theme,
@@ -161,8 +129,8 @@ class StatsScreen extends StatelessWidget {
               Text(
                 label,
                 style: theme.textTheme.bodySmall?.copyWith(
-                      color: color,
-                    ),
+                  color: color,
+                ),
               ),
             ],
           ),
@@ -216,10 +184,7 @@ class StatsScreen extends StatelessWidget {
 
                   return PieChartSectionData(
                     value: entry.value,
-                    color: category?.color ??
-                        (isDark
-                            ? const Color(0xFF64748B)
-                            : const Color(0xFF94A3B8)),
+                    color: category?.color ?? AppColors.expense,
                     radius: 90,
                     title: '${(percentage * 100).toStringAsFixed(0)}%',
                     titleStyle: daftarNumberStyle(
@@ -246,10 +211,7 @@ class StatsScreen extends StatelessWidget {
                     width: 10,
                     height: 10,
                     decoration: BoxDecoration(
-                      color: category?.color ??
-                          (isDark
-                              ? const Color(0xFF64748B)
-                              : const Color(0xFF94A3B8)),
+                      color: category?.color ?? AppColors.expense,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -295,11 +257,12 @@ class StatsScreen extends StatelessWidget {
           const SizedBox(height: 16),
           ...sortedCategories.take(5).map((entry) {
             final category = provider.getCategoryById(entry.key);
+            final catColor = category?.color ?? AppColors.expense;
             return Container(
               margin: const EdgeInsets.only(bottom: 8),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: theme.scaffoldBackgroundColor,
+                color: isDark ? AppColors.darkSurface : AppColors.surface,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Row(
@@ -308,19 +271,12 @@ class StatsScreen extends StatelessWidget {
                     width: 36,
                     height: 36,
                     decoration: BoxDecoration(
-                      color: (category?.color ??
-                              (isDark
-                                  ? const Color(0xFF64748B)
-                                  : const Color(0xFF94A3B8)))
-                          .withOpacity(0.1),
+                      color: catColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
                       category?.icon ?? Icons.category_outlined,
-                      color: category?.color ??
-                          (isDark
-                              ? const Color(0xFF64748B)
-                              : const Color(0xFF94A3B8)),
+                      color: catColor,
                       size: 18,
                     ),
                   ),
@@ -335,7 +291,7 @@ class StatsScreen extends StatelessWidget {
                     formatLyd(entry.value),
                     style: daftarNumberStyle(
                       fontSize: 14,
-                      color: theme.colorScheme.onSurface,
+                      color: AppColors.expense,
                     ),
                   ),
                 ],

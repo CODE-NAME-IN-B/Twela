@@ -2,10 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../theme/app_colors.dart';
+import '../../theme/daftar_theme.dart';
 import '../../providers/debt_provider.dart';
 import '../../providers/app_settings_provider.dart';
 import '../../models/debt.dart';
+import '../../models/transaction.dart';
 import '../../utils/formatters.dart';
+import '../../utils/daftar_number_style.dart';
+import '../../widgets/twela_design_system.dart';
+import '../../widgets/daftar_card.dart';
 
 class DebtDetailScreen extends StatefulWidget {
   final Debt debt;
@@ -54,35 +59,16 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
   }
 
   void _confirmDelete(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        title: const Text('حذف الدين'),
-        content: const Text('هل أنت متأكد من حذف هذا الدين؟'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('إلغاء'),
-          ),
-          TextButton(
-            onPressed: () {
-              context.read<DebtProvider>().removeDebt(widget.debt.id);
-              Navigator.pop(ctx);
-              Navigator.pop(context);
-            },
-            child: const Text(
-              'حذف',
-              style: TextStyle(color: AppColors.danger),
-            ),
-          ),
-        ],
+      builder: (ctx) => TwelaConfirmDialog(
+        title: 'حذف الدين',
+        message: 'هل أنت متأكد من حذف هذا الدين؟ سيتم حذف جميع المعاملات المرتبطة به.',
+        confirmLabel: 'حذف',
+        onConfirm: () {
+          context.read<DebtProvider>().removeDebt(widget.debt.id);
+          Navigator.pop(context);
+        },
       ),
     );
   }
@@ -93,7 +79,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
       appBar: AppBar(
         title: Text(widget.debt.personName),
         actions: [
@@ -101,37 +87,39 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
             padding: const EdgeInsets.only(left: 16),
             child: Container(
               decoration: BoxDecoration(
-                color: isDark
-                    ? const Color(0xFFE5484D).withOpacity(0.1)
-                    : const Color(0xFFFEF2F2),
+                color: isDark ? AppColors.danger.withOpacity(0.12) : AppColors.dangerSurface,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: IconButton(
                 icon: const Icon(Icons.delete_outline, color: AppColors.danger),
-                onPressed: () {
-                  _confirmDelete(context);
-                },
+                onPressed: () => _confirmDelete(context),
               ),
             ),
           ),
         ],
       ),
-      body: Consumer<DebtProvider>(
-        builder: (context, provider, _) {
-          final debt = provider.getDebtById(widget.debt.id) ?? widget.debt;
+      body: SafeArea(
+        child: Consumer<DebtProvider>(
+          builder: (context, provider, _) {
+            final debt = provider.getDebtById(widget.debt.id) ?? widget.debt;
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildDebtSummary(context, debt, isDark, theme),
-                const SizedBox(height: 24),
-                _buildPaymentSection(context, debt, isDark, theme),
-              ],
-            ),
-          );
-        },
+            return SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildDebtSummary(context, debt, isDark, theme),
+                  const SizedBox(height: 24),
+                  _buildPaymentSection(context, debt, isDark, theme),
+                  if (debt.paidAmount > 0) ...[
+                    const SizedBox(height: 24),
+                    _buildPaymentHistory(context, debt, provider, isDark, theme),
+                  ],
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -139,17 +127,11 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
   Widget _buildDebtSummary(
       BuildContext context, Debt debt, bool isDark, ThemeData theme) {
     final progress = debt.totalAmount > 0 ? debt.paidAmount / debt.totalAmount : 0.0;
+    final totalDots = 10;
+    final filledDots = (progress * totalDots).round().clamp(0, totalDots);
 
-    return Container(
+    return DaftarCard(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
-          width: 1,
-        ),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -163,28 +145,24 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                     Text(
                       debt.personName,
                       style: theme.textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
                         color: debt.isGiven
-                            ? (isDark
-                                ? const Color(0xFFE5484D).withOpacity(0.1)
-                                : const Color(0xFFFEF2F2))
-                            : (isDark
-                                ? const Color(0xFF149C6D).withOpacity(0.1)
-                                : const Color(0xFFECFDF5)),
-                        borderRadius: BorderRadius.circular(6),
+                            ? (isDark ? AppColors.debt.withOpacity(0.12) : AppColors.debtSurface)
+                            : (isDark ? AppColors.income.withOpacity(0.12) : AppColors.incomeSurface),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        debt.isGiven ? 'أنا أديت له' : 'هو أديت لي',
+                        debt.isGiven ? 'أنا أعطيت' : 'أنا استلمت',
                         style: TextStyle(
-                          fontSize: 11,
+                          fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: debt.isGiven ? AppColors.danger : AppColors.success,
+                          color: debt.isGiven ? AppColors.debt : AppColors.income,
                         ),
                       ),
                     ),
@@ -192,21 +170,17 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: debt.isPaidOff
-                      ? (isDark
-                          ? const Color(0xFF149C6D).withOpacity(0.1)
-                          : const Color(0xFFECFDF5))
-                      : (isDark
-                          ? const Color(0xFFF5A524).withOpacity(0.1)
-                          : const Color(0xFFFFFBEB)),
+                      ? (isDark ? AppColors.success.withOpacity(0.12) : AppColors.successSurface)
+                      : (isDark ? AppColors.debt.withOpacity(0.12) : AppColors.debtSurface),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   debt.isPaidOff ? 'تم السداد' : 'نشط',
                   style: TextStyle(
-                    color: debt.isPaidOff ? AppColors.success : AppColors.warning,
+                    color: debt.isPaidOff ? AppColors.success : AppColors.debt,
                     fontWeight: FontWeight.w600,
                     fontSize: 12,
                   ),
@@ -218,10 +192,8 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
           Text(
             debt.itemDescription,
             style: theme.textTheme.bodyMedium?.copyWith(
-                  color: isDark
-                      ? const Color(0xFF94A3B8)
-                      : const Color(0xFF64748B),
-                ),
+              color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+            ),
           ),
           const SizedBox(height: 24),
           Row(
@@ -231,7 +203,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                   context,
                   'الإجمالي',
                   debt.totalAmount,
-                  theme.colorScheme.onSurface,
+                  AppColors.debt,
                   isDark,
                   theme,
                 ),
@@ -253,7 +225,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                   context,
                   'المتبقي',
                   debt.remaining,
-                  AppColors.danger,
+                  debt.isPaidOff ? AppColors.success : AppColors.debt,
                   isDark,
                   theme,
                 ),
@@ -261,17 +233,10 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
             ],
           ),
           const SizedBox(height: 20),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: progress,
-              backgroundColor:
-                  isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
-              valueColor: AlwaysStoppedAnimation<Color>(
-                debt.isPaidOff ? AppColors.success : AppColors.primary,
-              ),
-              minHeight: 8,
-            ),
+          TwelaProgressDots(
+            total: totalDots,
+            filled: filledDots,
+            filledColor: debt.isPaidOff ? AppColors.success : AppColors.debt,
           ),
           const SizedBox(height: 8),
           Row(
@@ -279,11 +244,15 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
             children: [
               Text(
                 '${(progress * 100).toStringAsFixed(0)}% مكتمل',
-                style: theme.textTheme.bodySmall,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                ),
               ),
               Text(
                 formatDate(debt.date),
-                style: theme.textTheme.bodySmall,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: isDark ? AppColors.darkTextTertiary : AppColors.textTertiary,
+                ),
               ),
             ],
           ),
@@ -303,24 +272,23 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.05),
+        color: isDark ? color.withOpacity(0.08) : color.withOpacity(0.06),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
         children: [
           Text(
             label,
-            style: theme.textTheme.bodySmall?.copyWith(
-                  color: color,
-                ),
+            style: theme.textTheme.bodySmall?.copyWith(color: color),
           ),
           const SizedBox(height: 4),
           Text(
             formatLydShort(amount),
-            style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: color,
-                ),
+            style: daftarNumberStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
           ),
         ],
       ),
@@ -330,77 +298,150 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
   Widget _buildPaymentSection(
       BuildContext context, Debt debt, bool isDark, ThemeData theme) {
     if (debt.isPaidOff) {
-      return Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: isDark
-              ? const Color(0xFF149C6D).withOpacity(0.1)
-              : const Color(0xFFECFDF5),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: AppColors.success.withOpacity(0.2),
-            width: 1,
-          ),
-        ),
+      return DaftarCard(
+        padding: const EdgeInsets.all(24),
+        backgroundColor: isDark ? AppColors.success.withOpacity(0.08) : AppColors.successSurface,
+        showShadow: false,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.check_circle_outline, color: AppColors.success),
-            const SizedBox(width: 8),
+            const Icon(Icons.check_circle_outline, color: AppColors.success, size: 28),
+            const SizedBox(width: 10),
             Text(
               'تم سداد الدين بالكامل',
               style: theme.textTheme.titleMedium?.copyWith(
-                    color: AppColors.success,
-                    fontWeight: FontWeight.w600,
-                  ),
+                color: AppColors.success,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),
       );
     }
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
-          width: 1,
-        ),
-      ),
+    return DaftarCard(
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'إضافة دفعة',
-            style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-          ),
-          const SizedBox(height: 12),
           Row(
             children: [
-              Expanded(
-                child: TextField(
-                  controller: _paymentController,
-                  keyboardType: TextInputType.number,
-                  style: theme.textTheme.bodyMedium,
-                  decoration: const InputDecoration(
-                    hintText: 'المبلغ',
-                    suffixText: 'د.ل',
-                  ),
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: isDark ? AppColors.debt.withOpacity(0.12) : AppColors.debtSurface,
+                  borderRadius: BorderRadius.circular(10),
                 ),
+                child: const Icon(Icons.payment_outlined, color: AppColors.debt, size: 20),
               ),
               const SizedBox(width: 12),
-              ElevatedButton(
-                onPressed: _addPayment,
-                child: const Text('إضافة'),
+              Text(
+                'تسجيل دفعة',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ],
           ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _paymentController,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            textAlign: TextAlign.center,
+            style: daftarNumberStyle(
+              fontSize: 28,
+              color: AppColors.debt,
+            ),
+            decoration: InputDecoration(
+              hintText: '0',
+              hintStyle: daftarNumberStyle(
+                fontSize: 28,
+                color: isDark ? AppColors.darkTextTertiary : AppColors.textTertiary,
+              ),
+              suffixText: 'د.ل',
+              suffixStyle: TextStyle(
+                fontSize: 14,
+                color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+              ),
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(vertical: 16),
+            ),
+          ),
+          const SizedBox(height: 12),
+          TwelaPrimaryButton(
+            label: 'تسجيل دفعة',
+            icon: Icons.check_circle_outline,
+            color: AppColors.debt,
+            onPressed: _addPayment,
+          ),
         ],
       ),
+    );
+  }
+
+  Widget _buildPaymentHistory(
+      BuildContext context, Debt debt, DebtProvider provider, bool isDark, ThemeData theme) {
+    final payments = provider.ledger.transactions
+        .where((t) => t.relatedId == debt.id && t.type == TransactionType.debtPayment)
+        .toList()
+      ..sort((a, b) => b.date.compareTo(a.date));
+
+    if (payments.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TwelaSectionHeader(title: 'سجل الدفعات'),
+        const SizedBox(height: 8),
+        ...payments.map((tx) => DaftarCard(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              showShadow: false,
+              child: Row(
+                children: [
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? AppColors.success.withOpacity(0.12)
+                          : AppColors.successSurface,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.check, color: AppColors.success, size: 16),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'دفعة',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Text(
+                          formatDateTime(tx.date),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: isDark ? AppColors.darkTextTertiary : AppColors.textTertiary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Text(
+                    formatLyd(tx.amount),
+                    style: daftarNumberStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.success,
+                    ),
+                  ),
+                ],
+              ),
+            )),
+      ],
     );
   }
 }

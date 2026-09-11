@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/twela_provider.dart';
 import '../../providers/app_settings_provider.dart';
+import '../../theme/app_colors.dart';
+import '../../theme/daftar_theme.dart';
 import '../../widgets/balance_card.dart';
+import '../../widgets/daftar_card.dart';
 import '../../widgets/wallet_mini_card.dart';
 import '../../widgets/limit_progress_bar.dart';
 import '../../utils/formatters.dart';
@@ -31,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final appSettings = context.watch<AppSettingsProvider>();
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
       body: SafeArea(
         child: Container(
           decoration: BoxDecoration(
@@ -39,45 +42,46 @@ class _HomeScreenState extends State<HomeScreen> {
               begin: Alignment.topRight,
               end: Alignment.bottomLeft,
               colors: isDark
-                  ? [const Color(0xFF1E1B4B), const Color(0xFF0F172A)]
-                  : [theme.colorScheme.primary.withOpacity(0.08), Colors.white],
+                  ? [const Color(0xFF1E1B4B), DaftarTheme.darkSurface]
+                  : [AppColors.primary.withAlpha(20), DaftarTheme.lightSurface],
             ),
           ),
           child: RefreshIndicator(
             onRefresh: () async {},
-            color: theme.colorScheme.primary,
+            color: AppColors.primary,
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
               child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeader(context, theme, isDark),
-                const SizedBox(height: 6),
-                _buildMotivationalMessage(context, theme, isDark),
-                if (appSettings.showGlyphBar) ...[
-                  const SizedBox(height: 12),
-                  _buildGlyphBar(context, theme, isDark),
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(context, theme, isDark),
+                  const SizedBox(height: 6),
+                  _buildMotivationalMessage(context, theme, isDark),
+                  if (appSettings.showGlyphBar) ...[
+                    const SizedBox(height: 12),
+                    _buildGlyphBar(context, theme, isDark),
+                  ],
+                  const SizedBox(height: 24),
+                  const BalanceCard(),
+                  const SizedBox(height: 20),
+                  _buildWalletCards(context),
+                  const SizedBox(height: 24),
+                  _buildTodaySpending(context, theme, isDark),
+                  const SizedBox(height: 24),
+                  _buildQuickActions(context, theme, isDark),
                 ],
-                const SizedBox(height: 24),
-                const BalanceCard(),
-                const SizedBox(height: 20),
-                _buildWalletCards(context),
-                const SizedBox(height: 24),
-                _buildTodaySpending(context, theme, isDark),
-                const SizedBox(height: 24),
-                _buildQuickActions(context, theme, isDark),
-              ],
+              ),
             ),
           ),
-        ),
         ),
       ),
     );
   }
 
   Widget _buildHeader(BuildContext context, ThemeData theme, bool isDark) {
-    final logoAsset = isDark ? 'assets/logo/twela_logo_mono.png' : 'assets/logo/twela_logo.png';
+    final logoAsset =
+        isDark ? 'assets/logo/twela_logo_mono.png' : 'assets/logo/twela_logo.png';
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -89,11 +93,11 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 40,
               decoration: BoxDecoration(
                 color: isDark
-                    ? theme.colorScheme.primary.withOpacity(0.1)
-                    : const Color(0xFFECFDF5),
+                    ? AppColors.primary.withAlpha(25)
+                    : AppColors.primarySurface,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: theme.colorScheme.primary.withOpacity(0.15),
+                  color: AppColors.primary.withAlpha(38),
                   width: 1,
                 ),
               ),
@@ -105,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   errorBuilder: (context, error, stackTrace) {
                     return Icon(
                       Icons.account_balance_wallet_outlined,
-                      color: theme.colorScheme.primary,
+                      color: AppColors.primary,
                       size: 22,
                     );
                   },
@@ -119,7 +123,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 Text(
                   _getGreeting(),
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -127,7 +133,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   'Twela',
                   style: theme.textTheme.headlineLarge?.copyWith(
                     fontWeight: FontWeight.w700,
-                    color: theme.colorScheme.onSurface,
+                    color: isDark
+                        ? AppColors.darkTextPrimary
+                        : AppColors.textPrimary,
                   ),
                 ),
               ],
@@ -139,24 +147,27 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildMotivationalMessage(BuildContext context, ThemeData theme, bool isDark) {
+  Widget _buildMotivationalMessage(
+      BuildContext context, ThemeData theme, bool isDark) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: isDark
-            ? theme.colorScheme.primary.withOpacity(0.06)
-            : theme.colorScheme.primary.withOpacity(0.04),
+            ? AppColors.primary.withAlpha(15)
+            : AppColors.primary.withAlpha(10),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.12),
+          color: AppColors.primary.withAlpha(30),
           width: 1,
         ),
       ),
       child: Text(
         _motivationalMessage,
         style: theme.textTheme.bodySmall?.copyWith(
-          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+          color: isDark
+              ? AppColors.darkTextSecondary
+              : AppColors.textSecondary,
           fontStyle: FontStyle.italic,
           height: 1.4,
         ),
@@ -185,7 +196,8 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Widget _buildNotificationButton(BuildContext context, ThemeData theme, bool isDark) {
+  Widget _buildNotificationButton(
+      BuildContext context, ThemeData theme, bool isDark) {
     return GestureDetector(
       onTap: () {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -193,10 +205,10 @@ class _HomeScreenState extends State<HomeScreen> {
             content: Text(
               'لا توجد إشعارات جديدة',
               style: TextStyle(
-                color: isDark ? const Color(0xFFF1F5F9) : Colors.white,
+                color: isDark ? AppColors.darkTextPrimary : Colors.white,
               ),
             ),
-            backgroundColor: isDark ? const Color(0xFF334155) : const Color(0xFF334155),
+            backgroundColor: isDark ? AppColors.darkBorder : AppColors.darkTextTertiary,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
@@ -209,17 +221,17 @@ class _HomeScreenState extends State<HomeScreen> {
         height: 44,
         decoration: BoxDecoration(
           color: isDark
-              ? theme.colorScheme.primary.withOpacity(0.1)
-              : const Color(0xFFECFDF5),
+              ? AppColors.primary.withAlpha(25)
+              : AppColors.primarySurface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: theme.colorScheme.primary.withOpacity(0.12),
+            color: AppColors.primary.withAlpha(30),
             width: 1,
           ),
         ),
-        child: Icon(
+        child: const Icon(
           Icons.notifications_outlined,
-          color: theme.colorScheme.primary,
+          color: AppColors.primary,
           size: 22,
         ),
       ),
@@ -255,33 +267,35 @@ class _HomeScreenState extends State<HomeScreen> {
           icon = Icons.calendar_today_outlined;
         }
 
-        final surfaceColor = isDark
-            ? const Color(0xFF1E293B).withOpacity(0.5)
-            : Colors.white.withOpacity(0.6);
-        final borderColor = isDark
-            ? const Color(0xFF334155).withOpacity(0.5)
-            : const Color(0xFFE2E8F0).withOpacity(0.7);
-
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(
-            color: surfaceColor,
+            color: isDark
+                ? AppColors.darkSurface.withAlpha(128)
+                : Colors.white.withAlpha(153),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: borderColor, width: 1),
+            border: Border.all(
+              color: isDark
+                  ? AppColors.darkBorder.withAlpha(128)
+                  : AppColors.border.withAlpha(180),
+              width: 1,
+            ),
           ),
           child: Row(
             children: [
               Icon(
                 icon,
                 size: 16,
-                color: theme.colorScheme.primary,
+                color: AppColors.primary,
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   message,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.textSecondary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -294,8 +308,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildWalletCards(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Consumer<TwelaProvider>(
       builder: (context, provider, _) {
         return Row(
@@ -305,7 +317,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: 'كاش',
                 amount: provider.cashBalance,
                 icon: Icons.money_outlined,
-                color: theme.colorScheme.primary,
+                color: AppColors.primary,
               ),
             ),
             const SizedBox(width: 12),
@@ -314,7 +326,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: 'مصرف',
                 amount: provider.bankBalance,
                 icon: Icons.account_balance_outlined,
-                color: const Color(0xFF10B981),
+                color: AppColors.success,
               ),
             ),
           ],
@@ -323,21 +335,16 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildTodaySpending(BuildContext context, ThemeData theme, bool isDark) {
+  Widget _buildTodaySpending(
+      BuildContext context, ThemeData theme, bool isDark) {
     return Consumer<TwelaProvider>(
       builder: (context, provider, _) {
         final dailyLimit = provider.budgetSettings.dailySpendingLimit;
         final todaySpent = provider.todaySpent;
-        final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
-        final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
 
-        return Container(
+        return DaftarCard(
+          showDiagonalCut: false,
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: surfaceColor,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: borderColor, width: 1),
-          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -351,17 +358,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         height: 32,
                         decoration: BoxDecoration(
                           color: isDark
-                              ? theme.colorScheme.primary.withOpacity(0.15)
-                              : const Color(0xFFECFDF5),
+                              ? AppColors.primary.withAlpha(38)
+                              : AppColors.primarySurface,
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: theme.colorScheme.primary.withOpacity(0.12),
+                            color: AppColors.primary.withAlpha(30),
                             width: 1,
                           ),
                         ),
-                        child: Icon(
+                        child: const Icon(
                           Icons.receipt_long_outlined,
-                          color: theme.colorScheme.primary,
+                          color: AppColors.primary,
                           size: 18,
                         ),
                       ),
@@ -369,7 +376,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       Text(
                         'صرف اليوم',
                         style: theme.textTheme.titleMedium?.copyWith(
-                          color: theme.colorScheme.onSurface,
+                          color: isDark
+                              ? AppColors.darkTextPrimary
+                              : AppColors.textPrimary,
                         ),
                       ),
                     ],
@@ -377,7 +386,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Text(
                     formatLyd(todaySpent),
                     style: theme.textTheme.titleMedium?.copyWith(
-                      color: theme.colorScheme.primary,
+                      color: AppColors.primary,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -396,14 +405,20 @@ class _HomeScreenState extends State<HomeScreen> {
                     Text(
                       'الحد: ${formatLyd(dailyLimit)}',
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary,
                       ),
                     ),
                     Text(
-                      dailyLimit > 0 ? '${((todaySpent / dailyLimit) * 100).toStringAsFixed(0)}%' : '0%',
+                      dailyLimit > 0
+                          ? '${((todaySpent / dailyLimit) * 100).toStringAsFixed(0)}%'
+                          : '0%',
                       style: theme.textTheme.bodySmall?.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary,
                       ),
                     ),
                   ],
@@ -423,7 +438,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Text(
           'إجراءات سريعة',
           style: theme.textTheme.headlineSmall?.copyWith(
-            color: theme.colorScheme.onSurface,
+            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 12),
@@ -436,7 +451,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 isDark: isDark,
                 icon: Icons.arrow_upward_rounded,
                 label: 'إضافة صرف',
-                color: const Color(0xFFE5484D),
+                color: AppColors.expense,
                 onTap: () => Navigator.pushNamed(context, '/add-transaction'),
               ),
             ),
@@ -448,7 +463,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 isDark: isDark,
                 icon: Icons.arrow_downward_rounded,
                 label: 'إضافة دخل',
-                color: const Color(0xFF149C6D),
+                color: AppColors.income,
                 onTap: () => Navigator.pushNamed(
                   context,
                   '/add-transaction',
@@ -471,17 +486,17 @@ class _HomeScreenState extends State<HomeScreen> {
     required Color color,
     required VoidCallback onTap,
   }) {
-    final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
-
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
         decoration: BoxDecoration(
-          color: surfaceColor,
+          color: isDark ? AppColors.darkSurface : Colors.white,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: borderColor, width: 1),
+          border: Border.all(
+            color: isDark ? AppColors.darkBorder : AppColors.border,
+            width: 1,
+          ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -490,10 +505,10 @@ class _HomeScreenState extends State<HomeScreen> {
               width: 28,
               height: 28,
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withAlpha(25),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: color.withOpacity(0.15),
+                  color: color.withAlpha(38),
                   width: 1,
                 ),
               ),
@@ -503,7 +518,9 @@ class _HomeScreenState extends State<HomeScreen> {
             Text(
               label,
               style: theme.textTheme.titleSmall?.copyWith(
-                color: theme.colorScheme.onSurface,
+                color: isDark
+                    ? AppColors.darkTextPrimary
+                    : AppColors.textPrimary,
               ),
             ),
           ],

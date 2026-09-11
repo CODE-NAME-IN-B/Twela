@@ -22,6 +22,7 @@ import 'screens/savings/add_savings_goal_screen.dart';
 import 'screens/data/data_export_screen.dart';
 import 'models/debt.dart';
 import 'models/transaction.dart';
+import 'services/update_service.dart';
 
 class TwelaApp extends StatelessWidget {
   const TwelaApp({super.key});
@@ -92,6 +93,16 @@ class _MainScreenState extends State<MainScreen> {
     StatsScreen(),
     SettingsScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize update service and auto-check after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      UpdateService.init();
+      UpdateService.autoCheckForUpdate(context);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

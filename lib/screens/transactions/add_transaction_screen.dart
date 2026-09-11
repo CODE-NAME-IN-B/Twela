@@ -5,6 +5,9 @@ import 'package:uuid/uuid.dart';
 import '../../providers/twela_provider.dart';
 import '../../providers/app_settings_provider.dart';
 import '../../models/transaction.dart';
+import '../../theme/app_colors.dart';
+import '../../theme/daftar_theme.dart';
+import '../../widgets/twela_design_system.dart';
 import '../../widgets/wallet_toggle.dart';
 import '../../widgets/category_picker.dart';
 
@@ -35,6 +38,12 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     _noteController.dispose();
     super.dispose();
   }
+
+  Color get _semanticColor =>
+      _type == TransactionType.expense ? AppColors.expense : AppColors.income;
+
+  String get _title =>
+      _type == TransactionType.expense ? 'إضافة صرف' : 'إضافة دخل';
 
   void _saveTransaction() {
     final amount = double.tryParse(_amountController.text);
@@ -77,225 +86,143 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor:
+          isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.close,
+            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: Text(
-          _type == TransactionType.expense ? 'إضافة صرف' : 'إضافة دخل',
-          style: TextStyle(color: theme.colorScheme.onSurface),
+          _title,
+          style: TextStyle(
+            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildTypeSelector(theme, isDark),
-            const SizedBox(height: 24),
-            WalletToggle(
-              selected: _walletType,
-              onChanged: (type) => setState(() => _walletType = type),
-            ),
-            const SizedBox(height: 24),
-            _buildAmountField(theme, isDark),
-            const SizedBox(height: 20),
-            if (_type == TransactionType.expense) ...[
-              Text(
-                'التصنيف',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: theme.colorScheme.onSurface,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TwelaSegmentedControl<TransactionType>(
+                segments: const {
+                  TransactionType.expense: 'صرف',
+                  TransactionType.income: 'دخل',
+                },
+                selected: _type,
+                onSelected: (type) => setState(() => _type = type),
+                activeColor: _semanticColor,
+              ),
+              const SizedBox(height: 24),
+              WalletToggle(
+                selected: _walletType,
+                onChanged: (type) => setState(() => _walletType = type),
+              ),
+              const SizedBox(height: 28),
+              _buildAmountSection(isDark),
+              const SizedBox(height: 28),
+              if (_type == TransactionType.expense) ...[
+                Text(
+                  'التصنيف',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.textSecondary,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              CategoryPicker(
-                selectedId: _selectedCategoryId,
-                onSelect: (id) => setState(() => _selectedCategoryId = id),
-              ),
-              const SizedBox(height: 20),
-            ],
-            _buildNoteField(theme, isDark),
-            const SizedBox(height: 32),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
+                const SizedBox(height: 12),
+                CategoryPicker(
+                  selectedId: _selectedCategoryId,
+                  onSelect: (id) => setState(() => _selectedCategoryId = id),
+                ),
+                const SizedBox(height: 28),
+              ],
+              _buildNoteField(isDark),
+              const SizedBox(height: 32),
+              TwelaPrimaryButton(
+                label: 'حفظ المعملة',
+                color: _semanticColor,
+                icon: Icons.check_rounded,
                 onPressed: _saveTransaction,
-                child: const Text('حفظ المعاملة'),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildTypeSelector(ThemeData theme, bool isDark) {
-    final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
-    final secondaryColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
-
+  Widget _buildAmountSection(bool isDark) {
     return Container(
-      padding: const EdgeInsets.all(4),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 20),
       decoration: BoxDecoration(
-        color: surfaceColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: borderColor, width: 1),
+        color: isDark ? AppColors.darkSurface : Colors.white,
+        borderRadius: BorderRadius.circular(TwelaRadius.lg),
+        border: Border.all(
+          color: isDark ? AppColors.darkBorder : AppColors.borderLight,
+          width: 1,
+        ),
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: GestureDetector(
-              onTap: () => setState(() => _type = TransactionType.expense),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                  color: _type == TransactionType.expense
-                      ? theme.colorScheme.primary
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.arrow_upward_rounded,
-                      color: _type == TransactionType.expense
-                          ? Colors.white
-                          : secondaryColor,
-                      size: 18,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      'صرف',
-                      style: TextStyle(
-                        color: _type == TransactionType.expense
-                            ? Colors.white
-                            : secondaryColor,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: GestureDetector(
-              onTap: () => setState(() => _type = TransactionType.income),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                  color: _type == TransactionType.income
-                      ? const Color(0xFF149C6D)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.arrow_downward_rounded,
-                      color: _type == TransactionType.income
-                          ? Colors.white
-                          : secondaryColor,
-                      size: 18,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      'دخل',
-                      style: TextStyle(
-                        color: _type == TransactionType.income
-                            ? Colors.white
-                            : secondaryColor,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
+      child: TwelaAmountField(
+        controller: _amountController,
+        accentColor: _semanticColor,
+        suffixText: 'د.ل',
       ),
     );
   }
 
-  Widget _buildAmountField(ThemeData theme, bool isDark) {
-    final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
-    final secondaryColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
-
+  Widget _buildNoteField(bool isDark) {
     return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: surfaceColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderColor, width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'المبلغ',
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: theme.colorScheme.onSurface,
-            ),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _amountController,
-            keyboardType: TextInputType.number,
-            style: theme.textTheme.displaySmall?.copyWith(
-              fontWeight: FontWeight.w700,
-              color: theme.colorScheme.onSurface,
-            ),
-            decoration: InputDecoration(
-              hintText: '0.00',
-              suffixText: 'د.ل',
-              suffixStyle: theme.textTheme.titleMedium?.copyWith(
-                color: secondaryColor,
-              ),
-              border: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              focusedBorder: InputBorder.none,
-              contentPadding: EdgeInsets.zero,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNoteField(ThemeData theme, bool isDark) {
-    final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
-    final secondaryColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
-
-    return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: surfaceColor,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: borderColor, width: 1),
+        color: isDark ? AppColors.darkSurface : Colors.white,
+        borderRadius: BorderRadius.circular(TwelaRadius.lg),
+        border: Border.all(
+          color: isDark ? AppColors.darkBorder : AppColors.borderLight,
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'ملاحظة (اختياري)',
-            style: theme.textTheme.titleSmall?.copyWith(
-              color: secondaryColor,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: isDark
+                  ? AppColors.darkTextTertiary
+                  : AppColors.textTertiary,
             ),
           ),
           const SizedBox(height: 8),
           TextField(
             controller: _noteController,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurface,
+            style: TextStyle(
+              fontSize: 14,
+              color: isDark
+                  ? AppColors.darkTextPrimary
+                  : AppColors.textPrimary,
             ),
             decoration: InputDecoration(
               hintText: 'أضف ملاحظة...',
-              hintStyle: TextStyle(color: secondaryColor),
+              hintStyle: TextStyle(
+                color: isDark
+                    ? AppColors.darkTextTertiary
+                    : AppColors.textTertiary,
+              ),
               border: InputBorder.none,
               enabledBorder: InputBorder.none,
               focusedBorder: InputBorder.none,

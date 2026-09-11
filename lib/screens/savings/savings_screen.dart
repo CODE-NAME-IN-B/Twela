@@ -8,6 +8,7 @@ import '../../providers/savings_provider.dart';
 import '../../models/savings_goal.dart';
 import '../../models/savings_entry.dart';
 import '../../utils/formatters.dart';
+import '../../widgets/twela_design_system.dart';
 import 'add_savings_goal_screen.dart';
 
 class SavingsScreen extends StatelessWidget {
@@ -19,7 +20,7 @@ class SavingsScreen extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
       appBar: AppBar(
         title: const Text('الحصالة'),
         actions: [
@@ -27,13 +28,11 @@ class SavingsScreen extends StatelessWidget {
             padding: const EdgeInsets.only(left: 16),
             child: Container(
               decoration: BoxDecoration(
-                color: isDark
-                    ? theme.colorScheme.primary.withOpacity(0.15)
-                    : const Color(0xFFECFDF5),
+                color: AppColors.savingsSurface,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: IconButton(
-                icon: Icon(Icons.add, color: theme.colorScheme.primary),
+                icon: const Icon(Icons.add, color: AppColors.savings),
                 onPressed: () => Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const AddSavingsGoalScreen()),
@@ -43,103 +42,56 @@ class SavingsScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Consumer<SavingsProvider>(
-        builder: (context, provider, _) {
-          final activeGoals = provider.activeGoals;
-          final completedGoals = provider.completedGoals;
+      body: SafeArea(
+        child: Consumer<SavingsProvider>(
+          builder: (context, provider, _) {
+            final activeGoals = provider.activeGoals;
+            final completedGoals = provider.completedGoals;
 
-          if (activeGoals.isEmpty && completedGoals.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(40),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? DaftarTheme.darkSurface
-                            : DaftarTheme.lightSurface,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: isDark
-                              ? const Color(0xFF334155)
-                              : const Color(0xFFE2E8F0),
-                          width: 1,
-                        ),
-                      ),
-                      child: Icon(
-                        Icons.savings_outlined,
-                        size: 36,
-                        color: isDark
-                            ? const Color(0xFF94A3B8)
-                            : AppColors.primary,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      'لم تنشئ حصالة بعد',
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        color: theme.colorScheme.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'أنشئ حصالة لادخار المال بشكل يومي',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: isDark
-                            ? const Color(0xFF94A3B8)
-                            : const Color(0xFF64748B),
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 24),
-                    ElevatedButton.icon(
-                      onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const AddSavingsGoalScreen()),
-                      ),
-                      icon: const Icon(Icons.add),
-                      label: const Text('إنشاء حصالة'),
-                    ),
-                  ],
+            if (activeGoals.isEmpty && completedGoals.isEmpty) {
+              return TwelaEmptyState(
+                icon: Icons.savings_outlined,
+                title: 'لم تنشئ حصالة بعد',
+                subtitle: 'أنشئ حصالة لادخار المال بشكل يومي',
+                actionLabel: 'إنشاء حصالة',
+                onAction: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AddSavingsGoalScreen()),
                 ),
+              );
+            }
+
+            return SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (activeGoals.isNotEmpty) ...[
+                    Text(
+                      'نشطة',
+                      style: theme.textTheme.headlineSmall,
+                    ),
+                    const SizedBox(height: 12),
+                    ...activeGoals.map((goal) => _buildGoalCard(context, goal, theme, isDark)),
+                  ],
+                  if (completedGoals.isNotEmpty) ...[
+                    const SizedBox(height: 28),
+                    Text(
+                      'مكتملة',
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    ...completedGoals.map((goal) => _buildGoalCard(context, goal, theme, isDark)),
+                  ],
+                ],
               ),
             );
-          }
-
-          return SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (activeGoals.isNotEmpty) ...[
-                  Text(
-                    'نشطة',
-                    style: theme.textTheme.headlineSmall,
-                  ),
-                  const SizedBox(height: 12),
-                  ...activeGoals.map((goal) => _buildGoalCard(context, goal, theme, isDark)),
-                ],
-                if (completedGoals.isNotEmpty) ...[
-                  const SizedBox(height: 28),
-                  Text(
-                    'مكتملة',
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      color: isDark
-                          ? const Color(0xFF94A3B8)
-                          : const Color(0xFF64748B),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  ...completedGoals.map((goal) => _buildGoalCard(context, goal, theme, isDark)),
-                ],
-              ],
-            ),
-          );
-        },
+          },
+        ),
       ),
     );
   }
@@ -171,15 +123,15 @@ class SavingsScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: goal.isCompleted
-                          ? (isDark ? const Color(0xFF149C6D).withOpacity(0.1) : const Color(0xFFECFDF5))
-                          : (isDark ? theme.colorScheme.primary.withOpacity(0.15) : const Color(0xFFECFDF5)),
+                          ? AppColors.incomeSurface
+                          : AppColors.savingsSurface,
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
                       goal.isCompleted ? 'مكتمل' : 'نشط',
                       style: TextStyle(
                         fontSize: 11,
-                        color: goal.isCompleted ? AppColors.success : theme.colorScheme.primary,
+                        color: goal.isCompleted ? AppColors.income : AppColors.savings,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -211,9 +163,9 @@ class SavingsScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(4),
                 child: LinearProgressIndicator(
                   value: progress,
-                  backgroundColor: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                  backgroundColor: isDark ? AppColors.darkBorder : AppColors.borderLight,
                   valueColor: AlwaysStoppedAnimation<Color>(
-                    goal.isCompleted ? AppColors.success : theme.colorScheme.primary,
+                    goal.isCompleted ? AppColors.income : AppColors.savings,
                   ),
                   minHeight: 6,
                 ),
@@ -225,13 +177,17 @@ class SavingsScreen extends StatelessWidget {
                   Text(
                     '${formatLydShort(goal.dailyTarget)} / يوم',
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.textSecondary,
                     ),
                   ),
                   Text(
                     '${goal.daysElapsed} من ${goal.durationDays} يوم',
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.textSecondary,
                     ),
                   ),
                 ],
@@ -269,7 +225,7 @@ class SavingsScreen extends StatelessWidget {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1),
+                    color: isDark ? AppColors.darkBorder : AppColors.divider,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -315,7 +271,9 @@ class SavingsScreen extends StatelessWidget {
                 Text(
                   'لا توجد عمليات ادخار بعد',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.textSecondary,
                   ),
                 )
               else
@@ -323,7 +281,7 @@ class SavingsScreen extends StatelessWidget {
                   margin: const EdgeInsets.only(bottom: 8),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: theme.scaffoldBackgroundColor,
+                    color: isDark ? AppColors.darkSurface : AppColors.surface,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
@@ -337,7 +295,7 @@ class SavingsScreen extends StatelessWidget {
                         formatLyd(entry.amount),
                         style: daftarNumberStyle(
                           fontSize: 14,
-                          color: AppColors.success,
+                          color: AppColors.income,
                         ),
                       ),
                     ],

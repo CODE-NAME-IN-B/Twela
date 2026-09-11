@@ -9,9 +9,10 @@ import '../../providers/app_settings_provider.dart';
 import '../../models/budget_settings.dart';
 import '../../models/app_settings.dart';
 import '../../services/update_service.dart';
+import '../../theme/app_colors.dart';
 import '../../theme/daftar_theme.dart';
-import '../../utils/daftar_number_style.dart';
 import '../../widgets/daftar_card.dart';
+import '../../widgets/twela_design_system.dart';
 import '../data/data_export_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -91,85 +92,90 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(child: _buildHeroCard(context, theme, isDark)),
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate([
-                _buildSearchBar(context, theme, isDark),
-                const SizedBox(height: 16),
-                if (_matchesSearch('المظهر') ||
-                    _matchesSearch('فاتح') ||
-                    _matchesSearch('داكن'))
-                  _buildThemeSection(context, theme, isDark),
-                if (_matchesSearch('المظهر') ||
-                    _matchesSearch('فاتح') ||
-                    _matchesSearch('داكن'))
+      backgroundColor: isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
+      body: SafeArea(
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(child: _buildHeroCard(context, theme, isDark)),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
+              sliver: SliverList(
+                delegate: SliverChildListDelegate([
+                  _buildSearchBar(context, theme, isDark),
                   const SizedBox(height: 16),
-                if (_matchesSearch('ميزات') ||
-                    _matchesSearch('اهتزاز') ||
-                    _matchesSearch('زجاج') ||
-                    _matchesSearch('شريط') ||
-                    _matchesSearch('لون'))
-                  _buildFeaturesSection(context, theme, isDark),
-                if (_matchesSearch('ميزات') ||
-                    _matchesSearch('اهتزاز') ||
-                    _matchesSearch('زجاج') ||
-                    _matchesSearch('شريط') ||
-                    _matchesSearch('لون'))
-                  const SizedBox(height: 16),
-                if (_matchesSearch('ميزانية') ||
-                    _matchesSearch('شهري'))
-                  _buildBudgetSection(context, theme, isDark),
-                if (_matchesSearch('ميزانية') ||
-                    _matchesSearch('شهري'))
-                  const SizedBox(height: 16),
-                if (_matchesSearch('يومي') ||
-                    _matchesSearch('حد'))
-                  _buildDailyLimitSection(context, theme, isDark),
-                if (_matchesSearch('يومي') ||
-                    _matchesSearch('حد'))
-                  const SizedBox(height: 16),
-                if (_matchesSearch('رصيد') || _matchesSearch('منخفض'))
-                  _buildLowBalanceSection(context, theme, isDark),
-                if (_matchesSearch('رصيد') || _matchesSearch('منخفض'))
-                  const SizedBox(height: 16),
-                if (_matchesSearch('تحديث') || _matchesSearch('إصدار'))
-                  _buildUpdateSection(context, theme, isDark),
-                if (_matchesSearch('تحديث') || _matchesSearch('إصدار'))
-                  const SizedBox(height: 16),
-                if (_matchesSearch('بيانات') ||
-                    _matchesSearch('تصدير') ||
-                    _matchesSearch('استيراد'))
-                  _buildDataSection(context, theme, isDark),
-                if (_matchesSearch('بيانات') ||
-                    _matchesSearch('تصدير') ||
-                    _matchesSearch('استيراد'))
-                  const SizedBox(height: 16),
-                _buildDeveloperSection(context, theme, isDark),
-                const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _saveSettings,
-                    child: const Text('حفظ الإعدادات'),
+                  if (_matchesSearch('المظهر') ||
+                      _matchesSearch('فاتح') ||
+                      _matchesSearch('داكن'))
+                    _buildThemeSection(context, theme, isDark),
+                  if (_matchesSearch('المظهر') ||
+                      _matchesSearch('فاتح') ||
+                      _matchesSearch('داكن'))
+                    const SizedBox(height: 16),
+                  if (_matchesSearch('ميزات') ||
+                      _matchesSearch('اهتزاز') ||
+                      _matchesSearch('زجاج') ||
+                      _matchesSearch('شريط') ||
+                      _matchesSearch('لون'))
+                    _buildFeaturesSection(context, theme, isDark),
+                  if (_matchesSearch('ميزات') ||
+                      _matchesSearch('اهتزاز') ||
+                      _matchesSearch('زجاج') ||
+                      _matchesSearch('شريط') ||
+                      _matchesSearch('لون'))
+                    const SizedBox(height: 16),
+                  if (_matchesSearch('تخصيص') ||
+                      _matchesSearch('لون'))
+                    _buildCustomizationSection(context, theme, isDark),
+                  if (_matchesSearch('تخصيص') ||
+                      _matchesSearch('لون'))
+                    const SizedBox(height: 16),
+                  if (_matchesSearch('ميزانية') ||
+                      _matchesSearch('شهري') ||
+                      _matchesSearch('يومي') ||
+                      _matchesSearch('حد') ||
+                      _matchesSearch('رصيد') ||
+                      _matchesSearch('منخفض'))
+                    _buildBudgetSection(context, theme, isDark),
+                  if (_matchesSearch('ميزانية') ||
+                      _matchesSearch('شهري') ||
+                      _matchesSearch('يومي') ||
+                      _matchesSearch('حد') ||
+                      _matchesSearch('رصيد') ||
+                      _matchesSearch('منخفض'))
+                    const SizedBox(height: 16),
+                  if (_matchesSearch('تحديث') || _matchesSearch('إصدار'))
+                    _buildUpdateSection(context, theme, isDark),
+                  if (_matchesSearch('تحديث') || _matchesSearch('إصدار'))
+                    const SizedBox(height: 16),
+                  if (_matchesSearch('بيانات') ||
+                      _matchesSearch('تصدير') ||
+                      _matchesSearch('استيراد'))
+                    _buildDataSection(context, theme, isDark),
+                  if (_matchesSearch('بيانات') ||
+                      _matchesSearch('تصدير') ||
+                      _matchesSearch('استيراد'))
+                    const SizedBox(height: 16),
+                  _buildDeveloperSection(context, theme, isDark),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    child: TwelaPrimaryButton(
+                      label: 'حفظ الإعدادات',
+                      onPressed: _saveSettings,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                _buildVersionNumber(),
-              ]),
+                  const SizedBox(height: 16),
+                  _buildVersionNumber(),
+                ]),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildHeroCard(BuildContext context, ThemeData theme, bool isDark) {
-    final primaryColor = theme.colorScheme.primary;
     final provider = context.watch<TwelaProvider>();
     final days = provider.daysSinceFirstUse;
 
@@ -188,14 +194,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     'Twela',
                     style: theme.textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.w800,
-                      color: theme.colorScheme.onSurface,
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 6),
                   Text(
                     '$days يوم معك',
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: isDark ? const Color(0xFF9C8E7E) : const Color(0xFF8A7E72),
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.textSecondary,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -203,10 +213,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Text(
                     'تتبع مصاريفك بالدينار الليبي',
                     style: theme.textTheme.bodySmall?.copyWith(
-                      // ignore: deprecated_member_use
-                      color: (isDark ? const Color(0xFF9C8E7E) : const Color(0xFF8A7E72))
-                          // ignore: deprecated_member_use
-                          .withOpacity(0.7),
+                      color: isDark
+                          ? AppColors.darkTextTertiary
+                          : AppColors.textTertiary,
                       fontSize: 11,
                     ),
                   ),
@@ -216,7 +225,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Container(
               width: 52,
               height: 52,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: DaftarTheme.accent,
                 shape: BoxShape.circle,
               ),
@@ -240,16 +249,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
         focusNode: _searchFocus,
         onChanged: (value) => setState(() => _searchQuery = value),
         style: theme.textTheme.bodyMedium?.copyWith(
-          color: theme.colorScheme.onSurface,
+          color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
         ),
         decoration: InputDecoration(
           hintText: 'بحث في الإعدادات...',
           hintStyle: TextStyle(
-            color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+            color: isDark ? AppColors.darkTextTertiary : AppColors.textTertiary,
           ),
           prefixIcon: Icon(
             Icons.search,
-            color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+            color: isDark ? AppColors.darkTextTertiary : AppColors.textTertiary,
             size: 20,
           ),
           suffixIcon: _searchQuery.isNotEmpty
@@ -262,7 +271,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 )
               : null,
           filled: true,
-          fillColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFB),
+          fillColor: isDark ? AppColors.darkSurface : AppColors.borderLight,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
@@ -270,10 +279,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(
-              color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+              color: isDark ? AppColors.darkBorder : AppColors.border,
             ),
           ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         ),
       ),
     );
@@ -281,16 +291,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget _buildThemeSection(BuildContext context, ThemeData theme, bool isDark) {
     final themeProvider = context.watch<ThemeProvider>();
-    final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
 
-    return Container(
+    return DaftarCard(
+      showDiagonalCut: false,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: surfaceColor,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: borderColor, width: 1),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -298,47 +302,73 @@ class _SettingsScreenState extends State<SettingsScreen> {
             'المظهر',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onSurface,
+              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 16),
-          SegmentedButton<ThemeMode>(
-            segments: const [
-              ButtonSegment(
-                value: ThemeMode.light,
-                icon: Icon(Icons.light_mode_outlined, size: 18),
-                label: Text('فاتح'),
-              ),
-              ButtonSegment(
-                value: ThemeMode.dark,
-                icon: Icon(Icons.dark_mode_outlined, size: 18),
-                label: Text('داكن'),
-              ),
-              ButtonSegment(
-                value: ThemeMode.system,
-                icon: Icon(Icons.phone_iphone_outlined, size: 18),
-                label: Text('الجهاز'),
-              ),
-            ],
-            selected: {themeProvider.themeMode},
-            onSelectionChanged: (modes) => themeProvider.setThemeMode(modes.first),
-            style: ButtonStyle(
-              visualDensity: VisualDensity.compact,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              // ignore: deprecated_member_use
-              backgroundColor: WidgetStateProperty.resolveWith((states) {
-                if (states.contains(WidgetState.selected)) {
-                  return theme.colorScheme.primary;
-                }
-                return isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFB);
-              }),
-              // ignore: deprecated_member_use
-              foregroundColor: WidgetStateProperty.resolveWith((states) {
-                if (states.contains(WidgetState.selected)) {
-                  return Colors.white;
-                }
-                return theme.colorScheme.onSurface;
-              }),
+          TwelaSegmentedControl<ThemeMode>(
+            segments: const {
+              ThemeMode.light: 'فاتح',
+              ThemeMode.dark: 'داكن',
+              ThemeMode.system: 'الجهاز',
+            },
+            selected: themeProvider.themeMode,
+            onSelected: (mode) => themeProvider.setThemeMode(mode),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFeaturesSection(
+      BuildContext context, ThemeData theme, bool isDark) {
+    final appSettings = context.watch<AppSettingsProvider>();
+
+    return DaftarCard(
+      showDiagonalCut: false,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'المميزات',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 12),
+          TwelaSettingTile(
+            icon: Icons.vibration,
+            title: 'اهتزاز عند الحفظ',
+            subtitle: 'نبضة خفيفة عند إضافة أي عملية',
+            iconColor: AppColors.primary,
+            trailing: Switch(
+              value: appSettings.hapticFeedback,
+              onChanged: (_) => appSettings.toggleHapticFeedback(),
+              activeColor: AppColors.primary,
+            ),
+          ),
+          TwelaSettingTile(
+            icon: Icons.blur_on_outlined,
+            title: 'وضع الزجاج',
+            subtitle: 'خلفيات شبه شفافة للبطاقات',
+            iconColor: AppColors.info,
+            trailing: Switch(
+              value: appSettings.glassMode,
+              onChanged: (_) => appSettings.toggleGlassMode(),
+              activeColor: AppColors.primary,
+            ),
+          ),
+          TwelaSettingTile(
+            icon: Icons.bar_chart_outlined,
+            title: 'شريط Glyph',
+            subtitle: 'معلومة سريعة أعلى الرصيد',
+            iconColor: AppColors.warning,
+            trailing: Switch(
+              value: appSettings.showGlyphBar,
+              onChanged: (_) => appSettings.toggleGlyphBar(),
+              activeColor: AppColors.primary,
             ),
           ),
         ],
@@ -346,66 +376,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildFeaturesSection(BuildContext context, ThemeData theme, bool isDark) {
+  Widget _buildCustomizationSection(
+      BuildContext context, ThemeData theme, bool isDark) {
     final appSettings = context.watch<AppSettingsProvider>();
-    final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
 
-    return Container(
+    return DaftarCard(
+      showDiagonalCut: false,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: surfaceColor,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: borderColor, width: 1),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'الميزات',
+            'التخصيص',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onSurface,
+              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 12),
-          _buildFeatureToggle(
-            context,
-            theme: theme,
-            isDark: isDark,
-            icon: Icons.vibration,
-            label: 'اهتزاز عند الحفظ',
-            description: 'نبضة خفيفة عند إضافة أي عملية',
-            value: appSettings.hapticFeedback,
-            onChanged: () => appSettings.toggleHapticFeedback(),
-          ),
-          const SizedBox(height: 4),
-          _buildFeatureToggle(
-            context,
-            theme: theme,
-            isDark: isDark,
-            icon: Icons.blur_on_outlined,
-            label: 'وضع الزجاج',
-            description: 'خلفيات شبه شفافة للبطاقات',
-            value: appSettings.glassMode,
-            onChanged: () => appSettings.toggleGlassMode(),
-          ),
-          const SizedBox(height: 4),
-          _buildFeatureToggle(
-            context,
-            theme: theme,
-            isDark: isDark,
-            icon: Icons.bar_chart_outlined,
-            label: 'شريط Glyph',
-            description: 'معلومة سريعة أعلى الرصيد',
-            value: appSettings.showGlyphBar,
-            onChanged: () => appSettings.toggleGlyphBar(),
-          ),
-          const SizedBox(height: 16),
           Text(
             'لون التمييز',
             style: theme.textTheme.titleSmall?.copyWith(
-              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+              color: isDark
+                  ? AppColors.darkTextSecondary
+                  : AppColors.textSecondary,
             ),
           ),
           const SizedBox(height: 10),
@@ -423,7 +417,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     color: color,
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: isSelected ? theme.colorScheme.onSurface : Colors.transparent,
+                      color: isSelected
+                          ? (isDark
+                              ? AppColors.darkTextPrimary
+                              : AppColors.textPrimary)
+                          : Colors.transparent,
                       width: 2,
                     ),
                   ),
@@ -439,158 +437,51 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildFeatureToggle(
-    BuildContext context, {
-    required ThemeData theme,
-    required bool isDark,
-    required IconData icon,
-    required String label,
-    required String description,
-    required bool value,
-    required VoidCallback onChanged,
-  }) {
-    final secondaryTextColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
-    final primaryColor = theme.colorScheme.primary;
-
-    return GestureDetector(
-      onTap: onChanged,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          color: value
-              // ignore: deprecated_member_use
-              ? primaryColor.withOpacity(isDark ? 0.1 : 0.05)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(10),
-          border: value
-              // ignore: deprecated_member_use
-              ? Border.all(color: primaryColor.withOpacity(0.2), width: 1)
-              : null,
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              color: value ? primaryColor : secondaryTextColor,
-              size: 20,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      color: value ? primaryColor : theme.colorScheme.onSurface,
-                      fontWeight: value ? FontWeight.w600 : FontWeight.w400,
-                    ),
-                  ),
-                  const SizedBox(height: 1),
-                  Text(
-                    description,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: secondaryTextColor,
-                      fontSize: 11,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Switch(
-              value: value,
-              onChanged: (_) => onChanged(),
-              activeColor: primaryColor,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBudgetSection(BuildContext context, ThemeData theme, bool isDark) {
-    return _buildSection(
-      context, theme, isDark,
-      'الميزانية الشهرية',
-      [
-        _buildBudgetField(
-          context,
-          theme: theme,
-          isDark: isDark,
-          controller: _monthlyBudgetController,
-          label: 'الحد الشهري الإجمالي',
-          hint: 'أدخل المبلغ',
-          icon: Icons.calendar_month_outlined,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDailyLimitSection(BuildContext context, ThemeData theme, bool isDark) {
-    return _buildSection(
-      context, theme, isDark,
-      'الحد اليومي',
-      [
-        _buildBudgetField(
-          context,
-          theme: theme,
-          isDark: isDark,
-          controller: _dailyLimitController,
-          label: 'حد الصرف اليومي',
-          hint: 'أدخل المبلغ',
-          icon: Icons.today_outlined,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildLowBalanceSection(BuildContext context, ThemeData theme, bool isDark) {
-    return _buildSection(
-      context, theme, isDark,
-      'الرصيد المنخفض',
-      [
-        _buildBudgetField(
-          context,
-          theme: theme,
-          isDark: isDark,
-          controller: _lowBalanceController,
-          label: 'تنبيه الرصيد المنخفض',
-          hint: 'أدخل الحد الأدنى',
-          icon: Icons.warning_outlined,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSection(
-    BuildContext context,
-    ThemeData theme,
-    bool isDark,
-    String title,
-    List<Widget> children,
-  ) {
-    final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
-
-    return Container(
+  Widget _buildBudgetSection(
+      BuildContext context, ThemeData theme, bool isDark) {
+    return DaftarCard(
+      showDiagonalCut: false,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: surfaceColor,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: borderColor, width: 1),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            title,
+            'الميزانية',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onSurface,
+              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 12),
-          ...children,
+          _buildBudgetField(
+            context,
+            theme: theme,
+            isDark: isDark,
+            controller: _monthlyBudgetController,
+            label: 'الحد الشهري الإجمالي',
+            hint: 'أدخل المبلغ',
+            icon: Icons.calendar_month_outlined,
+          ),
+          const SizedBox(height: 12),
+          _buildBudgetField(
+            context,
+            theme: theme,
+            isDark: isDark,
+            controller: _dailyLimitController,
+            label: 'حد الصرف اليومي',
+            hint: 'أدخل المبلغ',
+            icon: Icons.today_outlined,
+          ),
+          const SizedBox(height: 12),
+          _buildBudgetField(
+            context,
+            theme: theme,
+            isDark: isDark,
+            controller: _lowBalanceController,
+            label: 'تنبيه الرصيد المنخفض',
+            hint: 'أدخل الحد الأدنى',
+            icon: Icons.warning_outlined,
+          ),
         ],
       ),
     );
@@ -609,7 +500,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       controller: controller,
       keyboardType: TextInputType.number,
       style: theme.textTheme.bodyMedium?.copyWith(
-        color: theme.colorScheme.onSurface,
+        color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
       ),
       decoration: InputDecoration(
         labelText: label,
@@ -617,27 +508,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
         suffixText: 'د.ل',
         prefixIcon: Icon(icon, size: 20),
         labelStyle: TextStyle(
-          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+          color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
         ),
         hintStyle: TextStyle(
-          color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+          color: isDark ? AppColors.darkTextTertiary : AppColors.textTertiary,
         ),
       ),
     );
   }
 
   Widget _buildDataSection(BuildContext context, ThemeData theme, bool isDark) {
-    final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
-    final primaryColor = theme.colorScheme.primary;
+    final primaryColor = AppColors.primary;
 
-    return Container(
+    return DaftarCard(
+      showDiagonalCut: false,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: surfaceColor,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: borderColor, width: 1),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -645,62 +530,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
             'البيانات',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onSurface,
+              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 12),
-          GestureDetector(
+          TwelaSettingTile(
+            icon: Icons.sync_outlined,
+            title: 'تصدير واستيراد',
+            subtitle: 'نسخة احتياطية ومشاركة البيانات',
+            iconColor: primaryColor,
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const DataExportScreen()),
-            ),
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFB),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      // ignore: deprecated_member_use
-                      color: primaryColor.withOpacity(isDark ? 0.15 : 0.08),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(Icons.sync_outlined, color: primaryColor, size: 18),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'تصدير واستيراد',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            color: theme.colorScheme.onSurface,
-                          ),
-                        ),
-                        const SizedBox(height: 1),
-                        Text(
-                          'نسخة احتياطية ومشاركة البيانات',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                            fontSize: 11,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Icon(
-                    Icons.chevron_left,
-                    color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                    size: 20,
-                  ),
-                ],
-              ),
             ),
           ),
         ],
@@ -708,18 +549,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildUpdateSection(BuildContext context, ThemeData theme, bool isDark) {
-    final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
-    final primaryColor = theme.colorScheme.primary;
+  Widget _buildUpdateSection(
+      BuildContext context, ThemeData theme, bool isDark) {
+    final primaryColor = AppColors.primary;
 
-    return Container(
+    return DaftarCard(
+      showDiagonalCut: false,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: surfaceColor,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: borderColor, width: 1),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -727,90 +563,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
             'التطبيق',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onSurface,
+              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 12),
-          GestureDetector(
+          TwelaSettingTile(
+            icon: Icons.system_update_outlined,
+            title: 'التحقق من التحديثات',
+            subtitle: 'اضغط للتحقق من إصدار جديد',
+            iconColor: primaryColor,
             onTap: _isCheckingUpdate ? null : _checkForUpdate,
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFB),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      // ignore: deprecated_member_use
-                      color: primaryColor.withOpacity(isDark ? 0.15 : 0.08),
-                      borderRadius: BorderRadius.circular(8),
+            trailing: _isCheckingUpdate
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.primary,
                     ),
-                    child: _isCheckingUpdate
-                        ? Padding(
-                            padding: const EdgeInsets.all(9),
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: primaryColor,
-                            ),
-                          )
-                        : Icon(
-                            Icons.system_update_outlined,
-                            color: primaryColor,
-                            size: 18,
-                          ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'التحقق من التحديثات',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            color: theme.colorScheme.onSurface,
-                          ),
-                        ),
-                        const SizedBox(height: 1),
-                        Text(
-                          'اضغط للتحقق من إصدار جديد',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                            fontSize: 11,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Icon(
-                    Icons.chevron_left,
-                    color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                    size: 20,
-                  ),
-                ],
-              ),
-            ),
+                  )
+                : null,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildDeveloperSection(BuildContext context, ThemeData theme, bool isDark) {
-    final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
-    final primaryColor = theme.colorScheme.primary;
+  Widget _buildDeveloperSection(
+      BuildContext context, ThemeData theme, bool isDark) {
+    final primaryColor = AppColors.primary;
 
-    return Container(
+    return DaftarCard(
+      showDiagonalCut: false,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: surfaceColor,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: borderColor, width: 1),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -818,7 +603,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             'المطور',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onSurface,
+              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 16),
@@ -827,15 +612,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: isDark
-                    ? [const Color(0xFF0F172A), const Color(0xFF1E293B)]
-                    : [const Color(0xFFF8FAFB), const Color(0xFFECFDF5)],
+                    ? [AppColors.darkBackground, AppColors.darkSurface]
+                    : [AppColors.borderLight, const Color(0xFFECFDF5)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                // ignore: deprecated_member_use
-                color: primaryColor.withOpacity(0.2),
+                color: primaryColor.withAlpha(50),
                 width: 1,
               ),
             ),
@@ -846,15 +630,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   height: 72,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [primaryColor, primaryColor.withOpacity(0.7)],
+                      colors: [primaryColor, primaryColor.withAlpha(180)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        // ignore: deprecated_member_use
-                        color: primaryColor.withOpacity(0.3),
+                        color: primaryColor.withAlpha(80),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -871,16 +654,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   'CODE-NAME-IN-B',
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w800,
-                    color: theme.colorScheme.onSurface,
+                    color: isDark
+                        ? AppColors.darkTextPrimary
+                        : AppColors.textPrimary,
                     letterSpacing: 0.5,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    // ignore: deprecated_member_use
-                    color: primaryColor.withOpacity(0.1),
+                    color: primaryColor.withAlpha(25),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -899,13 +684,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Icon(
                       Icons.location_on_outlined,
                       size: 14,
-                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.textSecondary,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       'Libya',
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary,
                       ),
                     ),
                   ],
@@ -913,20 +702,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 16),
                 GestureDetector(
                   onTap: () async {
-                    final uri = Uri.parse('https://github.com/CODE-NAME-IN-B');
+                    final uri =
+                        Uri.parse('https://github.com/CODE-NAME-IN-B');
                     if (await canLaunchUrl(uri)) {
-                      await launchUrl(uri, mode: LaunchMode.externalApplication);
+                      await launchUrl(uri,
+                          mode: LaunchMode.externalApplication);
                     }
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
                     decoration: BoxDecoration(
                       color: primaryColor,
                       borderRadius: BorderRadius.circular(10),
                       boxShadow: [
                         BoxShadow(
-                          // ignore: deprecated_member_use
-                          color: primaryColor.withOpacity(0.3),
+                          color: primaryColor.withAlpha(80),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -935,7 +726,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     child: const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.code_outlined, color: Colors.white, size: 16),
+                        Icon(Icons.code_outlined,
+                            color: Colors.white, size: 16),
                         SizedBox(width: 8),
                         Text(
                           'github.com/CODE-NAME-IN-B',
@@ -957,7 +749,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             'مشاريع',
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onSurface,
+              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 10),
@@ -969,7 +761,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             description: 'تطبيق تتبع المصاريف بالدينار الليبي',
             icon: Icons.account_balance_wallet_outlined,
             color: primaryColor,
-            version: _currentVersion.isNotEmpty ? 'v$_currentVersion' : 'v1.1.8',
+            version:
+                _currentVersion.isNotEmpty ? 'v$_currentVersion' : 'v1.1.9',
           ),
           const SizedBox(height: 8),
           _buildProjectItem(
@@ -979,7 +772,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             name: 'All Other Projects',
             description: 'مشاريع مفتوحة المصدر متنوعة',
             icon: Icons.folder_outlined,
-            color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+            color: isDark ? AppColors.darkTextTertiary : AppColors.textTertiary,
           ),
         ],
       ),
@@ -999,10 +792,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: theme.scaffoldBackgroundColor,
+        color: isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+          color: isDark ? AppColors.darkBorder : AppColors.border,
         ),
       ),
       child: Row(
@@ -1011,8 +804,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              // ignore: deprecated_member_use
-              color: color.withOpacity(0.1),
+              color: color.withAlpha(25),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: color, size: 20),
@@ -1026,14 +818,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   name,
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface,
+                    color: isDark
+                        ? AppColors.darkTextPrimary
+                        : AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   description,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.textSecondary,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -1045,8 +841,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                // ignore: deprecated_member_use
-                color: color.withOpacity(0.1),
+                color: color.withAlpha(25),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
@@ -1066,16 +861,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _buildVersionNumber() {
     return Center(
       child: Text(
-        'Twela v${_currentVersion.isNotEmpty ? _currentVersion : '1.1.8'}',
+        'Twela v${_currentVersion.isNotEmpty ? _currentVersion : '1.1.9'}',
         style: GoogleFonts.silkscreen(
           fontSize: 12,
           fontWeight: FontWeight.w500,
-          // ignore: deprecated_member_use
           color: Theme.of(context).brightness == Brightness.dark
-              // ignore: deprecated_member_use
-              ? Colors.white.withOpacity(0.25)
-              // ignore: deprecated_member_use
-              : Colors.black.withOpacity(0.2),
+              ? Colors.white.withAlpha(64)
+              : Colors.black.withAlpha(51),
         ),
       ),
     );
@@ -1099,25 +891,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _showUpdateDialog(UpdateInfo updateInfo) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final primaryColor = AppColors.primary;
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
             Container(
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                // ignore: deprecated_member_use
-                color: theme.colorScheme.primary.withOpacity(0.15),
+                color: primaryColor.withAlpha(38),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.system_update_outlined,
-                color: theme.colorScheme.primary,
+                color: AppColors.primary,
               ),
             ),
             const SizedBox(width: 12),
@@ -1126,7 +919,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 'تحديث متاح',
                 style: TextStyle(
                   fontSize: 18,
-                  color: theme.colorScheme.onSurface,
+                  color: isDark
+                      ? AppColors.darkTextPrimary
+                      : AppColors.textPrimary,
                 ),
               ),
             ),
@@ -1140,14 +935,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
               'الإصدار الجديد: ${updateInfo.version}',
               style: TextStyle(
                 fontWeight: FontWeight.w600,
-                color: theme.colorScheme.onSurface,
+                color: isDark
+                    ? AppColors.darkTextPrimary
+                    : AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               'الإصدار الحالي: $_currentVersion',
               style: TextStyle(
-                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : AppColors.textSecondary,
                 fontSize: 13,
               ),
             ),
@@ -1158,21 +957,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 13,
-                  color: theme.colorScheme.onSurface,
+                  color: isDark
+                      ? AppColors.darkTextPrimary
+                      : AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFB),
+                  color: isDark ? AppColors.darkBackground : AppColors.borderLight,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
                   updateInfo.releaseNotes,
                   style: TextStyle(
                     fontSize: 13,
-                    color: theme.colorScheme.onSurface,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.textSecondary,
                   ),
                 ),
               ),
@@ -1182,13 +985,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('لاحقاً'),
+            child: Text(
+              'لاحقاً',
+              style: TextStyle(
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : AppColors.textSecondary,
+              ),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               _showDownloadProgress(updateInfo);
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
             child: const Text('تحديث الآن'),
           ),
         ],
@@ -1197,8 +1014,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showDownloadProgress(UpdateInfo updateInfo) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     double progress = 0;
     String status = 'جاري التحميل...';
 
@@ -1212,24 +1028,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
           dialogSetState = setDialogState;
 
           return AlertDialog(
-            backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             title: Text(
               status,
-              style: TextStyle(color: theme.colorScheme.onSurface),
+              style: TextStyle(
+                color: isDark
+                    ? AppColors.darkTextPrimary
+                    : AppColors.textPrimary,
+              ),
             ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 LinearProgressIndicator(
                   value: progress > 0 ? progress : null,
-                  backgroundColor: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                  backgroundColor:
+                      isDark ? AppColors.darkBorder : AppColors.border,
+                  color: AppColors.primary,
                 ),
                 const SizedBox(height: 12),
                 Text(
                   progress > 0 ? '${(progress * 100).toInt()}%' : '',
                   style: TextStyle(
-                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.textSecondary,
                   ),
                 ),
               ],
