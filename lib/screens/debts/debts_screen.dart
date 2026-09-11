@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../theme/app_colors.dart';
+import '../../theme/daftar_theme.dart';
 import '../../providers/debt_provider.dart';
 import '../../widgets/debt_tile.dart';
 
@@ -13,7 +14,7 @@ class DebtsScreen extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
       appBar: AppBar(
         title: const Text('الديون'),
         actions: [
@@ -22,8 +23,8 @@ class DebtsScreen extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                 color: isDark
-                    ? theme.colorScheme.primary.withOpacity(0.15)
-                    : const Color(0xFFECFDF5),
+                    ? const Color(0xFF2A2520)
+                    : const Color(0xFFF5F0E8),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: IconButton(
@@ -51,13 +52,13 @@ class DebtsScreen extends StatelessWidget {
                       height: 80,
                       decoration: BoxDecoration(
                         color: isDark
-                            ? const Color(0xFF1E293B)
-                            : const Color(0xFFECFDF5),
+                            ? const Color(0xFF2A2520)
+                            : const Color(0xFFF5F0E8),
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: isDark
-                              ? const Color(0xFF334155)
-                              : const Color(0xFFE2E8F0),
+                              ? const Color(0xFF3D3830)
+                              : const Color(0xFFE8E0D4),
                           width: 1,
                         ),
                       ),
@@ -65,7 +66,7 @@ class DebtsScreen extends StatelessWidget {
                         Icons.people_outline,
                         size: 36,
                         color: isDark
-                            ? const Color(0xFF64748B)
+                            ? const Color(0xFF9C8E7E)
                             : AppColors.primary,
                       ),
                     ),
@@ -81,8 +82,8 @@ class DebtsScreen extends StatelessWidget {
                       'أضف دين جديد للبدء في التتبع',
                       style: theme.textTheme.bodyMedium?.copyWith(
                             color: isDark
-                                ? const Color(0xFF94A3B8)
-                                : const Color(0xFF64748B),
+                                ? const Color(0xFF9C8E7E)
+                                : const Color(0xFF8A7E72),
                           ),
                       textAlign: TextAlign.center,
                     ),
@@ -117,8 +118,8 @@ class DebtsScreen extends StatelessWidget {
                     'تم السداد',
                     style: theme.textTheme.headlineSmall?.copyWith(
                           color: isDark
-                              ? const Color(0xFF94A3B8)
-                              : const Color(0xFF64748B),
+                              ? const Color(0xFF9C8E7E)
+                              : const Color(0xFF8A7E72),
                         ),
                   ),
                   const SizedBox(height: 12),

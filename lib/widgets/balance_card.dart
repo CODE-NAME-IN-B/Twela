@@ -2,6 +2,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../theme/app_colors.dart';
+import '../theme/daftar_theme.dart';
+import '../widgets/daftar_card.dart';
+import '../utils/daftar_number_style.dart';
 import '../providers/twela_provider.dart';
 import '../providers/app_settings_provider.dart';
 import '../utils/formatters.dart';
@@ -60,26 +63,9 @@ class _BalanceCardState extends State<BalanceCard>
                 child: child,
               );
             },
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: glassMode
-                    ? (isDark
-                        ? AppColors.darkSurface.withOpacity(0.3)
-                        : Colors.white.withOpacity(0.3))
-                    : (isDark
-                        ? AppColors.darkSurface.withOpacity(0.5)
-                        : Colors.white.withOpacity(0.6)),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: isDark
-                      ? AppColors.darkBorder.withOpacity(0.6)
-                      : AppColors.border.withOpacity(0.8),
-                  width: 1,
-                  strokeAlign: BorderSide.strokeAlignInside,
-                ),
-              ),
+            child: DaftarCard(
+              showDiagonalCut: true,
+              padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -99,11 +85,14 @@ class _BalanceCardState extends State<BalanceCard>
                             horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
                           color: isDark
-                              ? AppColors.primary.withOpacity(0.1)
-                              : AppColors.primary.withOpacity(0.08),
+                              // ignore: deprecated_member_use
+                              ? DaftarTheme.accent.withOpacity(0.1)
+                              // ignore: deprecated_member_use
+                              : DaftarTheme.accent.withOpacity(0.08),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: AppColors.primary.withOpacity(0.2),
+                            // ignore: deprecated_member_use
+                            color: DaftarTheme.accent.withOpacity(0.2),
                             width: 1,
                           ),
                         ),
@@ -134,11 +123,11 @@ class _BalanceCardState extends State<BalanceCard>
                   const SizedBox(height: 16),
                   Text(
                     formatLyd(provider.totalBalance),
-                    style: theme.textTheme.displayMedium?.copyWith(
+                    style: daftarNumberStyle(
+                      fontSize: 28,
                       color: isDark
                           ? AppColors.darkTextPrimary
                           : AppColors.textPrimary,
-                      fontWeight: FontWeight.w700,
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -159,7 +148,7 @@ class _BalanceCardState extends State<BalanceCard>
                       _buildMiniStat(
                         context,
                         'اليوم',
-                        formatLyd(provider.todaySpent),
+                        formatLydShort(provider.todaySpent),
                         Icons.today_outlined,
                         isDark,
                       ),
@@ -167,7 +156,7 @@ class _BalanceCardState extends State<BalanceCard>
                       _buildMiniStat(
                         context,
                         'الشهر',
-                        formatLyd(provider.monthSpent),
+                        formatLydShort(provider.monthSpent),
                         Icons.calendar_month_outlined,
                         isDark,
                       ),
@@ -183,7 +172,7 @@ class _BalanceCardState extends State<BalanceCard>
 
     if (glassMode) {
       return ClipRRect(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(12),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: card,
@@ -200,23 +189,19 @@ class _BalanceCardState extends State<BalanceCard>
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: isDark
+            // ignore: deprecated_member_use
             ? AppColors.darkBorder.withOpacity(0.3)
+            // ignore: deprecated_member_use
             : AppColors.borderLight.withOpacity(0.5),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isDark
-              ? AppColors.darkBorder.withOpacity(0.5)
-              : AppColors.border.withOpacity(0.5),
-          width: 1,
-        ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _buildStatItem(
-              context, 'كاش', formatLyd(provider.cashBalance), isDark),
+              context, 'كاش', formatLydShort(provider.cashBalance), isDark),
           _buildStatItem(
-              context, 'مصرف', formatLyd(provider.bankBalance), isDark),
+              context, 'مصرف', formatLydShort(provider.bankBalance), isDark),
         ],
       ),
     );
@@ -237,12 +222,12 @@ class _BalanceCardState extends State<BalanceCard>
         const SizedBox(height: 4),
         Text(
           value,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: isDark
-                    ? AppColors.darkTextPrimary
-                    : AppColors.textPrimary,
-                fontWeight: FontWeight.w600,
-              ),
+          style: daftarNumberStyle(
+            fontSize: 14,
+            color: isDark
+                ? AppColors.darkTextPrimary
+                : AppColors.textPrimary,
+          ),
         ),
       ],
     );
@@ -260,15 +245,11 @@ class _BalanceCardState extends State<BalanceCard>
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
           color: isDark
+              // ignore: deprecated_member_use
               ? AppColors.darkBorder.withOpacity(0.3)
+              // ignore: deprecated_member_use
               : AppColors.borderLight.withOpacity(0.5),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: isDark
-                ? AppColors.darkBorder.withOpacity(0.4)
-                : AppColors.border.withOpacity(0.4),
-            width: 1,
-          ),
         ),
         child: Row(
           children: [
@@ -296,12 +277,12 @@ class _BalanceCardState extends State<BalanceCard>
                   const SizedBox(height: 2),
                   Text(
                     value,
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          color: isDark
-                              ? AppColors.darkTextPrimary
-                              : AppColors.textPrimary,
-                          fontWeight: FontWeight.w600,
-                        ),
+                    style: daftarNumberStyle(
+                      fontSize: 12,
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.textPrimary,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],

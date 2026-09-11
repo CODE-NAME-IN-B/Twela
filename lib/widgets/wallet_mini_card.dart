@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utils/formatters.dart';
+import '../utils/daftar_number_style.dart';
+import '../widgets/daftar_card.dart';
 
 class WalletMiniCard extends StatelessWidget {
   final String title;
@@ -19,21 +21,11 @@ class WalletMiniCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final surfaceColor = isDark
-        ? const Color(0xFF1E293B).withOpacity(0.5)
-        : Colors.white.withOpacity(0.6);
-    final borderColor = isDark
-        ? const Color(0xFF334155).withOpacity(0.6)
-        : const Color(0xFFE2E8F0).withOpacity(0.8);
     final secondaryTextColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
 
-    return Container(
+    return DaftarCard(
+      showDiagonalCut: false,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: surfaceColor,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: borderColor, width: 1),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -44,12 +36,9 @@ class WalletMiniCard extends StatelessWidget {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
+                  // ignore: deprecated_member_use
                   color: color.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: color.withOpacity(0.15),
-                    width: 1,
-                  ),
                 ),
                 child: Icon(icon, color: color, size: 18),
               ),
@@ -70,8 +59,8 @@ class WalletMiniCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             formatLydShort(amount),
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w700,
+            style: daftarNumberStyle(
+              fontSize: 16,
               color: theme.colorScheme.onSurface,
             ),
           ),

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../theme/app_colors.dart';
+import '../../theme/daftar_theme.dart';
+import '../../widgets/daftar_card.dart';
+import '../../utils/daftar_number_style.dart';
 import '../../providers/twela_provider.dart';
 import '../../models/transaction.dart';
 import '../../utils/formatters.dart';
@@ -38,8 +41,8 @@ class StatsScreen extends StatelessWidget {
                       height: 80,
                       decoration: BoxDecoration(
                         color: isDark
-                            ? theme.colorScheme.primary.withOpacity(0.15)
-                            : const Color(0xFFECFDF5),
+                            ? DaftarTheme.darkSurface
+                            : DaftarTheme.lightSurface,
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -91,16 +94,8 @@ class StatsScreen extends StatelessWidget {
 
   Widget _buildMonthlySummary(
       BuildContext context, TwelaProvider provider, bool isDark, ThemeData theme) {
-    return Container(
+    return DaftarCard(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
-          width: 1,
-        ),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -128,7 +123,7 @@ class StatsScreen extends StatelessWidget {
                   context,
                   'المصروفات',
                   formatLyd(provider.monthSpent),
-                  AppColors.danger,
+                  DaftarTheme.danger,
                   Icons.arrow_upward_rounded,
                   isDark,
                   theme,
@@ -174,10 +169,10 @@ class StatsScreen extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             value,
-            style: theme.textTheme.headlineSmall?.copyWith(
-                  color: color,
-                  fontWeight: FontWeight.w700,
-                ),
+            style: daftarNumberStyle(
+              fontSize: 18,
+              color: color,
+            ),
             overflow: TextOverflow.ellipsis,
           ),
         ],
@@ -200,16 +195,8 @@ class StatsScreen extends StatelessWidget {
 
     final totalSpent = categorySpending.values.fold(0.0, (sum, v) => sum + v);
 
-    return Container(
+    return DaftarCard(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
-          width: 1,
-        ),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -235,9 +222,8 @@ class StatsScreen extends StatelessWidget {
                             : const Color(0xFF94A3B8)),
                     radius: 90,
                     title: '${(percentage * 100).toStringAsFixed(0)}%',
-                    titleStyle: const TextStyle(
+                    titleStyle: daftarNumberStyle(
                       fontSize: 12,
-                      fontWeight: FontWeight.w700,
                       color: Colors.white,
                     ),
                   );
@@ -297,16 +283,8 @@ class StatsScreen extends StatelessWidget {
     final sortedCategories = categorySpending.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
 
-    return Container(
+    return DaftarCard(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
-          width: 1,
-        ),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -355,9 +333,10 @@ class StatsScreen extends StatelessWidget {
                   ),
                   Text(
                     formatLyd(entry.value),
-                    style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
+                    style: daftarNumberStyle(
+                      fontSize: 14,
+                      color: theme.colorScheme.onSurface,
+                    ),
                   ),
                 ],
               ),

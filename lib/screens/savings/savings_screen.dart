@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../theme/app_colors.dart';
+import '../../theme/daftar_theme.dart';
+import '../../widgets/daftar_card.dart';
+import '../../utils/daftar_number_style.dart';
 import '../../providers/savings_provider.dart';
 import '../../models/savings_goal.dart';
 import '../../models/savings_entry.dart';
@@ -57,8 +60,8 @@ class SavingsScreen extends StatelessWidget {
                       height: 80,
                       decoration: BoxDecoration(
                         color: isDark
-                            ? const Color(0xFF1E293B)
-                            : const Color(0xFFECFDF5),
+                            ? DaftarTheme.darkSurface
+                            : DaftarTheme.lightSurface,
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: isDark
@@ -71,7 +74,7 @@ class SavingsScreen extends StatelessWidget {
                         Icons.savings_outlined,
                         size: 36,
                         color: isDark
-                            ? const Color(0xFF64748B)
+                            ? const Color(0xFF94A3B8)
                             : AppColors.primary,
                       ),
                     ),
@@ -146,98 +149,95 @@ class SavingsScreen extends StatelessWidget {
 
     return GestureDetector(
       onTap: () => _showGoalDetails(context, goal, theme, isDark),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E293B) : Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    goal.name,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: DaftarCard(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      goal.name,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: goal.isCompleted
-                        ? (isDark ? const Color(0xFF149C6D).withOpacity(0.1) : const Color(0xFFECFDF5))
-                        : (isDark ? theme.colorScheme.primary.withOpacity(0.15) : const Color(0xFFECFDF5)),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    goal.isCompleted ? 'مكتمل' : 'نشط',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: goal.isCompleted ? AppColors.success : theme.colorScheme.primary,
-                      fontWeight: FontWeight.w600,
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: goal.isCompleted
+                          ? (isDark ? const Color(0xFF149C6D).withOpacity(0.1) : const Color(0xFFECFDF5))
+                          : (isDark ? theme.colorScheme.primary.withOpacity(0.15) : const Color(0xFFECFDF5)),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      goal.isCompleted ? 'مكتمل' : 'نشط',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: goal.isCompleted ? AppColors.success : theme.colorScheme.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '${formatLydShort(goal.savedAmount)} / ${formatLydShort(goal.targetAmount)}',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                Text(
-                  '${(progress * 100).toStringAsFixed(0)}%',
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                value: progress,
-                backgroundColor: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  goal.isCompleted ? AppColors.success : theme.colorScheme.primary,
-                ),
-                minHeight: 6,
+                ],
               ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '${formatLydShort(goal.dailyTarget)} / يوم',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '${formatLydShort(goal.savedAmount)} / ${formatLydShort(goal.targetAmount)}',
+                    style: daftarNumberStyle(
+                      fontSize: 18,
+                      color: theme.colorScheme.onSurface,
+                    ),
                   ),
-                ),
-                Text(
-                  '${goal.daysElapsed} من ${goal.durationDays} يوم',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                  Text(
+                    '${(progress * 100).toStringAsFixed(0)}%',
+                    style: daftarNumberStyle(
+                      fontSize: 14,
+                      color: theme.colorScheme.onSurface,
+                    ),
                   ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: progress,
+                  backgroundColor: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    goal.isCompleted ? AppColors.success : theme.colorScheme.primary,
+                  ),
+                  minHeight: 6,
                 ),
-              ],
-            ),
-          ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '${formatLydShort(goal.dailyTarget)} / يوم',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                    ),
+                  ),
+                  Text(
+                    '${goal.daysElapsed} من ${goal.durationDays} يوم',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -257,7 +257,7 @@ class SavingsScreen extends StatelessWidget {
         minChildSize: 0.5,
         builder: (ctx, scrollController) => Container(
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            color: isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
           ),
           child: ListView(
@@ -291,7 +291,15 @@ class SavingsScreen extends StatelessWidget {
                       _showSaveDialog(context, goal, theme, isDark);
                     },
                     icon: const Icon(Icons.savings_outlined),
-                    label: Text('ادخر ${formatLyd(goal.dailyTarget)}'),
+                    label: Text.rich(TextSpan(
+                      children: [
+                        const TextSpan(text: 'ادخر '),
+                        TextSpan(
+                          text: formatLyd(goal.dailyTarget),
+                          style: daftarNumberStyle(fontSize: 14),
+                        ),
+                      ],
+                    )),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -327,8 +335,8 @@ class SavingsScreen extends StatelessWidget {
                       ),
                       Text(
                         formatLyd(entry.amount),
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
+                        style: daftarNumberStyle(
+                          fontSize: 14,
                           color: AppColors.success,
                         ),
                       ),
@@ -348,7 +356,7 @@ class SavingsScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+        backgroundColor: isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text('ادخار - ${goal.name}'),
         content: TextField(

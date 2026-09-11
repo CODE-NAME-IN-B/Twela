@@ -9,6 +9,9 @@ import '../../providers/app_settings_provider.dart';
 import '../../models/budget_settings.dart';
 import '../../models/app_settings.dart';
 import '../../services/update_service.dart';
+import '../../theme/daftar_theme.dart';
+import '../../utils/daftar_number_style.dart';
+import '../../widgets/daftar_card.dart';
 import '../data/data_export_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -170,88 +173,61 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final provider = context.watch<TwelaProvider>();
     final days = provider.daysSinceFirstUse;
 
-    return Container(
-      margin: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: isDark
-              ? [const Color(0xFF149C6D).withOpacity(0.15), const Color(0xFF0F766E).withOpacity(0.08)]
-              : [const Color(0xFFECFDF5), const Color(0xFFF0FDF4)],
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark
-              // ignore: deprecated_member_use
-              ? primaryColor.withOpacity(0.2)
-              // ignore: deprecated_member_use
-              : primaryColor.withOpacity(0.15),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Twela',
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: theme.colorScheme.onSurface,
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+      child: DaftarCard(
+        showDiagonalCut: true,
+        padding: const EdgeInsets.all(20),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Twela',
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: theme.colorScheme.onSurface,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  '$days يوم معك',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                    fontWeight: FontWeight.w500,
+                  const SizedBox(height: 6),
+                  Text(
+                    '$days يوم معك',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: isDark ? const Color(0xFF9C8E7E) : const Color(0xFF8A7E72),
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  'تتبع مصاريفك بالدينار الليبي',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    // ignore: deprecated_member_use
-                    color: (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B))
-                        // ignore: deprecated_member_use
-                        .withOpacity(0.7),
-                    fontSize: 11,
+                  const SizedBox(height: 2),
+                  Text(
+                    'تتبع مصاريفك بالدينار الليبي',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      // ignore: deprecated_member_use
+                      color: (isDark ? const Color(0xFF9C8E7E) : const Color(0xFF8A7E72))
+                          // ignore: deprecated_member_use
+                          .withOpacity(0.7),
+                      fontSize: 11,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [primaryColor, primaryColor.withOpacity(0.7)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+                ],
               ),
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  // ignore: deprecated_member_use
-                  color: primaryColor.withOpacity(0.3),
-                  blurRadius: 10,
-                  offset: const Offset(0, 3),
-                ),
-              ],
             ),
-            child: const Icon(
-              Icons.account_balance_wallet_rounded,
-              color: Colors.white,
-              size: 26,
+            Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                color: DaftarTheme.accent,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.account_balance_wallet_rounded,
+                color: Colors.white,
+                size: 26,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -993,7 +969,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             description: 'تطبيق تتبع المصاريف بالدينار الليبي',
             icon: Icons.account_balance_wallet_outlined,
             color: primaryColor,
-            version: _currentVersion.isNotEmpty ? 'v$_currentVersion' : 'v1.1.7',
+            version: _currentVersion.isNotEmpty ? 'v$_currentVersion' : 'v1.1.8',
           ),
           const SizedBox(height: 8),
           _buildProjectItem(
@@ -1090,7 +1066,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _buildVersionNumber() {
     return Center(
       child: Text(
-        'Twela v${_currentVersion.isNotEmpty ? _currentVersion : '1.1.7'}',
+        'Twela v${_currentVersion.isNotEmpty ? _currentVersion : '1.1.8'}',
         style: GoogleFonts.silkscreen(
           fontSize: 12,
           fontWeight: FontWeight.w500,

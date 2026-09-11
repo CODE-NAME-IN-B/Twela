@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../theme/app_colors.dart';
+import '../theme/daftar_theme.dart';
 import '../providers/debt_provider.dart';
 import '../models/debt.dart';
 import '../utils/formatters.dart';
+import '../utils/daftar_number_style.dart';
+import 'daftar_card.dart';
 
 class DebtTile extends StatelessWidget {
   final Debt debt;
@@ -24,7 +27,7 @@ class DebtTile extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            color: isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
           ),
           child: Column(
@@ -37,8 +40,8 @@ class DebtTile extends StatelessWidget {
                   height: 4,
                   decoration: BoxDecoration(
                     color: isDark
-                        ? const Color(0xFF475569)
-                        : const Color(0xFFCBD5E1),
+                        ? const Color(0xFF3D3830)
+                        : const Color(0xFFD4C5B0),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -55,8 +58,8 @@ class DebtTile extends StatelessWidget {
                 'المتبقي: ${formatLyd(debt.remaining)}',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: isDark
-                      ? const Color(0xFF94A3B8)
-                      : const Color(0xFF64748B),
+                      ? const Color(0xFF9C8E7E)
+                      : const Color(0xFF8A7E72),
                 ),
               ),
               const SizedBox(height: 20),
@@ -125,18 +128,8 @@ class DebtTile extends StatelessWidget {
       onTap: () {
         Navigator.pushNamed(context, '/debt-detail', arguments: debt);
       },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
+      child: DaftarCard(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E293B) : Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color:
-                isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
-            width: 1,
-          ),
-        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -152,11 +145,11 @@ class DebtTile extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: debt.isPaidOff
                               ? (isDark
-                                  ? const Color(0xFF149C6D).withOpacity(0.1)
-                                  : const Color(0xFFECFDF5))
+                                  ? const Color(0xFF0A846B).withOpacity(0.1)
+                                  : const Color(0xFFF0FAF5))
                               : (isDark
-                                  ? const Color(0xFFF5A524).withOpacity(0.1)
-                                  : const Color(0xFFFFFBEB)),
+                                  ? const Color(0xFFD4A574).withOpacity(0.1)
+                                  : const Color(0xFFFDF8F0)),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Icon(
@@ -189,11 +182,11 @@ class DebtTile extends StatelessWidget {
                                   decoration: BoxDecoration(
                                     color: debt.isGiven
                                         ? (isDark
-                                            ? const Color(0xFFE5484D).withOpacity(0.1)
-                                            : const Color(0xFFFEF2F2))
+                                            ? const Color(0xFFC4483A).withOpacity(0.1)
+                                            : const Color(0xFFFDF2F0))
                                         : (isDark
-                                            ? const Color(0xFF149C6D).withOpacity(0.1)
-                                            : const Color(0xFFECFDF5)),
+                                            ? const Color(0xFF0A846B).withOpacity(0.1)
+                                            : const Color(0xFFF0FAF5)),
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   child: Text(
@@ -228,8 +221,8 @@ class DebtTile extends StatelessWidget {
                           horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: isDark
-                            ? theme.colorScheme.primary.withOpacity(0.15)
-                            : const Color(0xFFECFDF5),
+                            ? const Color(0xFF2A2520)
+                            : const Color(0xFFF5F0E8),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
@@ -259,8 +252,8 @@ class DebtTile extends StatelessWidget {
                         horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: isDark
-                          ? const Color(0xFF149C6D).withOpacity(0.1)
-                          : const Color(0xFFECFDF5),
+                          ? const Color(0xFF0A846B).withOpacity(0.1)
+                          : const Color(0xFFF0FAF5),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
@@ -280,11 +273,11 @@ class DebtTile extends StatelessWidget {
               children: [
                 Text(
                   formatLyd(debt.remaining),
-                  style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
+                  style: daftarNumberStyle(
+                        fontSize: 16,
                         color: debt.isPaidOff
                             ? AppColors.success
-                            : theme.colorScheme.onSurface,
+                            : null,
                       ),
                 ),
                 Text(
@@ -296,22 +289,54 @@ class DebtTile extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 10),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                value: progress,
-                backgroundColor: isDark
-                    ? const Color(0xFF334155)
-                    : const Color(0xFFF1F5F9),
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  debt.isPaidOff ? AppColors.success : AppColors.primary,
-                ),
-                minHeight: 6,
-              ),
+            _SegmentedProgress(
+              progress: progress,
+              isPaidOff: debt.isPaidOff,
+              isDark: isDark,
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _SegmentedProgress extends StatelessWidget {
+  final double progress;
+  final bool isPaidOff;
+  final bool isDark;
+
+  const _SegmentedProgress({
+    required this.progress,
+    required this.isPaidOff,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    const totalSegments = 20;
+    final filledSegments = (progress * totalSegments).round().clamp(0, totalSegments);
+
+    return Row(
+      children: List.generate(totalSegments, (index) {
+        final isFilled = index < filledSegments;
+        return Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 1.5),
+            child: Container(
+              height: 6,
+              decoration: BoxDecoration(
+                color: isFilled
+                    ? (isPaidOff ? AppColors.success : DaftarTheme.accent)
+                    : (isDark
+                        ? const Color(0xFF3D3830)
+                        : const Color(0xFFE8E0D4)),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+        );
+      }),
     );
   }
 }

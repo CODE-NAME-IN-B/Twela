@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../theme/app_colors.dart';
+import '../../theme/daftar_theme.dart';
 import '../../providers/twela_provider.dart';
 import '../../models/transaction.dart';
 import '../../widgets/transaction_tile.dart';
@@ -69,7 +70,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
       appBar: AppBar(
         title: const Text('السجل'),
       ),
@@ -98,7 +99,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   borderSide: BorderSide.none,
                 ),
                 filled: true,
-                fillColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                fillColor: isDark
+                    ? const Color(0xFF2A2622)
+                    : const Color(0xFFF0EDE6),
               ),
               onChanged: (value) => setState(() => _searchQuery = value),
             ),
@@ -140,13 +143,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             height: 80,
                             decoration: BoxDecoration(
                               color: isDark
-                                  ? const Color(0xFF1E293B)
-                                  : const Color(0xFFECFDF5),
+                                  ? const Color(0xFF2A2622)
+                                  : const Color(0xFFF0EDE6),
                               shape: BoxShape.circle,
                               border: Border.all(
                                 color: isDark
-                                    ? const Color(0xFF334155)
-                                    : const Color(0xFFE2E8F0),
+                                    ? const Color(0xFF3A3530)
+                                    : const Color(0xFFE8E4DB),
                                 width: 1,
                               ),
                             ),
@@ -154,7 +157,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               Icons.receipt_long_outlined,
                               size: 36,
                               color: isDark
-                                  ? const Color(0xFF64748B)
+                                  ? const Color(0xFF9A9186)
                                   : AppColors.primary,
                             ),
                           ),
@@ -174,8 +177,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                 : 'ابدأ بتسجيل أول صرف أو دخل',
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: isDark
-                                  ? const Color(0xFF94A3B8)
-                                  : const Color(0xFF64748B),
+                                  ? const Color(0xFF9A9186)
+                                  : const Color(0xFF8A8178),
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -222,12 +225,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
         decoration: BoxDecoration(
           color: isSelected
               ? theme.colorScheme.primary
-              : (isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9)),
+              : (isDark ? const Color(0xFF2A2622) : const Color(0xFFF0EDE6)),
           borderRadius: BorderRadius.circular(20),
           border: isSelected
               ? null
               : Border.all(
-                  color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                  color: isDark ? const Color(0xFF3A3530) : const Color(0xFFE8E4DB),
                 ),
         ),
         child: Text(
@@ -237,7 +240,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
             color: isSelected
                 ? Colors.white
-                : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+                : (isDark ? const Color(0xFF9A9186) : const Color(0xFF8A8178)),
           ),
         ),
       ),

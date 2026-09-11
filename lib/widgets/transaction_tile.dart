@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../theme/app_colors.dart';
+import '../theme/daftar_theme.dart';
 import '../providers/twela_provider.dart';
 import '../models/transaction.dart';
 import '../utils/formatters.dart';
+import '../utils/daftar_number_style.dart';
 
 class TransactionTile extends StatelessWidget {
   final TwelaTransaction transaction;
@@ -21,7 +23,7 @@ class TransactionTile extends StatelessWidget {
       builder: (ctx) => Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+          color: isDark ? DaftarTheme.darkSurface : Colors.white,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: Column(
@@ -32,7 +34,7 @@ class TransactionTile extends StatelessWidget {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1),
+                    color: isDark ? const Color(0xFF4A443C) : const Color(0xFFD4CFC6),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -64,7 +66,7 @@ class TransactionTile extends StatelessWidget {
               isDark: isDark,
               icon: Icons.delete_outline,
               label: 'حذف المعاملة',
-              color: AppColors.danger,
+              color: DaftarTheme.danger,
               onTap: () {
                 Navigator.pop(ctx);
                 _confirmDelete(context, provider);
@@ -86,14 +88,14 @@ class TransactionTile extends StatelessWidget {
     required VoidCallback onTap,
     Color? color,
   }) {
-    final itemColor = color ?? (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B));
+    final itemColor = color ?? (isDark ? const Color(0xFF9A9186) : const Color(0xFF8A8178));
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFB),
+          color: isDark ? const Color(0xFF252220) : const Color(0xFFF5F2EB),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -119,7 +121,7 @@ class TransactionTile extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+        backgroundColor: isDark ? DaftarTheme.darkSurface : Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
@@ -140,7 +142,7 @@ class TransactionTile extends StatelessWidget {
             },
             child: const Text(
               'حذف',
-              style: TextStyle(color: AppColors.danger),
+              style: TextStyle(color: DaftarTheme.danger),
             ),
           ),
         ],
@@ -162,10 +164,10 @@ class TransactionTile extends StatelessWidget {
         padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
         child: Container(
           padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1E293B) : Colors.white,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-          ),
+            decoration: BoxDecoration(
+              color: isDark ? DaftarTheme.darkSurface : Colors.white,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -175,7 +177,7 @@ class TransactionTile extends StatelessWidget {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1),
+                  color: isDark ? const Color(0xFF4A443C) : const Color(0xFFD4CFC6),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -243,7 +245,7 @@ class TransactionTile extends StatelessWidget {
         return await showDialog<bool>(
           context: context,
           builder: (ctx) => AlertDialog(
-            backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+            backgroundColor: isDark ? DaftarTheme.darkSurface : Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
@@ -258,7 +260,7 @@ class TransactionTile extends StatelessWidget {
                 onPressed: () => Navigator.pop(ctx, true),
                 child: const Text(
                   'حذف',
-                  style: TextStyle(color: AppColors.danger),
+                  style: TextStyle(color: DaftarTheme.danger),
                 ),
               ),
             ],
@@ -273,13 +275,12 @@ class TransactionTile extends StatelessWidget {
       },
       background: Container(
         alignment: Alignment.centerRight,
-        margin: const EdgeInsets.only(bottom: 8),
+        margin: const EdgeInsets.only(bottom: 1),
         padding: const EdgeInsets.only(left: 20),
-        decoration: BoxDecoration(
-          color: AppColors.danger,
-          borderRadius: BorderRadius.circular(12),
+        decoration: const BoxDecoration(
+          color: DaftarTheme.danger,
         ),
-        child: const Icon(
+        child: Icon(
           Icons.delete_outline,
           color: Colors.white,
           size: 24,
@@ -288,37 +289,26 @@ class TransactionTile extends StatelessWidget {
       child: GestureDetector(
         onLongPress: () => _showEditDialog(context),
         child: Container(
-          margin: const EdgeInsets.only(bottom: 8),
-          padding: const EdgeInsets.all(14),
+          margin: const EdgeInsets.only(bottom: 1),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1E293B) : Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
-              width: 1,
+            color: isDark ? const Color(0xFF252220) : const Color(0xFFF5F2EB),
+            border: Border(
+              bottom: BorderSide(
+                color: isDark ? const Color(0xFF3A3530) : const Color(0xFFE8E4DB),
+                width: 1,
+              ),
             ),
           ),
           child: Row(
             children: [
-              Container(
-                width: 42,
-                height: 42,
-                decoration: BoxDecoration(
-                  color: (category?.color ??
-                          (isDark
-                              ? const Color(0xFF64748B)
-                              : const Color(0xFF94A3B8)))
-                      .withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  category?.icon ?? Icons.receipt_outlined,
-                  color: category?.color ??
-                      (isDark
-                          ? const Color(0xFF64748B)
-                          : const Color(0xFF94A3B8)),
-                  size: 20,
-                ),
+              Icon(
+                category?.icon ?? Icons.receipt_outlined,
+                color: category?.color ??
+                    (isDark
+                        ? const Color(0xFF9A9186)
+                        : const Color(0xFF8A8178)),
+                size: 20,
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -346,10 +336,11 @@ class TransactionTile extends StatelessWidget {
                 children: [
                   Text(
                     '${isExpense ? '-' : '+'}${formatLydShort(transaction.amount)}',
-                    style: theme.textTheme.titleSmall?.copyWith(
-                          color: isExpense ? AppColors.danger : AppColors.success,
-                          fontWeight: FontWeight.w700,
-                        ),
+                    style: daftarNumberStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: isExpense ? DaftarTheme.danger : AppColors.success,
+                    ),
                   ),
                   const SizedBox(height: 2),
                   Text(
@@ -366,14 +357,14 @@ class TransactionTile extends StatelessWidget {
                   height: 32,
                   decoration: BoxDecoration(
                     color: isDark
-                        ? const Color(0xFF334155).withOpacity(0.5)
-                        : const Color(0xFFF1F5F9),
+                        ? const Color(0xFF3A3530)
+                        : const Color(0xFFE8E4DB),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
                     Icons.more_vert,
                     size: 16,
-                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                    color: isDark ? const Color(0xFF9A9186) : const Color(0xFF8A8178),
                   ),
                 ),
               ),

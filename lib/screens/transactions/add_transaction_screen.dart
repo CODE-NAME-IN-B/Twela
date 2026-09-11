@@ -9,7 +9,8 @@ import '../../widgets/wallet_toggle.dart';
 import '../../widgets/category_picker.dart';
 
 class AddTransactionScreen extends StatefulWidget {
-  const AddTransactionScreen({super.key});
+  final TransactionType? initialType;
+  const AddTransactionScreen({super.key, this.initialType});
 
   @override
   State<AddTransactionScreen> createState() => _AddTransactionScreenState();
@@ -18,9 +19,15 @@ class AddTransactionScreen extends StatefulWidget {
 class _AddTransactionScreenState extends State<AddTransactionScreen> {
   final _amountController = TextEditingController();
   final _noteController = TextEditingController();
-  TransactionType _type = TransactionType.expense;
+  late TransactionType _type;
   WalletType _walletType = WalletType.cash;
   String? _selectedCategoryId;
+
+  @override
+  void initState() {
+    super.initState();
+    _type = widget.initialType ?? TransactionType.expense;
+  }
 
   @override
   void dispose() {

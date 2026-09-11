@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'theme/app_theme.dart';
+import 'theme/daftar_theme.dart';
 import 'providers/theme_provider.dart';
 import 'providers/app_settings_provider.dart';
 import 'services/storage_service.dart';
@@ -20,6 +21,7 @@ import 'screens/savings/savings_screen.dart';
 import 'screens/savings/add_savings_goal_screen.dart';
 import 'screens/data/data_export_screen.dart';
 import 'models/debt.dart';
+import 'models/transaction.dart';
 
 class TwelaApp extends StatelessWidget {
   const TwelaApp({super.key});
@@ -42,7 +44,12 @@ class TwelaApp extends StatelessWidget {
           routes: {
             '/onboarding': (context) => const OnboardingScreen(),
             '/home': (context) => const MainScreen(),
-            '/add-transaction': (context) => const AddTransactionScreen(),
+            '/add-transaction': (context) {
+              final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+              return AddTransactionScreen(
+                initialType: args?['type'] == 'income' ? TransactionType.income : null,
+              );
+            },
             '/history': (context) => const HistoryScreen(),
             '/settings': (context) => const SettingsScreen(),
             '/routine-settings': (context) => const RoutineSettingsScreen(),
@@ -107,9 +114,9 @@ class _MainScreenState extends State<MainScreen> {
             shape: BoxShape.circle,
           ),
           child: CustomPaint(
-            painter: _DashedRingPainter(primaryColor),
+            painter: _DashedRingPainter(DaftarTheme.accent),
             child: Center(
-              child: Icon(Icons.add, color: primaryColor, size: 24),
+              child: Icon(Icons.add, color: DaftarTheme.accent, size: 24),
             ),
           ),
         ),
@@ -125,12 +132,14 @@ class _MainScreenState extends State<MainScreen> {
       top: BorderSide(
         color: isDark
             // ignore: deprecated_member_use
-            ? Colors.white.withOpacity(0.08)
+            ? Colors.white.withOpacity(0.06)
             // ignore: deprecated_member_use
-            : Colors.black.withOpacity(0.06),
+            : Colors.black.withOpacity(0.04),
         width: 0.5,
       ),
     );
+
+    final barColor = isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface;
 
     final barContent = SafeArea(
       child: SizedBox(
@@ -150,7 +159,7 @@ class _MainScreenState extends State<MainScreen> {
 
     if (!glassMode) {
       return Container(
-        decoration: BoxDecoration(color: theme.colorScheme.surface, border: border),
+        decoration: BoxDecoration(color: barColor, border: border),
         child: barContent,
       );
     }
