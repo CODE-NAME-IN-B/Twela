@@ -23,6 +23,8 @@ import 'screens/data/data_export_screen.dart';
 import 'models/debt.dart';
 import 'models/transaction.dart';
 import 'services/update_service.dart';
+import 'l10n/generated/app_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 class TwelaApp extends StatelessWidget {
   const TwelaApp({super.key});
@@ -41,6 +43,17 @@ class TwelaApp extends StatelessWidget {
           darkTheme: AppTheme.darkTheme(accentColor: appSettings.accentColor),
           themeMode: themeProvider.themeMode,
           locale: const Locale('ar', 'LY'),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('ar', 'LY'),
+            Locale('ar'),
+            Locale('en'),
+          ],
           initialRoute: onboardingComplete ? '/home' : '/onboarding',
           routes: {
             '/onboarding': (context) => const OnboardingScreen(),
