@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../design/screen.dart';
 import '../../providers/twela_provider.dart';
 import '../../providers/app_settings_provider.dart';
 import '../../theme/app_colors.dart';
@@ -12,7 +13,17 @@ import '../../utils/formatters.dart';
 import '../../utils/motivational_messages.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({
+    super.key,
+    this.embedded = false,
+    this.bottomBarHeight = 0,
+    this.onOpenSettings,
+  });
+
+  /// When true the tab shell owns the scaffold; this screen renders only its body.
+  final bool embedded;
+  final double bottomBarHeight;
+  final VoidCallback? onOpenSettings;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -33,55 +44,61 @@ class _HomeScreenState extends State<HomeScreen> {
     final isDark = theme.brightness == Brightness.dark;
     final appSettings = context.watch<AppSettingsProvider>();
 
-    return Scaffold(
-      backgroundColor: isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
-      body: SafeArea(
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topRight,
-              end: Alignment.bottomLeft,
-              colors: isDark
-                  ? [const Color(0xFF1E1B4B), DaftarTheme.darkSurface]
-                  : [AppColors.primary.withAlpha(20), DaftarTheme.lightSurface],
-            ),
-          ),
-          child: RefreshIndicator(
-            onRefresh: () async {},
-            color: AppColors.primary,
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeader(context, theme, isDark),
-                  const SizedBox(height: 6),
-                  _buildMotivationalMessage(context, theme, isDark),
-                  if (appSettings.showGlyphBar) ...[
-                    const SizedBox(height: 12),
-                    _buildGlyphBar(context, theme, isDark),
-                  ],
-                  const SizedBox(height: 24),
-                  const BalanceCard(),
-                  const SizedBox(height: 20),
-                  _buildWalletCards(context),
-                  const SizedBox(height: 24),
-                  _buildTodaySpending(context, theme, isDark),
-                  const SizedBox(height: 24),
-                  _buildQuickActions(context, theme, isDark),
-                ],
-              ),
-            ),
+    final content = Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: isDark
+              ? [const Color(0xFF1E1B4B), DaftarTheme.darkSurface]
+              : [AppColors.primary.withAlpha(20), DaftarTheme.lightSurface],
+        ),
+      ),
+      child: RefreshIndicator(
+        onRefresh: () async {},
+        color: AppColors.primary,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeader(context, theme, isDark),
+              const SizedBox(height: 6),
+              _buildMotivationalMessage(context, theme, isDark),
+              if (appSettings.showGlyphBar) ...[
+                const SizedBox(height: 12),
+                _buildGlyphBar(context, theme, isDark),
+              ],
+              const SizedBox(height: 24),
+              const BalanceCard(),
+              const SizedBox(height: 20),
+              _buildWalletCards(context),
+              const SizedBox(height: 24),
+              _buildTodaySpending(context, theme, isDark),
+              const SizedBox(height: 24),
+              _buildQuickActions(context, theme, isDark),
+            ],
           ),
         ),
       ),
     );
+
+    if (widget.embedded) {
+      return InbScreen(embedded: true, child: content);
+    }
+
+    return Scaffold(
+      backgroundColor:
+          isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
+      body: SafeArea(child: content),
+    );
   }
 
   Widget _buildHeader(BuildContext context, ThemeData theme, bool isDark) {
-    final logoAsset =
-        isDark ? 'assets/logo/twela_logo_mono.png' : 'assets/logo/twela_logo.png';
+    final logoAsset = isDark
+        ? 'assets/logo/twela_logo_mono.png'
+        : 'assets/logo/twela_logo.png';
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -165,9 +182,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Text(
         _motivationalMessage,
         style: theme.textTheme.bodySmall?.copyWith(
-          color: isDark
-              ? AppColors.darkTextSecondary
-              : AppColors.textSecondary,
+          color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
           fontStyle: FontStyle.italic,
           height: 1.4,
         ),
@@ -200,21 +215,11 @@ class _HomeScreenState extends State<HomeScreen> {
       BuildContext context, ThemeData theme, bool isDark) {
     return GestureDetector(
       onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'لا توجد إشعارات جديدة',
-              style: TextStyle(
-                color: isDark ? AppColors.darkTextPrimary : Colors.white,
-              ),
-            ),
-            backgroundColor: isDark ? AppColors.darkBorder : AppColors.darkTextTertiary,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-        );
+        if (widget.onOpenSettings != null) {
+          widget.onOpenSettings!();
+        } else {
+          Navigator.pushNamed(context, '/settings');
+        }
       },
       child: Container(
         width: 44,
@@ -229,8 +234,8 @@ class _HomeScreenState extends State<HomeScreen> {
             width: 1,
           ),
         ),
-        child: const Icon(
-          Icons.notifications_outlined,
+        child: Icon(
+          Icons.settings_outlined,
           color: AppColors.primary,
           size: 22,
         ),
@@ -366,7 +371,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             width: 1,
                           ),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.receipt_long_outlined,
                           color: AppColors.primary,
                           size: 18,
@@ -431,7 +436,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildQuickActions(BuildContext context, ThemeData theme, bool isDark) {
+  Widget _buildQuickActions(
+      BuildContext context, ThemeData theme, bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -518,9 +524,8 @@ class _HomeScreenState extends State<HomeScreen> {
             Text(
               label,
               style: theme.textTheme.titleSmall?.copyWith(
-                color: isDark
-                    ? AppColors.darkTextPrimary
-                    : AppColors.textPrimary,
+                color:
+                    isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
               ),
             ),
           ],

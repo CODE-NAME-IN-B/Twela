@@ -40,10 +40,10 @@ android {
 
     defaultConfig {
         applicationId "com.twela.app"
-        minSdkVersion 23
+        minSdkVersion flutter.minSdkVersion
         targetSdk 34
-        versionCode 20
-        versionName "1.2.0"
+        versionCode flutter.versionCode
+        versionName flutter.versionName
     }
 
     buildTypes {

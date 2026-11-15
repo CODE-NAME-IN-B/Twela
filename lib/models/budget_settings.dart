@@ -18,9 +18,13 @@ class BudgetSettings {
     bool clearLowBalance = false,
   }) {
     return BudgetSettings(
-      monthlyBudgetTotal: clearMonthly ? null : (monthlyBudgetTotal ?? this.monthlyBudgetTotal),
-      dailySpendingLimit: clearDaily ? null : (dailySpendingLimit ?? this.dailySpendingLimit),
-      lowBalanceThreshold: clearLowBalance ? null : (lowBalanceThreshold ?? this.lowBalanceThreshold),
+      monthlyBudgetTotal:
+          clearMonthly ? null : (monthlyBudgetTotal ?? this.monthlyBudgetTotal),
+      dailySpendingLimit:
+          clearDaily ? null : (dailySpendingLimit ?? this.dailySpendingLimit),
+      lowBalanceThreshold: clearLowBalance
+          ? null
+          : (lowBalanceThreshold ?? this.lowBalanceThreshold),
     );
   }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 import 'app.dart';
@@ -12,8 +13,17 @@ import 'providers/savings_provider.dart';
 import 'providers/person_provider.dart';
 import 'providers/app_settings_provider.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Edge to edge: the app draws behind the system bars and every screen
+  // insets itself with SafeArea (see lib/design/screen.dart).
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    systemNavigationBarColor: Colors.transparent,
+  ));
+
   await initializeDateFormatting('ar', null);
 
   final storageService = StorageService();
@@ -21,8 +31,10 @@ void main() async {
 
   await NotificationService.init();
 
-  // Create TwelaProvider first so it can be injected into dependent providers
+  // TwelaProvider first so it can be injected into dependent providers.
   final twelaProvider = TwelaProvider(storageService);
+  // DebtProvider next: savings goals settle debts, so savings needs it.
+  final debtProvider = DebtProvider(storageService, twelaProvider);
 
   runApp(
     MultiProvider(
@@ -30,11 +42,15 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         Provider.value(value: storageService),
         ChangeNotifierProvider.value(value: twelaProvider),
-        ChangeNotifierProvider(create: (_) => DebtProvider(storageService, twelaProvider)),
+        ChangeNotifierProvider.value(value: debtProvider),
         ChangeNotifierProvider(create: (_) => RoutineProvider(storageService)),
-        ChangeNotifierProvider(create: (_) => SavingsProvider(storageService, twelaProvider)),
+        ChangeNotifierProvider(
+          create: (_) =>
+              SavingsProvider(storageService, twelaProvider, debtProvider),
+        ),
         ChangeNotifierProvider(create: (_) => PersonProvider(storageService)),
-        ChangeNotifierProvider(create: (_) => AppSettingsProvider(storageService)),
+        ChangeNotifierProvider(
+            create: (_) => AppSettingsProvider(storageService)),
       ],
       child: const TwelaApp(),
     ),

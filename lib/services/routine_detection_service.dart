@@ -13,7 +13,8 @@ class RoutineDetectionService {
     final now = DateTime.now();
     final thirtyDaysAgo = now.subtract(const Duration(days: 30));
     final recentExpenses = transactions
-        .where((t) => t.type == TransactionType.expense && t.date.isAfter(thirtyDaysAgo))
+        .where((t) =>
+            t.type == TransactionType.expense && t.date.isAfter(thirtyDaysAgo))
         .toList();
 
     final patterns = List<RoutinePattern>.from(existingPatterns);
@@ -40,12 +41,14 @@ class RoutineDetectionService {
         if (matches.length >= 3) {
           final existingPattern = patterns.where((p) =>
               p.categoryId == categoryId &&
-              (p.approxAmount - transaction.amount).abs() <= transaction.amount * 0.2);
+              (p.approxAmount - transaction.amount).abs() <=
+                  transaction.amount * 0.2);
 
           if (existingPattern.isNotEmpty) {
             final pattern = existingPattern.first;
             pattern.occurrenceCount = matches.length;
-            if (pattern.occurrenceCount >= 4 && pattern.status == PatternStatus.learning) {
+            if (pattern.occurrenceCount >= 4 &&
+                pattern.status == PatternStatus.learning) {
               pattern.status = PatternStatus.suggesting;
             }
           } else {
@@ -63,7 +66,9 @@ class RoutineDetectionService {
                 minute: transaction.date.minute,
               ),
               occurrenceCount: matches.length,
-              status: matches.length >= 4 ? PatternStatus.suggesting : PatternStatus.learning,
+              status: matches.length >= 4
+                  ? PatternStatus.suggesting
+                  : PatternStatus.learning,
             );
             patterns.add(newPattern);
           }

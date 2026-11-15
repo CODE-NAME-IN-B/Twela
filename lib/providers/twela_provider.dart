@@ -45,46 +45,92 @@ class TwelaProvider extends ChangeNotifier {
 
   double get cashBalance {
     final income = _transactions
-        .where((t) => t.type == TransactionType.income && t.walletType == WalletType.cash)
+        .where((t) =>
+            t.type == TransactionType.income && t.walletType == WalletType.cash)
         .fold(0.0, (sum, t) => sum + t.amount);
     final expense = _transactions
-        .where((t) => t.type == TransactionType.expense && t.walletType == WalletType.cash)
+        .where((t) =>
+            t.type == TransactionType.expense &&
+            t.walletType == WalletType.cash)
         .fold(0.0, (sum, t) => sum + t.amount);
     final debtGiven = _transactions
-        .where((t) => t.type == TransactionType.debtGiven && t.walletType == WalletType.cash)
+        .where((t) =>
+            t.type == TransactionType.debtGiven &&
+            t.walletType == WalletType.cash)
         .fold(0.0, (sum, t) => sum + t.amount);
     final debtReceived = _transactions
-        .where((t) => t.type == TransactionType.debtReceived && t.walletType == WalletType.cash)
+        .where((t) =>
+            t.type == TransactionType.debtReceived &&
+            t.walletType == WalletType.cash)
         .fold(0.0, (sum, t) => sum + t.amount);
     final debtPayment = _transactions
-        .where((t) => t.type == TransactionType.debtPayment && t.walletType == WalletType.cash)
+        .where((t) =>
+            t.type == TransactionType.debtPayment &&
+            t.walletType == WalletType.cash)
         .fold(0.0, (sum, t) => sum + t.amount);
     final savings = _transactions
-        .where((t) => t.type == TransactionType.savings && t.walletType == WalletType.cash)
+        .where((t) =>
+            t.type == TransactionType.savings &&
+            t.walletType == WalletType.cash)
         .fold(0.0, (sum, t) => sum + t.amount);
-    return _walletSettings.initialCashBalance + income - expense - debtGiven + debtReceived - debtPayment - savings;
+    final savingsWithdrawal = _transactions
+        .where((t) =>
+            t.type == TransactionType.savingsWithdrawal &&
+            t.walletType == WalletType.cash)
+        .fold(0.0, (sum, t) => sum + t.amount);
+    return _walletSettings.initialCashBalance +
+        income -
+        expense -
+        debtGiven +
+        debtReceived -
+        debtPayment -
+        savings +
+        savingsWithdrawal;
   }
 
   double get bankBalance {
     final income = _transactions
-        .where((t) => t.type == TransactionType.income && t.walletType == WalletType.bank)
+        .where((t) =>
+            t.type == TransactionType.income && t.walletType == WalletType.bank)
         .fold(0.0, (sum, t) => sum + t.amount);
     final expense = _transactions
-        .where((t) => t.type == TransactionType.expense && t.walletType == WalletType.bank)
+        .where((t) =>
+            t.type == TransactionType.expense &&
+            t.walletType == WalletType.bank)
         .fold(0.0, (sum, t) => sum + t.amount);
     final debtGiven = _transactions
-        .where((t) => t.type == TransactionType.debtGiven && t.walletType == WalletType.bank)
+        .where((t) =>
+            t.type == TransactionType.debtGiven &&
+            t.walletType == WalletType.bank)
         .fold(0.0, (sum, t) => sum + t.amount);
     final debtReceived = _transactions
-        .where((t) => t.type == TransactionType.debtReceived && t.walletType == WalletType.bank)
+        .where((t) =>
+            t.type == TransactionType.debtReceived &&
+            t.walletType == WalletType.bank)
         .fold(0.0, (sum, t) => sum + t.amount);
     final debtPayment = _transactions
-        .where((t) => t.type == TransactionType.debtPayment && t.walletType == WalletType.bank)
+        .where((t) =>
+            t.type == TransactionType.debtPayment &&
+            t.walletType == WalletType.bank)
         .fold(0.0, (sum, t) => sum + t.amount);
     final savings = _transactions
-        .where((t) => t.type == TransactionType.savings && t.walletType == WalletType.bank)
+        .where((t) =>
+            t.type == TransactionType.savings &&
+            t.walletType == WalletType.bank)
         .fold(0.0, (sum, t) => sum + t.amount);
-    return _walletSettings.initialBankBalance + income - expense - debtGiven + debtReceived - debtPayment - savings;
+    final savingsWithdrawal = _transactions
+        .where((t) =>
+            t.type == TransactionType.savingsWithdrawal &&
+            t.walletType == WalletType.bank)
+        .fold(0.0, (sum, t) => sum + t.amount);
+    return _walletSettings.initialBankBalance +
+        income -
+        expense -
+        debtGiven +
+        debtReceived -
+        debtPayment -
+        savings +
+        savingsWithdrawal;
   }
 
   double get totalBalance => cashBalance + bankBalance;
@@ -93,9 +139,8 @@ class TwelaProvider extends ChangeNotifier {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     return _transactions
-        .where((t) =>
-            t.type == TransactionType.expense &&
-            !t.date.isBefore(today))
+        .where(
+            (t) => t.type == TransactionType.expense && !t.date.isBefore(today))
         .fold(0.0, (sum, t) => sum + t.amount);
   }
 
@@ -104,8 +149,7 @@ class TwelaProvider extends ChangeNotifier {
     final monthStart = DateTime(now.year, now.month, 1);
     return _transactions
         .where((t) =>
-            t.type == TransactionType.expense &&
-            !t.date.isBefore(monthStart))
+            t.type == TransactionType.expense && !t.date.isBefore(monthStart))
         .fold(0.0, (sum, t) => sum + t.amount);
   }
 
@@ -130,7 +174,8 @@ class TwelaProvider extends ChangeNotifier {
 
   int get daysSinceFirstUse {
     if (_transactions.isEmpty) return 0;
-    final earliest = _transactions.reduce((a, b) => a.date.isBefore(b.date) ? a : b);
+    final earliest =
+        _transactions.reduce((a, b) => a.date.isBefore(b.date) ? a : b);
     return DateTime.now().difference(earliest.date).inDays;
   }
 
@@ -217,12 +262,14 @@ class TwelaProvider extends ChangeNotifier {
       if (percentage >= 1.0) {
         await NotificationService.showBudgetWarning(
           title: 'تجاوز سقف التصنيف',
-          body: 'لقد تجاوزت سقف ${category.name} الشهري (${(percentage * 100).toStringAsFixed(0)}%)',
+          body:
+              'لقد تجاوزت سقف ${category.name} الشهري (${(percentage * 100).toStringAsFixed(0)}%)',
         );
       } else if (percentage >= 0.8) {
         await NotificationService.showBudgetWarning(
           title: 'قريب من سقف التصنيف',
-          body: 'لقد وصلت ${category.name} إلى ${(percentage * 100).toStringAsFixed(0)}% من السقف الشهري',
+          body:
+              'لقد وصلت ${category.name} إلى ${(percentage * 100).toStringAsFixed(0)}% من السقف الشهري',
         );
       }
     }
@@ -242,12 +289,14 @@ class TwelaProvider extends ChangeNotifier {
       if (percentage >= 1.0) {
         await NotificationService.showBudgetWarning(
           title: 'تجاوز الميزانية الشهرية',
-          body: 'لقد تجاوزت الميزانية الشهرية (${(percentage * 100).toStringAsFixed(0)}%)',
+          body:
+              'لقد تجاوزت الميزانية الشهرية (${(percentage * 100).toStringAsFixed(0)}%)',
         );
       } else if (percentage >= 0.8) {
         await NotificationService.showBudgetWarning(
           title: 'قريب من الميزانية الشهرية',
-          body: 'لقد وصلت إلى ${(percentage * 100).toStringAsFixed(0)}% من الميزانية الشهرية',
+          body:
+              'لقد وصلت إلى ${(percentage * 100).toStringAsFixed(0)}% من الميزانية الشهرية',
         );
       }
     }

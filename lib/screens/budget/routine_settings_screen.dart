@@ -64,8 +64,8 @@ class RoutineSettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEnableSwitch(
-      BuildContext context, RoutineProvider provider, bool isDark, ThemeData theme) {
+  Widget _buildEnableSwitch(BuildContext context, RoutineProvider provider,
+      bool isDark, ThemeData theme) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -86,8 +86,8 @@ class RoutineSettingsScreen extends StatelessWidget {
                 Text(
                   'يتعلم منك',
                   style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -130,7 +130,8 @@ class RoutineSettingsScreen extends StatelessWidget {
               color: isDark ? const Color(0xFF1E293B) : Colors.white,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                color:
+                    isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
                 width: 1,
               ),
             ),
@@ -138,10 +139,10 @@ class RoutineSettingsScreen extends StatelessWidget {
               child: Text(
                 'لا توجد أنماط',
                 style: theme.textTheme.bodyMedium?.copyWith(
-                      color: isDark
-                          ? const Color(0xFF94A3B8)
-                          : const Color(0xFF64748B),
-                    ),
+                  color: isDark
+                      ? const Color(0xFF94A3B8)
+                      : const Color(0xFF64748B),
+                ),
               ),
             ),
           )

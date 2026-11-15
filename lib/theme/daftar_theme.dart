@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
 
+import '../design/tokens.dart';
+
+/// Compatibility layer: legacy `DaftarTheme` names mapped to INB tokens.
 class DaftarTheme {
   DaftarTheme._();
 
-  // Surfaces
-  static const Color lightSurface = Color(0xFFFAF8F3);
-  static const Color darkSurface = Color(0xFF1A1815);
-
-  // Accent
-  static const Color accent = Color(0xFF0A846B);
-
-  // Shadow (offset print style)
-  static const Color lightShadow = Color(0x66D4A574);
-  static const Color darkShadow = Color(0x408A7E72);
-
-  // Danger
-  static const Color danger = Color(0xFFC4483A);
+  static Color get lightSurface => InbColors.light.surface;
+  static Color get darkSurface => InbColors.dark.surface;
+  static Color get accent => InbColors.light.island;
+  static Color get mint => InbColors.light.mint;
+  static Color get rose => InbColors.light.rose;
+  static Color get danger => InbSemantics.light.danger;
 }

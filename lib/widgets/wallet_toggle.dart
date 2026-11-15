@@ -1,118 +1,38 @@
 import 'package:flutter/material.dart';
+
+import '../design/tokens.dart';
+import '../design/widgets.dart';
 import '../models/transaction.dart';
-import '../theme/app_colors.dart';
 
+/// Legacy cash/bank toggle → INB chips.
 class WalletToggle extends StatelessWidget {
-  final WalletType selected;
-  final ValueChanged<WalletType> onChanged;
-
   const WalletToggle({
     super.key,
     required this.selected,
     required this.onChanged,
   });
 
+  final WalletType selected;
+  final ValueChanged<WalletType> onChanged;
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: theme.scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        children: [
+    return Row(
+      children: [
+        for (final entry in const <(WalletType, String)>[
+          (WalletType.cash, 'كاش'),
+          (WalletType.bank, 'مصرف'),
+        ]) ...[
+          if (entry.$1 != WalletType.cash) const SizedBox(width: S.sm),
           Expanded(
-            child: GestureDetector(
-              onTap: () => onChanged(WalletType.cash),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                  color: selected == WalletType.cash
-                      ? AppColors.primary
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.money_outlined,
-                      color: selected == WalletType.cash
-                          ? Colors.white
-                          : (isDark
-                              ? const Color(0xFF94A3B8)
-                              : const Color(0xFF64748B)),
-                      size: 18,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      'كاش',
-                      style: TextStyle(
-                        color: selected == WalletType.cash
-                            ? Colors.white
-                            : (isDark
-                                ? const Color(0xFF94A3B8)
-                                : const Color(0xFF64748B)),
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: GestureDetector(
-              onTap: () => onChanged(WalletType.bank),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                  color: selected == WalletType.bank
-                      ? AppColors.primary
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.account_balance_outlined,
-                      color: selected == WalletType.bank
-                          ? Colors.white
-                          : (isDark
-                              ? const Color(0xFF94A3B8)
-                              : const Color(0xFF64748B)),
-                      size: 18,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      'مصرف',
-                      style: TextStyle(
-                        color: selected == WalletType.bank
-                            ? Colors.white
-                            : (isDark
-                                ? const Color(0xFF94A3B8)
-                                : const Color(0xFF64748B)),
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            child: InbChip(
+              label: entry.$2,
+              selected: selected == entry.$1,
+              onTap: () => onChanged(entry.$1),
             ),
           ),
         ],
-      ),
+      ],
     );
   }
 }

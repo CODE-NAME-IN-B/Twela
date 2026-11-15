@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
+import '../../design/screen.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/daftar_theme.dart';
 import '../../widgets/daftar_card.dart';
@@ -11,57 +12,67 @@ import '../../utils/formatters.dart';
 import '../../widgets/twela_design_system.dart';
 
 class StatsScreen extends StatelessWidget {
-  const StatsScreen({super.key});
+  const StatsScreen({
+    super.key,
+    this.embedded = false,
+    this.bottomBarHeight = 0,
+  });
+
+  final bool embedded;
+  final double bottomBarHeight;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
+    final content = Consumer<TwelaProvider>(
+      builder: (context, provider, _) {
+        final transactions = provider.transactions;
+        final expenses = transactions
+            .where((t) => t.type == TransactionType.expense)
+            .toList();
+
+        if (expenses.isEmpty) {
+          return TwelaEmptyState(
+            icon: Icons.bar_chart_outlined,
+            title: 'لا توجد بيانات كافية',
+            subtitle: 'ابدأ بتسجيل مصاريفك لرؤية الإحصائيات',
+          );
+        }
+
+        return SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildMonthlySummary(context, provider, isDark, theme),
+              const SizedBox(height: 20),
+              _buildCategoryChart(context, provider, expenses, isDark, theme),
+              const SizedBox(height: 20),
+              _buildTopCategories(context, provider, expenses, isDark, theme),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (embedded) {
+      return InbScreen(embedded: true, child: content);
+    }
+
     return Scaffold(
-      backgroundColor: isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
+      backgroundColor:
+          isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
       appBar: AppBar(
         title: const Text('الإحصائيات'),
       ),
-      body: SafeArea(
-        child: Consumer<TwelaProvider>(
-          builder: (context, provider, _) {
-            final transactions = provider.transactions;
-            final expenses = transactions
-                .where((t) => t.type == TransactionType.expense)
-                .toList();
-
-            if (expenses.isEmpty) {
-              return TwelaEmptyState(
-                icon: Icons.bar_chart_outlined,
-                title: 'لا توجد بيانات كافية',
-                subtitle: 'ابدأ بتسجيل مصاريفك لرؤية الإحصائيات',
-              );
-            }
-
-            return SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildMonthlySummary(context, provider, isDark, theme),
-                  const SizedBox(height: 20),
-                  _buildCategoryChart(
-                      context, provider, expenses, isDark, theme),
-                  const SizedBox(height: 20),
-                  _buildTopCategories(
-                      context, provider, expenses, isDark, theme),
-                ],
-              ),
-            );
-          },
-        ),
-      ),
+      body: SafeArea(child: content),
     );
   }
 
-  Widget _buildMonthlySummary(
-      BuildContext context, TwelaProvider provider, bool isDark, ThemeData theme) {
+  Widget _buildMonthlySummary(BuildContext context, TwelaProvider provider,
+      bool isDark, ThemeData theme) {
     return DaftarCard(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -138,6 +149,7 @@ class StatsScreen extends StatelessWidget {
           Text(
             value,
             style: daftarNumberStyle(
+              context,
               fontSize: 18,
               color: color,
             ),
@@ -188,6 +200,7 @@ class StatsScreen extends StatelessWidget {
                     radius: 90,
                     title: '${(percentage * 100).toStringAsFixed(0)}%',
                     titleStyle: daftarNumberStyle(
+                      context,
                       fontSize: 12,
                       color: Colors.white,
                     ),
@@ -290,6 +303,7 @@ class StatsScreen extends StatelessWidget {
                   Text(
                     formatLyd(entry.value),
                     style: daftarNumberStyle(
+                      context,
                       fontSize: 14,
                       color: AppColors.expense,
                     ),

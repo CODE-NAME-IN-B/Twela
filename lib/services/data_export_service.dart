@@ -19,7 +19,8 @@ class DataExportService {
     return file;
   }
 
-  static Future<Map<String, dynamic>?> importFromJsonString(String jsonStr) async {
+  static Future<Map<String, dynamic>?> importFromJsonString(
+      String jsonStr) async {
     try {
       final data = jsonDecode(jsonStr) as Map<String, dynamic>;
       if (!_validateImportData(data)) {
@@ -49,7 +50,8 @@ class DataExportService {
     return true;
   }
 
-  static Future<void> restoreData(StorageService storage, Map<String, dynamic> data) async {
+  static Future<void> restoreData(
+      StorageService storage, Map<String, dynamic> data) async {
     await storage.importAllData(data);
   }
 }

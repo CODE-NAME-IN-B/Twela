@@ -92,7 +92,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
+      backgroundColor:
+          isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
@@ -123,11 +124,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       _matchesSearch('شريط') ||
                       _matchesSearch('لون'))
                     const SizedBox(height: 16),
-                  if (_matchesSearch('تخصيص') ||
-                      _matchesSearch('لون'))
+                  if (_matchesSearch('تخصيص') || _matchesSearch('لون'))
                     _buildCustomizationSection(context, theme, isDark),
-                  if (_matchesSearch('تخصيص') ||
-                      _matchesSearch('لون'))
+                  if (_matchesSearch('تخصيص') || _matchesSearch('لون'))
                     const SizedBox(height: 16),
                   if (_matchesSearch('ميزانية') ||
                       _matchesSearch('شهري') ||
@@ -225,7 +224,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Container(
               width: 52,
               height: 52,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: DaftarTheme.accent,
                 shape: BoxShape.circle,
               ),
@@ -289,7 +288,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildThemeSection(BuildContext context, ThemeData theme, bool isDark) {
+  Widget _buildThemeSection(
+      BuildContext context, ThemeData theme, bool isDark) {
     final themeProvider = context.watch<ThemeProvider>();
 
     return DaftarCard(
@@ -574,7 +574,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             iconColor: primaryColor,
             onTap: _isCheckingUpdate ? null : _checkForUpdate,
             trailing: _isCheckingUpdate
-                ? const SizedBox(
+                ? SizedBox(
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
@@ -702,8 +702,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 16),
                 GestureDetector(
                   onTap: () async {
-                    final uri =
-                        Uri.parse('https://github.com/CODE-NAME-IN-B');
+                    final uri = Uri.parse('https://github.com/CODE-NAME-IN-B');
                     if (await canLaunchUrl(uri)) {
                       await launchUrl(uri,
                           mode: LaunchMode.externalApplication);
@@ -897,8 +896,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
             Container(
@@ -908,7 +906,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 color: primaryColor.withAlpha(38),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.system_update_outlined,
                 color: AppColors.primary,
               ),
@@ -935,9 +933,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               'الإصدار الجديد: ${updateInfo.version}',
               style: TextStyle(
                 fontWeight: FontWeight.w600,
-                color: isDark
-                    ? AppColors.darkTextPrimary
-                    : AppColors.textPrimary,
+                color:
+                    isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
@@ -966,7 +963,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: isDark ? AppColors.darkBackground : AppColors.borderLight,
+                  color:
+                      isDark ? AppColors.darkBackground : AppColors.borderLight,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
@@ -1034,9 +1032,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: Text(
               status,
               style: TextStyle(
-                color: isDark
-                    ? AppColors.darkTextPrimary
-                    : AppColors.textPrimary,
+                color:
+                    isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
               ),
             ),
             content: Column(

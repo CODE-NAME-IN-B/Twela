@@ -31,7 +31,8 @@ class RoutineProvider extends ChangeNotifier {
   List<RoutinePattern> get autoConfirmedPatterns =>
       _patterns.where((p) => p.status == PatternStatus.autoConfirmed).toList();
 
-  Future<void> updatePatternStatus(String patternId, PatternStatus status) async {
+  Future<void> updatePatternStatus(
+      String patternId, PatternStatus status) async {
     final index = _patterns.indexWhere((p) => p.id == patternId);
     if (index != -1) {
       _patterns[index].status = status;

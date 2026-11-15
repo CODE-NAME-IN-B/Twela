@@ -29,7 +29,6 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
-pubspec.lock
 
 # Symbolication related
 app.*.symbols
@@ -67,3 +66,7 @@ build/
 # Signing
 *.jks
 key.properties
+
+# Android build state (machine-local)
+/android/.gradle/
+/android/local.properties

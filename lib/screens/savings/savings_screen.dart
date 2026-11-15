@@ -6,7 +6,6 @@ import '../../widgets/daftar_card.dart';
 import '../../utils/daftar_number_style.dart';
 import '../../providers/savings_provider.dart';
 import '../../models/savings_goal.dart';
-import '../../models/savings_entry.dart';
 import '../../utils/formatters.dart';
 import '../../widgets/twela_design_system.dart';
 import 'add_savings_goal_screen.dart';
@@ -20,7 +19,8 @@ class SavingsScreen extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
+      backgroundColor:
+          isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
       appBar: AppBar(
         title: const Text('الحصالة'),
         actions: [
@@ -32,10 +32,11 @@ class SavingsScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: IconButton(
-                icon: const Icon(Icons.add, color: AppColors.savings),
+                icon: Icon(Icons.add, color: AppColors.savings),
                 onPressed: () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const AddSavingsGoalScreen()),
+                  MaterialPageRoute(
+                      builder: (_) => const AddSavingsGoalScreen()),
                 ),
               ),
             ),
@@ -56,7 +57,8 @@ class SavingsScreen extends StatelessWidget {
                 actionLabel: 'إنشاء حصالة',
                 onAction: () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const AddSavingsGoalScreen()),
+                  MaterialPageRoute(
+                      builder: (_) => const AddSavingsGoalScreen()),
                 ),
               );
             }
@@ -72,7 +74,8 @@ class SavingsScreen extends StatelessWidget {
                       style: theme.textTheme.headlineSmall,
                     ),
                     const SizedBox(height: 12),
-                    ...activeGoals.map((goal) => _buildGoalCard(context, goal, theme, isDark)),
+                    ...activeGoals.map(
+                        (goal) => _buildGoalCard(context, goal, theme, isDark)),
                   ],
                   if (completedGoals.isNotEmpty) ...[
                     const SizedBox(height: 28),
@@ -85,7 +88,8 @@ class SavingsScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    ...completedGoals.map((goal) => _buildGoalCard(context, goal, theme, isDark)),
+                    ...completedGoals.map(
+                        (goal) => _buildGoalCard(context, goal, theme, isDark)),
                   ],
                 ],
               ),
@@ -96,7 +100,8 @@ class SavingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildGoalCard(BuildContext context, SavingsGoal goal, ThemeData theme, bool isDark) {
+  Widget _buildGoalCard(
+      BuildContext context, SavingsGoal goal, ThemeData theme, bool isDark) {
     final progress = goal.progress.clamp(0.0, 1.0);
 
     return GestureDetector(
@@ -120,7 +125,8 @@ class SavingsScreen extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: goal.isCompleted
                           ? AppColors.incomeSurface
@@ -131,7 +137,9 @@ class SavingsScreen extends StatelessWidget {
                       goal.isCompleted ? 'مكتمل' : 'نشط',
                       style: TextStyle(
                         fontSize: 11,
-                        color: goal.isCompleted ? AppColors.income : AppColors.savings,
+                        color: goal.isCompleted
+                            ? AppColors.income
+                            : AppColors.savings,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -145,6 +153,7 @@ class SavingsScreen extends StatelessWidget {
                   Text(
                     '${formatLydShort(goal.savedAmount)} / ${formatLydShort(goal.targetAmount)}',
                     style: daftarNumberStyle(
+                      context,
                       fontSize: 18,
                       color: theme.colorScheme.onSurface,
                     ),
@@ -152,6 +161,7 @@ class SavingsScreen extends StatelessWidget {
                   Text(
                     '${(progress * 100).toStringAsFixed(0)}%',
                     style: daftarNumberStyle(
+                      context,
                       fontSize: 14,
                       color: theme.colorScheme.onSurface,
                     ),
@@ -163,7 +173,8 @@ class SavingsScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(4),
                 child: LinearProgressIndicator(
                   value: progress,
-                  backgroundColor: isDark ? AppColors.darkBorder : AppColors.borderLight,
+                  backgroundColor:
+                      isDark ? AppColors.darkBorder : AppColors.borderLight,
                   valueColor: AlwaysStoppedAnimation<Color>(
                     goal.isCompleted ? AppColors.income : AppColors.savings,
                   ),
@@ -199,7 +210,8 @@ class SavingsScreen extends StatelessWidget {
     );
   }
 
-  void _showGoalDetails(BuildContext context, SavingsGoal goal, ThemeData theme, bool isDark) {
+  void _showGoalDetails(
+      BuildContext context, SavingsGoal goal, ThemeData theme, bool isDark) {
     final provider = context.read<SavingsProvider>();
     final entries = provider.getEntriesForGoal(goal.id);
 
@@ -252,7 +264,7 @@ class SavingsScreen extends StatelessWidget {
                         const TextSpan(text: 'ادخر '),
                         TextSpan(
                           text: formatLyd(goal.dailyTarget),
-                          style: daftarNumberStyle(fontSize: 14),
+                          style: daftarNumberStyle(context, fontSize: 14),
                         ),
                       ],
                     )),
@@ -278,29 +290,31 @@ class SavingsScreen extends StatelessWidget {
                 )
               else
                 ...entries.map((entry) => Container(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: isDark ? AppColors.darkSurface : AppColors.surface,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        formatDate(entry.date),
-                        style: theme.textTheme.bodySmall,
+                      margin: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color:
+                            isDark ? AppColors.darkSurface : AppColors.surface,
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      Text(
-                        formatLyd(entry.amount),
-                        style: daftarNumberStyle(
-                          fontSize: 14,
-                          color: AppColors.income,
-                        ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            formatDate(entry.date),
+                            style: theme.textTheme.bodySmall,
+                          ),
+                          Text(
+                            formatLyd(entry.amount),
+                            style: daftarNumberStyle(
+                              context,
+                              fontSize: 14,
+                              color: AppColors.income,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                )),
+                    )),
             ],
           ),
         ),
@@ -308,13 +322,15 @@ class SavingsScreen extends StatelessWidget {
     );
   }
 
-  void _showSaveDialog(BuildContext context, SavingsGoal goal, ThemeData theme, bool isDark) {
+  void _showSaveDialog(
+      BuildContext context, SavingsGoal goal, ThemeData theme, bool isDark) {
     final controller = TextEditingController(text: goal.dailyTarget.toString());
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
+        backgroundColor:
+            isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text('ادخار - ${goal.name}'),
         content: TextField(
@@ -335,11 +351,9 @@ class SavingsScreen extends StatelessWidget {
             onPressed: () {
               final amount = double.tryParse(controller.text);
               if (amount != null && amount > 0) {
-                final entry = SavingsEntry.create(
-                  savingsGoalId: goal.id,
-                  amount: amount,
-                );
-                context.read<SavingsProvider>().addEntry(entry);
+                context
+                    .read<SavingsProvider>()
+                    .addDeposit(goalId: goal.id, amount: amount);
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('تم تسجيل الادخار')),

@@ -63,7 +63,8 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
       context: context,
       builder: (ctx) => TwelaConfirmDialog(
         title: 'حذف الدين',
-        message: 'هل أنت متأكد من حذف هذا الدين؟ سيتم حذف جميع المعاملات المرتبطة به.',
+        message:
+            'هل أنت متأكد من حذف هذا الدين؟ سيتم حذف جميع المعاملات المرتبطة به.',
         confirmLabel: 'حذف',
         onConfirm: () {
           context.read<DebtProvider>().removeDebt(widget.debt.id);
@@ -79,7 +80,8 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
+      backgroundColor:
+          isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
       appBar: AppBar(
         title: Text(widget.debt.personName),
         actions: [
@@ -87,11 +89,13 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
             padding: const EdgeInsets.only(left: 16),
             child: Container(
               decoration: BoxDecoration(
-                color: isDark ? AppColors.danger.withOpacity(0.12) : AppColors.dangerSurface,
+                color: isDark
+                    ? AppColors.danger.withOpacity(0.12)
+                    : AppColors.dangerSurface,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: IconButton(
-                icon: const Icon(Icons.delete_outline, color: AppColors.danger),
+                icon: Icon(Icons.delete_outline, color: AppColors.danger),
                 onPressed: () => _confirmDelete(context),
               ),
             ),
@@ -113,7 +117,8 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                   _buildPaymentSection(context, debt, isDark, theme),
                   if (debt.paidAmount > 0) ...[
                     const SizedBox(height: 24),
-                    _buildPaymentHistory(context, debt, provider, isDark, theme),
+                    _buildPaymentHistory(
+                        context, debt, provider, isDark, theme),
                   ],
                 ],
               ),
@@ -126,7 +131,8 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
 
   Widget _buildDebtSummary(
       BuildContext context, Debt debt, bool isDark, ThemeData theme) {
-    final progress = debt.totalAmount > 0 ? debt.paidAmount / debt.totalAmount : 0.0;
+    final progress =
+        debt.totalAmount > 0 ? debt.paidAmount / debt.totalAmount : 0.0;
     final totalDots = 10;
     final filledDots = (progress * totalDots).round().clamp(0, totalDots);
 
@@ -150,11 +156,16 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                     ),
                     const SizedBox(height: 6),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
                         color: debt.isGiven
-                            ? (isDark ? AppColors.debt.withOpacity(0.12) : AppColors.debtSurface)
-                            : (isDark ? AppColors.income.withOpacity(0.12) : AppColors.incomeSurface),
+                            ? (isDark
+                                ? AppColors.debt.withOpacity(0.12)
+                                : AppColors.debtSurface)
+                            : (isDark
+                                ? AppColors.income.withOpacity(0.12)
+                                : AppColors.incomeSurface),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -162,7 +173,8 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: debt.isGiven ? AppColors.debt : AppColors.income,
+                          color:
+                              debt.isGiven ? AppColors.debt : AppColors.income,
                         ),
                       ),
                     ),
@@ -170,11 +182,16 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: debt.isPaidOff
-                      ? (isDark ? AppColors.success.withOpacity(0.12) : AppColors.successSurface)
-                      : (isDark ? AppColors.debt.withOpacity(0.12) : AppColors.debtSurface),
+                      ? (isDark
+                          ? AppColors.success.withOpacity(0.12)
+                          : AppColors.successSurface)
+                      : (isDark
+                          ? AppColors.debt.withOpacity(0.12)
+                          : AppColors.debtSurface),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -192,7 +209,9 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
           Text(
             debt.itemDescription,
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+              color: isDark
+                  ? AppColors.darkTextSecondary
+                  : AppColors.textSecondary,
             ),
           ),
           const SizedBox(height: 24),
@@ -245,13 +264,17 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
               Text(
                 '${(progress * 100).toStringAsFixed(0)}% مكتمل',
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.textSecondary,
                 ),
               ),
               Text(
                 formatDate(debt.date),
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: isDark ? AppColors.darkTextTertiary : AppColors.textTertiary,
+                  color: isDark
+                      ? AppColors.darkTextTertiary
+                      : AppColors.textTertiary,
                 ),
               ),
             ],
@@ -285,6 +308,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
           Text(
             formatLydShort(amount),
             style: daftarNumberStyle(
+              context,
               fontSize: 14,
               fontWeight: FontWeight.w700,
               color: color,
@@ -300,12 +324,15 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
     if (debt.isPaidOff) {
       return DaftarCard(
         padding: const EdgeInsets.all(24),
-        backgroundColor: isDark ? AppColors.success.withOpacity(0.08) : AppColors.successSurface,
+        backgroundColor: isDark
+            ? AppColors.success.withOpacity(0.08)
+            : AppColors.successSurface,
         showShadow: false,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.check_circle_outline, color: AppColors.success, size: 28),
+            Icon(Icons.check_circle_outline,
+                color: AppColors.success, size: 28),
             const SizedBox(width: 10),
             Text(
               'تم سداد الدين بالكامل',
@@ -330,10 +357,13 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: isDark ? AppColors.debt.withOpacity(0.12) : AppColors.debtSurface,
+                  color: isDark
+                      ? AppColors.debt.withOpacity(0.12)
+                      : AppColors.debtSurface,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.payment_outlined, color: AppColors.debt, size: 20),
+                child: Icon(Icons.payment_outlined,
+                    color: AppColors.debt, size: 20),
               ),
               const SizedBox(width: 12),
               Text(
@@ -350,19 +380,25 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             textAlign: TextAlign.center,
             style: daftarNumberStyle(
+              context,
               fontSize: 28,
               color: AppColors.debt,
             ),
             decoration: InputDecoration(
               hintText: '0',
               hintStyle: daftarNumberStyle(
+                context,
                 fontSize: 28,
-                color: isDark ? AppColors.darkTextTertiary : AppColors.textTertiary,
+                color: isDark
+                    ? AppColors.darkTextTertiary
+                    : AppColors.textTertiary,
               ),
               suffixText: 'د.ل',
               suffixStyle: TextStyle(
                 fontSize: 14,
-                color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : AppColors.textSecondary,
               ),
               border: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(vertical: 16),
@@ -380,10 +416,11 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
     );
   }
 
-  Widget _buildPaymentHistory(
-      BuildContext context, Debt debt, DebtProvider provider, bool isDark, ThemeData theme) {
+  Widget _buildPaymentHistory(BuildContext context, Debt debt,
+      DebtProvider provider, bool isDark, ThemeData theme) {
     final payments = provider.ledger.transactions
-        .where((t) => t.relatedId == debt.id && t.type == TransactionType.debtPayment)
+        .where((t) =>
+            t.relatedId == debt.id && t.type == TransactionType.debtPayment)
         .toList()
       ..sort((a, b) => b.date.compareTo(a.date));
 
@@ -408,7 +445,8 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                           : AppColors.successSurface,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(Icons.check, color: AppColors.success, size: 16),
+                    child:
+                        Icon(Icons.check, color: AppColors.success, size: 16),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -424,7 +462,9 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                         Text(
                           formatDateTime(tx.date),
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: isDark ? AppColors.darkTextTertiary : AppColors.textTertiary,
+                            color: isDark
+                                ? AppColors.darkTextTertiary
+                                : AppColors.textTertiary,
                           ),
                         ),
                       ],
@@ -433,6 +473,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                   Text(
                     formatLyd(tx.amount),
                     style: daftarNumberStyle(
+                      context,
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: AppColors.success,

@@ -18,7 +18,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final _cashController = TextEditingController(text: '0');
   final _bankController = TextEditingController(text: '0');
   final _pageController = PageController();
-  int _currentPage = 0;
 
   @override
   void dispose() {
@@ -60,7 +59,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   String get _logoAsset {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return isDark ? 'assets/logo/twela_logo_mono.png' : 'assets/logo/twela_logo.png';
+    return isDark
+        ? 'assets/logo/twela_logo_mono.png'
+        : 'assets/logo/twela_logo.png';
   }
 
   @override
@@ -73,7 +74,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       body: SafeArea(
         child: PageView(
           controller: _pageController,
-          onPageChanged: (index) => setState(() => _currentPage = index),
+          onPageChanged: (_) {},
           children: [
             _buildWelcomePage(theme, isDark),
             _buildBalancePage(theme, isDark),
@@ -148,7 +149,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             child: Text(
               message,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                color:
+                    isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                 fontStyle: FontStyle.italic,
               ),
               textAlign: TextAlign.center,
@@ -234,7 +236,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     required Color color,
   }) {
     final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
+    final borderColor =
+        isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -262,7 +265,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 Text(
                   label,
                   style: theme.textTheme.titleSmall?.copyWith(
-                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                    color: isDark
+                        ? const Color(0xFF94A3B8)
+                        : const Color(0xFF64748B),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -282,7 +287,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     focusedBorder: InputBorder.none,
                     contentPadding: EdgeInsets.zero,
                     hintStyle: TextStyle(
-                      color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                      color: isDark
+                          ? const Color(0xFF64748B)
+                          : const Color(0xFF94A3B8),
                     ),
                   ),
                 ),

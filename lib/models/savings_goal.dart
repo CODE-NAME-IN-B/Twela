@@ -8,6 +8,9 @@ class SavingsGoal {
   final double dailyTarget;
   final int durationDays;
   final DateTime startDate;
+
+  /// Cached net amount (deposits − withdrawals). Always recomputed from the
+  /// entries by [SavingsProvider] so it can never drift.
   final double savedAmount;
   final SavingsStatus status;
   final DateTime createdAt;
@@ -26,11 +29,26 @@ class SavingsGoal {
   });
 
   double get targetAmount => dailyTarget * durationDays;
-  double get progress => targetAmount > 0 ? savedAmount / targetAmount : 0;
-  bool get isCompleted => savedAmount >= targetAmount;
-  int get daysElapsed => DateTime.now().difference(startDate).inDays;
+  double get progress =>
+      targetAmount > 0 ? (savedAmount / targetAmount).clamp(0.0, 1.0) : 0.0;
+  bool get isCompleted => status == SavingsStatus.completed;
+  bool get isPaused => status == SavingsStatus.paused;
+  bool get isDeleted => status == SavingsStatus.deleted;
+  bool get isActive => status == SavingsStatus.active;
+
+  int get daysElapsed =>
+      DateTime.now().difference(startDate).inDays.clamp(0, durationDays);
   int get daysRemaining => (durationDays - daysElapsed).clamp(0, durationDays);
-  double get remainingAmount => (targetAmount - savedAmount).clamp(0, targetAmount);
+  double get remainingAmount =>
+      (targetAmount - savedAmount).clamp(0, targetAmount);
+
+  /// How much the goal is short of its target, never negative.
+  double get shortfall =>
+      (targetAmount - savedAmount).clamp(0, double.infinity);
+
+  /// Suggested daily amount to finish on time, zero when the goal is done.
+  double get suggestedDaily =>
+      daysRemaining > 0 ? (shortfall / daysRemaining) : 0;
 
   factory SavingsGoal.create({
     required String name,
@@ -54,6 +72,7 @@ class SavingsGoal {
     String? name,
     double? dailyTarget,
     int? durationDays,
+    DateTime? startDate,
     double? savedAmount,
     SavingsStatus? status,
   }) {
@@ -62,7 +81,7 @@ class SavingsGoal {
       name: name ?? this.name,
       dailyTarget: dailyTarget ?? this.dailyTarget,
       durationDays: durationDays ?? this.durationDays,
-      startDate: startDate,
+      startDate: startDate ?? this.startDate,
       savedAmount: savedAmount ?? this.savedAmount,
       status: status ?? this.status,
       createdAt: createdAt,

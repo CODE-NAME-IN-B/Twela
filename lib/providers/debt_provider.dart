@@ -26,6 +26,11 @@ class DebtProvider extends ChangeNotifier {
   List<Debt> get activeDebts => _debts.where((d) => !d.isPaidOff).toList();
   List<Debt> get paidDebts => _debts.where((d) => d.isPaidOff).toList();
 
+  /// Debts the user can collect money for (the user is the lender).
+  List<Debt> get collectibleDebts => _debts
+      .where((d) => d.isGiven && !d.isPaidOff && d.remaining > 0)
+      .toList();
+
   double get totalOwed => activeDebts.fold(0.0, (sum, d) => sum + d.remaining);
   double get totalPaid => _debts.fold(0.0, (sum, d) => sum + d.paidAmount);
 
@@ -41,7 +46,9 @@ class DebtProvider extends ChangeNotifier {
     await ledger.addTransaction(TwelaTransaction(
       id: _uuid.v4(),
       amount: debt.totalAmount,
-      type: debt.isGiven ? TransactionType.debtGiven : TransactionType.debtReceived,
+      type: debt.isGiven
+          ? TransactionType.debtGiven
+          : TransactionType.debtReceived,
       walletType: _walletFromString(debt.walletType),
       categoryId: '',
       note: '${debt.personName} - ${debt.itemDescription}',
@@ -53,26 +60,69 @@ class DebtProvider extends ChangeNotifier {
   }
 
   Future<void> addPayment(String debtId, double amount) async {
+    await applyPayment(debtId, amount);
+  }
+
+  /// Record a payment against a debt.
+  ///
+  /// [walletType] overrides the wallet the money leaves from — a payment made
+  /// out of a savings goal must leave the wallet the goal was funded from.
+  /// [relatedEntryId] links the movement to a savings entry so it can be undone.
+  Future<void> applyPayment(
+    String debtId,
+    double amount, {
+    String? walletType,
+    String? note,
+    String? relatedEntryId,
+  }) async {
+    if (amount <= 0) return;
     final index = _debts.indexWhere((d) => d.id == debtId);
     if (index == -1) return;
     final debt = _debts[index];
     final newPaidAmount = debt.paidAmount + amount;
     _debts[index] = debt.copyWith(
-      paidAmount: newPaidAmount > debt.totalAmount ? debt.totalAmount : newPaidAmount,
+      paidAmount:
+          newPaidAmount > debt.totalAmount ? debt.totalAmount : newPaidAmount,
     );
     await _storage.saveDebts(_debts);
 
-    // Record payment transaction on the balance using the debt's wallet type
+    // Record payment transaction on the balance
     await ledger.addTransaction(TwelaTransaction(
       id: _uuid.v4(),
       amount: amount,
       type: TransactionType.debtPayment,
-      walletType: _walletFromString(debt.walletType),
+      walletType: _walletFromString(walletType ?? debt.walletType),
       categoryId: '',
-      note: 'سداد: ${debt.personName}',
+      note: note ?? 'سداد: ${debt.personName}',
       date: DateTime.now(),
       relatedId: debt.id,
+      relatedEntryId: relatedEntryId,
     ));
+
+    notifyListeners();
+  }
+
+  /// Undo a payment that was linked to a savings entry: removes the movement
+  /// and gives the paid amount back to the debt.
+  Future<void> reversePayment(String debtId, double amount,
+      {String? relatedEntryId}) async {
+    final index = _debts.indexWhere((d) => d.id == debtId);
+    if (index == -1) return;
+    final debt = _debts[index];
+    _debts[index] = debt.copyWith(
+      paidAmount: (debt.paidAmount - amount).clamp(0.0, debt.totalAmount),
+    );
+    await _storage.saveDebts(_debts);
+
+    final txs = ledger.transactions
+        .where((t) =>
+            t.relatedId == debtId &&
+            t.type == TransactionType.debtPayment &&
+            (relatedEntryId == null || t.relatedEntryId == relatedEntryId))
+        .toList();
+    for (final tx in txs) {
+      await ledger.removeTransaction(tx.id);
+    }
 
     notifyListeners();
   }
@@ -82,9 +132,8 @@ class DebtProvider extends ChangeNotifier {
     if (debt == null) return;
 
     // Reverse all transactions associated with this debt
-    final txsToRemove = ledger.transactions
-        .where((t) => t.relatedId == id)
-        .toList();
+    final txsToRemove =
+        ledger.transactions.where((t) => t.relatedId == id).toList();
     for (final tx in txsToRemove) {
       await ledger.removeTransaction(tx.id);
     }

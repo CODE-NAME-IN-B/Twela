@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../design/screen.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/daftar_theme.dart';
 import '../../providers/debt_provider.dart';
@@ -10,15 +11,72 @@ import '../../utils/formatters.dart';
 import '../../utils/daftar_number_style.dart';
 
 class DebtsScreen extends StatelessWidget {
-  const DebtsScreen({super.key});
+  const DebtsScreen({
+    super.key,
+    this.embedded = false,
+    this.bottomBarHeight = 0,
+  });
+
+  final bool embedded;
+  final double bottomBarHeight;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
+    final content = Consumer<DebtProvider>(
+      builder: (context, provider, _) {
+        final activeDebts = provider.activeDebts;
+        final paidDebts = provider.paidDebts;
+
+        if (activeDebts.isEmpty && paidDebts.isEmpty) {
+          return TwelaEmptyState(
+            icon: Icons.handshake_outlined,
+            title: 'لا توجد ديون',
+            subtitle: 'أضف دين جديد للبدء في التتبع',
+            actionLabel: 'إضافة دين',
+            onAction: () => Navigator.pushNamed(context, '/add-debt'),
+          );
+        }
+
+        return SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (activeDebts.isNotEmpty) ...[
+                TwelaSectionHeader(title: 'نشطة'),
+                ...activeDebts.map((debt) => _DebtTile(debt: debt)),
+              ],
+              if (paidDebts.isNotEmpty) ...[
+                const SizedBox(height: 28),
+                TwelaSectionHeader(
+                  title: 'تم السداد',
+                  trailing: Text(
+                    '${paidDebts.length}',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: isDark
+                          ? AppColors.darkTextTertiary
+                          : AppColors.textTertiary,
+                    ),
+                  ),
+                ),
+                ...paidDebts.map((debt) => _DebtTile(debt: debt)),
+              ],
+            ],
+          ),
+        );
+      },
+    );
+
+    if (embedded) {
+      return InbScreen(embedded: true, child: content);
+    }
+
     return Scaffold(
-      backgroundColor: isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
+      backgroundColor:
+          isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
       appBar: AppBar(
         title: const Text('الديون'),
         actions: [
@@ -30,57 +88,14 @@ class DebtsScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: IconButton(
-                icon: const Icon(Icons.add, color: AppColors.debt),
+                icon: Icon(Icons.add, color: AppColors.debt),
                 onPressed: () => Navigator.pushNamed(context, '/add-debt'),
               ),
             ),
           ),
         ],
       ),
-      body: SafeArea(
-        child: Consumer<DebtProvider>(
-          builder: (context, provider, _) {
-            final activeDebts = provider.activeDebts;
-            final paidDebts = provider.paidDebts;
-
-            if (activeDebts.isEmpty && paidDebts.isEmpty) {
-              return TwelaEmptyState(
-                icon: Icons.handshake_outlined,
-                title: 'لا توجد ديون',
-                subtitle: 'أضف دين جديد للبدء في التتبع',
-                actionLabel: 'إضافة دين',
-                onAction: () => Navigator.pushNamed(context, '/add-debt'),
-              );
-            }
-
-            return SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (activeDebts.isNotEmpty) ...[
-                    TwelaSectionHeader(title: 'نشطة'),
-                    ...activeDebts.map((debt) => _DebtTile(debt: debt)),
-                  ],
-                  if (paidDebts.isNotEmpty) ...[
-                    const SizedBox(height: 28),
-                    TwelaSectionHeader(
-                      title: 'تم السداد',
-                      trailing: Text(
-                        '${paidDebts.length}',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: isDark ? AppColors.darkTextTertiary : AppColors.textTertiary,
-                        ),
-                      ),
-                    ),
-                    ...paidDebts.map((debt) => _DebtTile(debt: debt)),
-                  ],
-                ],
-              ),
-            );
-          },
-        ),
-      ),
+      body: SafeArea(child: content),
     );
   }
 }
@@ -94,10 +109,12 @@ class _DebtTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final progress = debt.totalAmount > 0 ? debt.paidAmount / debt.totalAmount : 0.0;
+    final progress =
+        debt.totalAmount > 0 ? debt.paidAmount / debt.totalAmount : 0.0;
 
     return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, '/debt-detail', arguments: debt),
+      onTap: () =>
+          Navigator.pushNamed(context, '/debt-detail', arguments: debt),
       child: DaftarCard(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -110,12 +127,18 @@ class _DebtTile extends StatelessWidget {
                   height: 40,
                   decoration: BoxDecoration(
                     color: debt.isGiven
-                        ? (isDark ? AppColors.debt.withOpacity(0.15) : AppColors.debtSurface)
-                        : (isDark ? AppColors.income.withOpacity(0.15) : AppColors.incomeSurface),
+                        ? (isDark
+                            ? AppColors.debt.withOpacity(0.15)
+                            : AppColors.debtSurface)
+                        : (isDark
+                            ? AppColors.income.withOpacity(0.15)
+                            : AppColors.incomeSurface),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(
-                    debt.isGiven ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
+                    debt.isGiven
+                        ? Icons.arrow_upward_rounded
+                        : Icons.arrow_downward_rounded,
                     color: debt.isGiven ? AppColors.debt : AppColors.income,
                     size: 20,
                   ),
@@ -136,11 +159,16 @@ class _DebtTile extends StatelessWidget {
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
                               color: debt.isGiven
-                                  ? (isDark ? AppColors.debt.withOpacity(0.12) : AppColors.debtSurface)
-                                  : (isDark ? AppColors.income.withOpacity(0.12) : AppColors.incomeSurface),
+                                  ? (isDark
+                                      ? AppColors.debt.withOpacity(0.12)
+                                      : AppColors.debtSurface)
+                                  : (isDark
+                                      ? AppColors.income.withOpacity(0.12)
+                                      : AppColors.incomeSurface),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
@@ -148,7 +176,9 @@ class _DebtTile extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
-                                color: debt.isGiven ? AppColors.debt : AppColors.income,
+                                color: debt.isGiven
+                                    ? AppColors.debt
+                                    : AppColors.income,
                               ),
                             ),
                           ),
@@ -158,7 +188,9 @@ class _DebtTile extends StatelessWidget {
                       Text(
                         debt.itemDescription,
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                          color: isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.textSecondary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -175,6 +207,7 @@ class _DebtTile extends StatelessWidget {
                 Text(
                   formatLyd(debt.remaining),
                   style: daftarNumberStyle(
+                    context,
                     fontSize: 16,
                     color: debt.isPaidOff ? AppColors.success : AppColors.debt,
                   ),
@@ -191,9 +224,12 @@ class _DebtTile extends StatelessWidget {
                       ),
                     if (debt.isPaidOff)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: isDark ? AppColors.success.withOpacity(0.12) : AppColors.successSurface,
+                          color: isDark
+                              ? AppColors.success.withOpacity(0.12)
+                              : AppColors.successSurface,
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
@@ -236,7 +272,8 @@ class _SegmentedProgress extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const totalSegments = 20;
-    final filledSegments = (progress * totalSegments).round().clamp(0, totalSegments);
+    final filledSegments =
+        (progress * totalSegments).round().clamp(0, totalSegments);
 
     return Row(
       children: List.generate(totalSegments, (index) {

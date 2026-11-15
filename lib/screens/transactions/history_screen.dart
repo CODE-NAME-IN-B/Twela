@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../design/screen.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/daftar_theme.dart';
 import '../../providers/twela_provider.dart';
@@ -12,7 +13,14 @@ import '../transactions/add_transaction_screen.dart';
 enum TransactionFilter { all, income, expense, debt, savings }
 
 class HistoryScreen extends StatefulWidget {
-  const HistoryScreen({super.key});
+  const HistoryScreen({
+    super.key,
+    this.embedded = false,
+    this.bottomBarHeight = 0,
+  });
+
+  final bool embedded;
+  final double bottomBarHeight;
 
   @override
   State<HistoryScreen> createState() => _HistoryScreenState();
@@ -29,26 +37,32 @@ class _HistoryScreenState extends State<HistoryScreen> {
     super.dispose();
   }
 
-  List<TwelaTransaction> _filterTransactions(List<TwelaTransaction> transactions) {
+  List<TwelaTransaction> _filterTransactions(
+      List<TwelaTransaction> transactions) {
     var filtered = transactions;
 
     switch (_filter) {
       case TransactionFilter.all:
         break;
       case TransactionFilter.income:
-        filtered = filtered.where((t) => t.type == TransactionType.income).toList();
+        filtered =
+            filtered.where((t) => t.type == TransactionType.income).toList();
         break;
       case TransactionFilter.expense:
-        filtered = filtered.where((t) => t.type == TransactionType.expense).toList();
+        filtered =
+            filtered.where((t) => t.type == TransactionType.expense).toList();
         break;
       case TransactionFilter.debt:
-        filtered = filtered.where((t) =>
-            t.type == TransactionType.debtGiven ||
-            t.type == TransactionType.debtReceived ||
-            t.type == TransactionType.debtPayment).toList();
+        filtered = filtered
+            .where((t) =>
+                t.type == TransactionType.debtGiven ||
+                t.type == TransactionType.debtReceived ||
+                t.type == TransactionType.debtPayment)
+            .toList();
         break;
       case TransactionFilter.savings:
-        filtered = filtered.where((t) => t.type == TransactionType.savings).toList();
+        filtered =
+            filtered.where((t) => t.type == TransactionType.savings).toList();
         break;
     }
 
@@ -79,13 +93,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
       case TransactionType.expense:
         return 'مصروف';
       case TransactionType.debtGiven:
-        return 'دين (授予)';
+        return 'دين (إعطاء)';
       case TransactionType.debtReceived:
         return 'دين (استلام)';
       case TransactionType.debtPayment:
         return 'دين (سداد)';
       case TransactionType.savings:
         return 'ادخار';
+      case TransactionType.savingsWithdrawal:
+        return 'سحب من ادخار';
     }
   }
 
@@ -116,12 +132,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
               ListTile(
                 leading: Icon(
                   Icons.edit_outlined,
-                  color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.textSecondary,
                 ),
                 title: Text(
                   'تعديل',
                   style: TextStyle(
-                    color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                    color: isDark
+                        ? AppColors.darkTextPrimary
+                        : AppColors.textPrimary,
                   ),
                 ),
                 onTap: () {
@@ -130,7 +150,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.delete_outline, color: AppColors.danger),
+                leading: Icon(Icons.delete_outline, color: AppColors.danger),
                 title: Text(
                   'حذف',
                   style: TextStyle(color: AppColors.danger),
@@ -165,7 +185,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
       context: context,
       builder: (ctx) => TwelaConfirmDialog(
         title: 'حذف المعاملة',
-        message: 'هل أنت متأكد من حذف هذه المعاملة؟ لا يمكن التراجع عن هذا الإجراء.',
+        message:
+            'هل أنت متأكد من حذف هذه المعاملة؟ لا يمكن التراجع عن هذا الإجراء.',
         confirmLabel: 'حذف',
         cancelLabel: 'إلغاء',
         onConfirm: () async {
@@ -181,220 +202,227 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return Scaffold(
-      backgroundColor: isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
-      appBar: AppBar(
-        title: const Text('السجل'),
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
-              child: TextField(
-                controller: _searchController,
-                style: theme.textTheme.bodyMedium,
-                decoration: InputDecoration(
-                  hintText: 'بحث...',
-                  prefixIcon: const Icon(Icons.search_outlined, size: 20),
-                  suffixIcon: _searchQuery.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.clear, size: 18),
-                          onPressed: () {
-                            _searchController.clear();
-                            setState(() => _searchQuery = '');
-                          },
-                        )
-                      : null,
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  filled: true,
-                  fillColor: isDark
-                      ? const Color(0xFF2A2622)
-                      : const Color(0xFFF0EDE6),
-                ),
-                onChanged: (value) => setState(() => _searchQuery = value),
+    final content = Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+          child: TextField(
+            controller: _searchController,
+            style: theme.textTheme.bodyMedium,
+            decoration: InputDecoration(
+              hintText: 'بحث...',
+              prefixIcon: const Icon(Icons.search_outlined, size: 20),
+              suffixIcon: _searchQuery.isNotEmpty
+                  ? IconButton(
+                      icon: const Icon(Icons.clear, size: 18),
+                      onPressed: () {
+                        _searchController.clear();
+                        setState(() => _searchQuery = '');
+                      },
+                    )
+                  : null,
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
               ),
+              filled: true,
+              fillColor:
+                  isDark ? const Color(0xFF2A2622) : const Color(0xFFF0EDE6),
             ),
-            const SizedBox(height: 8),
-            SizedBox(
-              height: 36,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                children: [
-                  _buildFilterChip(TransactionFilter.all, 'الكل'),
-                  const SizedBox(width: 8),
-                  _buildFilterChip(TransactionFilter.income, 'دخل'),
-                  const SizedBox(width: 8),
-                  _buildFilterChip(TransactionFilter.expense, 'مصروف'),
-                  const SizedBox(width: 8),
-                  _buildFilterChip(TransactionFilter.debt, 'ديون'),
-                  const SizedBox(width: 8),
-                  _buildFilterChip(TransactionFilter.savings, 'ادخار'),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
-            Expanded(
-              child: Consumer<TwelaProvider>(
-                builder: (context, provider, _) {
-                  final transactions = _filterTransactions(provider.transactions);
+            onChanged: (value) => setState(() => _searchQuery = value),
+          ),
+        ),
+        const SizedBox(height: 8),
+        SizedBox(
+          height: 36,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            children: [
+              _buildFilterChip(TransactionFilter.all, 'الكل'),
+              const SizedBox(width: 8),
+              _buildFilterChip(TransactionFilter.income, 'دخل'),
+              const SizedBox(width: 8),
+              _buildFilterChip(TransactionFilter.expense, 'مصروف'),
+              const SizedBox(width: 8),
+              _buildFilterChip(TransactionFilter.debt, 'ديون'),
+              const SizedBox(width: 8),
+              _buildFilterChip(TransactionFilter.savings, 'ادخار'),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        Expanded(
+          child: Consumer<TwelaProvider>(
+            builder: (context, provider, _) {
+              final transactions = _filterTransactions(provider.transactions);
 
-                  if (transactions.isEmpty) {
-                    return Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(40),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: 80,
-                              height: 80,
-                              decoration: BoxDecoration(
-                                color: isDark
-                                    ? const Color(0xFF2A2622)
-                                    : const Color(0xFFF0EDE6),
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: isDark
-                                      ? const Color(0xFF3A3530)
-                                      : const Color(0xFFE8E4DB),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Icon(
-                                Icons.receipt_long_outlined,
-                                size: 36,
-                                color: isDark
-                                    ? const Color(0xFF9A9186)
-                                    : AppColors.primary,
-                              ),
+              if (transactions.isEmpty) {
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(40),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? const Color(0xFF2A2622)
+                                : const Color(0xFFF0EDE6),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isDark
+                                  ? const Color(0xFF3A3530)
+                                  : const Color(0xFFE8E4DB),
+                              width: 1,
                             ),
-                            const SizedBox(height: 20),
-                            Text(
-                              _searchQuery.isNotEmpty
-                                  ? 'لا توجد نتائج للبحث'
-                                  : 'لا توجد حركات بعد',
-                              style: theme.textTheme.headlineSmall?.copyWith(
-                                color: theme.colorScheme.onSurface,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              _searchQuery.isNotEmpty
-                                  ? 'جرّب البحث بكلمات أخرى'
-                                  : 'ابدأ بتسجيل أول صرف أو دخل',
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: isDark
-                                    ? const Color(0xFF9A9186)
-                                    : const Color(0xFF8A8178),
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            if (_searchQuery.isEmpty) ...[
-                              const SizedBox(height: 24),
-                              ElevatedButton.icon(
-                                onPressed: () => Navigator.pushNamed(
-                                    context, '/add-transaction'),
-                                icon: const Icon(Icons.add),
-                                label: const Text('إضافة عملية'),
-                              ),
-                            ],
-                          ],
+                          ),
+                          child: Icon(
+                            Icons.receipt_long_outlined,
+                            size: 36,
+                            color: isDark
+                                ? const Color(0xFF9A9186)
+                                : AppColors.primary,
+                          ),
                         ),
-                      ),
-                    );
-                  }
-
-                  return ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 100),
-                    itemCount: transactions.length,
-                    separatorBuilder: (_, __) => Container(
-                      height: 1,
-                      color: isDark ? AppColors.darkBorder : AppColors.borderLight,
+                        const SizedBox(height: 20),
+                        Text(
+                          _searchQuery.isNotEmpty
+                              ? 'لا توجد نتائج للبحث'
+                              : 'لا توجد حركات بعد',
+                          style: theme.textTheme.headlineSmall?.copyWith(
+                            color: theme.colorScheme.onSurface,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _searchQuery.isNotEmpty
+                              ? 'جرّب البحث بكلمات أخرى'
+                              : 'ابدأ بتسجيل أول صرف أو دخل',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: isDark
+                                ? const Color(0xFF9A9186)
+                                : const Color(0xFF8A8178),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        if (_searchQuery.isEmpty) ...[
+                          const SizedBox(height: 24),
+                          ElevatedButton.icon(
+                            onPressed: () => Navigator.pushNamed(
+                                context, '/add-transaction'),
+                            icon: const Icon(Icons.add),
+                            label: const Text('إضافة عملية'),
+                          ),
+                        ],
+                      ],
                     ),
-                    itemBuilder: (context, index) {
-                      final transaction = transactions[index];
-                      final category =
-                          provider.getCategoryById(transaction.categoryId);
-                      final color = _amountColor(transaction);
-                      final prefix =
-                          transaction.isExpense ? '-' : (transaction.isIncome ? '+' : '');
+                  ),
+                );
+              }
 
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    transaction.note.isNotEmpty
-                                        ? transaction.note
-                                        : (category?.name ?? _typeLabel(transaction.type)),
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w500,
-                                      color: isDark
-                                          ? AppColors.darkTextPrimary
-                                          : AppColors.textPrimary,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    formatDate(transaction.date),
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: isDark
-                                          ? AppColors.darkTextTertiary
-                                          : AppColors.textTertiary,
-                                    ),
-                                  ),
-                                ],
+              return ListView.separated(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 100),
+                itemCount: transactions.length,
+                separatorBuilder: (_, __) => Container(
+                  height: 1,
+                  color: isDark ? AppColors.darkBorder : AppColors.borderLight,
+                ),
+                itemBuilder: (context, index) {
+                  final transaction = transactions[index];
+                  final category =
+                      provider.getCategoryById(transaction.categoryId);
+                  final color = _amountColor(transaction);
+                  final prefix = transaction.isExpense
+                      ? '-'
+                      : (transaction.isIncome ? '+' : '');
+
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                transaction.note.isNotEmpty
+                                    ? transaction.note
+                                    : (category?.name ??
+                                        _typeLabel(transaction.type)),
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                  color: isDark
+                                      ? AppColors.darkTextPrimary
+                                      : AppColors.textPrimary,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            Text(
-                              '$prefix${formatLydShort(transaction.amount)} د.ل',
-                              style: daftarNumberStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                                color: color,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            GestureDetector(
-                              onTap: () => _showEditMenu(transaction),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8),
-                                child: Icon(
-                                  Icons.more_vert,
-                                  size: 20,
+                              const SizedBox(height: 4),
+                              Text(
+                                formatDate(transaction.date),
+                                style: TextStyle(
+                                  fontSize: 12,
                                   color: isDark
                                       ? AppColors.darkTextTertiary
                                       : AppColors.textTertiary,
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      );
-                    },
+                        const SizedBox(width: 12),
+                        Text(
+                          '$prefix${formatLydShort(transaction.amount)} د.ل',
+                          style: daftarNumberStyle(
+                            context,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: color,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        GestureDetector(
+                          onTap: () => _showEditMenu(transaction),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Icon(
+                              Icons.more_vert,
+                              size: 20,
+                              color: isDark
+                                  ? AppColors.darkTextTertiary
+                                  : AppColors.textTertiary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   );
                 },
-              ),
-            ),
-          ],
+              );
+            },
+          ),
         ),
+      ],
+    );
+
+    if (widget.embedded) {
+      return InbScreen(embedded: true, child: content);
+    }
+
+    return Scaffold(
+      backgroundColor:
+          isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
+      appBar: AppBar(
+        title: const Text('السجل'),
       ),
+      body: SafeArea(child: content),
     );
   }
 
@@ -416,8 +444,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
           border: isSelected
               ? null
               : Border.all(
-                  color:
-                      isDark ? const Color(0xFF3A3530) : const Color(0xFFE8E4DB),
+                  color: isDark
+                      ? const Color(0xFF3A3530)
+                      : const Color(0xFFE8E4DB),
                 ),
         ),
         child: Text(

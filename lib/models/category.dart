@@ -48,7 +48,9 @@ class ExpenseCategory {
       id: json['id'] as String,
       name: json['name'] as String,
       icon: IconData(
+        // ignore: non_const_argument_for_const_parameter
         json['iconCodePoint'] as int,
+        // ignore: non_const_argument_for_const_parameter
         fontFamily: json['iconFontFamily'] as String?,
       ),
       color: Color(json['colorValue'] as int),

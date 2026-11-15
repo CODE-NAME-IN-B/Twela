@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
-TextStyle daftarNumberStyle({
-  double fontSize = 28,
+import '../design/theme.dart';
+
+/// Legacy number-style helper, now backed by the INB mono style.
+///
+/// Numbers in this app are always Latin digits in the mono face.
+TextStyle daftarNumberStyle(
+  BuildContext context, {
+  double fontSize = 16,
   FontWeight fontWeight = FontWeight.w700,
   Color? color,
-}) {
-  return GoogleFonts.spaceMono(
-    fontSize: fontSize,
-    fontWeight: fontWeight,
-    color: color,
-  );
-}
+}) =>
+    monoStyle(
+      context,
+      size: fontSize,
+      weight: fontWeight,
+      color: color,
+    );

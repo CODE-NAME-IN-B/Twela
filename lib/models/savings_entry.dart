@@ -1,5 +1,12 @@
 import 'package:uuid/uuid.dart';
 
+/// What a savings entry did to the goal.
+///
+/// - [deposit]    : money moved from a wallet into the goal
+/// - [withdrawal] : money moved out of the goal, either back to a wallet or
+///                  straight into a debt payment
+enum SavingsEntryType { deposit, withdrawal }
+
 class SavingsEntry {
   final String id;
   final String savingsGoalId;
@@ -8,6 +15,11 @@ class SavingsEntry {
   final String note;
   final DateTime createdAt;
   final String walletType;
+  final SavingsEntryType type;
+
+  /// Set when the withdrawal paid a debt instead of returning to a wallet.
+  final String? linkedDebtId;
+  final String? linkedDebtName;
 
   const SavingsEntry({
     required this.id,
@@ -17,13 +29,23 @@ class SavingsEntry {
     this.note = '',
     required this.createdAt,
     this.walletType = 'cash',
+    this.type = SavingsEntryType.deposit,
+    this.linkedDebtId,
+    this.linkedDebtName,
   });
+
+  bool get isDeposit => type == SavingsEntryType.deposit;
+  bool get isWithdrawal => type == SavingsEntryType.withdrawal;
+  bool get paysDebt => linkedDebtId != null && linkedDebtId!.isNotEmpty;
 
   factory SavingsEntry.create({
     required String savingsGoalId,
     required double amount,
     String? note,
     String walletType = 'cash',
+    SavingsEntryType type = SavingsEntryType.deposit,
+    String? linkedDebtId,
+    String? linkedDebtName,
   }) {
     final now = DateTime.now();
     return SavingsEntry(
@@ -34,6 +56,34 @@ class SavingsEntry {
       note: note ?? '',
       createdAt: now,
       walletType: walletType,
+      type: type,
+      linkedDebtId: linkedDebtId,
+      linkedDebtName: linkedDebtName,
+    );
+  }
+
+  SavingsEntry copyWith({
+    String? id,
+    String? savingsGoalId,
+    double? amount,
+    DateTime? date,
+    String? note,
+    String? walletType,
+    SavingsEntryType? type,
+    String? linkedDebtId,
+    String? linkedDebtName,
+  }) {
+    return SavingsEntry(
+      id: id ?? this.id,
+      savingsGoalId: savingsGoalId ?? this.savingsGoalId,
+      amount: amount ?? this.amount,
+      date: date ?? this.date,
+      note: note ?? this.note,
+      createdAt: createdAt,
+      walletType: walletType ?? this.walletType,
+      type: type ?? this.type,
+      linkedDebtId: linkedDebtId ?? this.linkedDebtId,
+      linkedDebtName: linkedDebtName ?? this.linkedDebtName,
     );
   }
 
@@ -46,6 +96,9 @@ class SavingsEntry {
       'note': note,
       'createdAt': createdAt.toIso8601String(),
       'walletType': walletType,
+      'type': type.index,
+      'linkedDebtId': linkedDebtId,
+      'linkedDebtName': linkedDebtName,
     };
   }
 
@@ -58,6 +111,10 @@ class SavingsEntry {
       note: json['note'] as String? ?? '',
       createdAt: DateTime.parse(json['createdAt'] as String),
       walletType: json['walletType'] as String? ?? 'cash',
+      // Entries written before withdrawals existed are always deposits.
+      type: SavingsEntryType.values[json['type'] as int? ?? 0],
+      linkedDebtId: json['linkedDebtId'] as String?,
+      linkedDebtName: json['linkedDebtName'] as String?,
     );
   }
 }

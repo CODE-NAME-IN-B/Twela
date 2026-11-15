@@ -196,11 +196,15 @@ class StorageService {
   // Import data from JSON
   Future<void> importAllData(Map<String, dynamic> data) async {
     if (data.containsKey('categories')) {
-      final cats = (data['categories'] as List).map((e) => ExpenseCategory.fromJson(e)).toList();
+      final cats = (data['categories'] as List)
+          .map((e) => ExpenseCategory.fromJson(e))
+          .toList();
       await saveCategories(cats);
     }
     if (data.containsKey('transactions')) {
-      final txs = (data['transactions'] as List).map((e) => TwelaTransaction.fromJson(e)).toList();
+      final txs = (data['transactions'] as List)
+          .map((e) => TwelaTransaction.fromJson(e))
+          .toList();
       await saveTransactions(txs);
     }
     if (data.containsKey('walletSettings')) {
@@ -210,23 +214,31 @@ class StorageService {
       await saveBudgetSettings(BudgetSettings.fromJson(data['budgetSettings']));
     }
     if (data.containsKey('debts')) {
-      final debts = (data['debts'] as List).map((e) => Debt.fromJson(e)).toList();
+      final debts =
+          (data['debts'] as List).map((e) => Debt.fromJson(e)).toList();
       await saveDebts(debts);
     }
     if (data.containsKey('persons')) {
-      final persons = (data['persons'] as List).map((e) => Person.fromJson(e)).toList();
+      final persons =
+          (data['persons'] as List).map((e) => Person.fromJson(e)).toList();
       await savePersons(persons);
     }
     if (data.containsKey('savingsGoals')) {
-      final goals = (data['savingsGoals'] as List).map((e) => SavingsGoal.fromJson(e)).toList();
+      final goals = (data['savingsGoals'] as List)
+          .map((e) => SavingsGoal.fromJson(e))
+          .toList();
       await saveSavingsGoals(goals);
     }
     if (data.containsKey('savingsEntries')) {
-      final entries = (data['savingsEntries'] as List).map((e) => SavingsEntry.fromJson(e)).toList();
+      final entries = (data['savingsEntries'] as List)
+          .map((e) => SavingsEntry.fromJson(e))
+          .toList();
       await saveSavingsEntries(entries);
     }
     if (data.containsKey('patterns')) {
-      final patterns = (data['patterns'] as List).map((e) => RoutinePattern.fromJson(e)).toList();
+      final patterns = (data['patterns'] as List)
+          .map((e) => RoutinePattern.fromJson(e))
+          .toList();
       await savePatterns(patterns);
     }
     if (data.containsKey('appSettings')) {

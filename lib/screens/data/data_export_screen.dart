@@ -118,7 +118,7 @@ class _DataExportScreenState extends State<DataExportScreen> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.warning_amber_outlined,
                         color: AppColors.danger,
                         size: 20,
@@ -228,7 +228,9 @@ class _DataExportScreenState extends State<DataExportScreen> {
                   Text(
                     subtitle,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                      color: isDark
+                          ? const Color(0xFF94A3B8)
+                          : const Color(0xFF64748B),
                     ),
                   ),
                 ],
@@ -268,16 +270,16 @@ class _DataExportScreenState extends State<DataExportScreen> {
 
   Future<void> _importData() async {
     try {
-      final result = await FilePicker.platform.pickFiles(
+      final files = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['json'],
       );
 
-      if (result == null || result.files.isEmpty) return;
+      if (files.isEmpty) return;
 
       setState(() => _isImporting = true);
 
-      final file = File(result.files.first.path!);
+      final file = File(files.first.path!);
       final data = await DataExportService.importFromFile(file);
 
       if (data == null) {
@@ -294,7 +296,8 @@ class _DataExportScreenState extends State<DataExportScreen> {
           context: context,
           builder: (ctx) => AlertDialog(
             title: const Text('تأكيد الاستيراد'),
-            content: const Text('سيتم استبدال جميع البيانات الحالية. هل أنت متأكد؟'),
+            content:
+                const Text('سيتم استبدال جميع البيانات الحالية. هل أنت متأكد؟'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx, false),
@@ -302,7 +305,7 @@ class _DataExportScreenState extends State<DataExportScreen> {
               ),
               TextButton(
                 onPressed: () => Navigator.pop(ctx, true),
-                child: const Text(
+                child: Text(
                   'استيراد',
                   style: TextStyle(color: AppColors.danger),
                 ),
@@ -343,7 +346,8 @@ class _DataExportScreenState extends State<DataExportScreen> {
       final storage = context.read<StorageService>();
       final jsonStr = await DataExportService.exportToJson(storage);
       final file = await DataExportService.saveExportToFile(jsonStr);
-      await Share.shareXFiles([XFile(file.path)], text: 'نسخة احتياطية من Twela');
+      await Share.shareXFiles([XFile(file.path)],
+          text: 'نسخة احتياطية من Twela');
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

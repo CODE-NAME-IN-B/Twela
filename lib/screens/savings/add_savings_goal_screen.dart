@@ -31,7 +31,11 @@ class _AddSavingsGoalScreenState extends State<AddSavingsGoalScreen> {
     final dailyTarget = double.tryParse(_dailyTargetController.text);
     final duration = int.tryParse(_durationController.text);
 
-    if (name.isEmpty || dailyTarget == null || dailyTarget <= 0 || duration == null || duration <= 0) {
+    if (name.isEmpty ||
+        dailyTarget == null ||
+        dailyTarget <= 0 ||
+        duration == null ||
+        duration <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('يرجى ملء جميع الحقول بشكل صحيح')),
       );
@@ -127,7 +131,9 @@ class _AddSavingsGoalScreenState extends State<AddSavingsGoalScreen> {
                         Text(
                           'هدفك',
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                            color: isDark
+                                ? const Color(0xFF94A3B8)
+                                : const Color(0xFF64748B),
                           ),
                         ),
                         Text(

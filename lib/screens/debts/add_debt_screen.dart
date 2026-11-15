@@ -25,7 +25,8 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     if (args != null && args['type'] == 'received') {
       _isGiven = false;
     }
@@ -44,7 +45,10 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
     final description = _descriptionController.text.trim();
     final amount = double.tryParse(_amountController.text);
 
-    if (person.isEmpty || description.isEmpty || amount == null || amount <= 0) {
+    if (person.isEmpty ||
+        description.isEmpty ||
+        amount == null ||
+        amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('يرجى ملء جميع الحقول')),
       );

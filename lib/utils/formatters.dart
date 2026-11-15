@@ -1,23 +1,14 @@
-import 'package:intl/intl.dart';
+import '../design/format.dart';
 
-String formatLyd(double amount) {
-  final formatter = NumberFormat('#,##0.00', 'en_US');
-  return '${formatter.format(amount)} د.ل';
-}
+/// Legacy entry points, now backed by the INB design system.
+/// Kept for the screens that predate the unified format API.
+String formatLyd(double amount) => '${formatMoney(amount)} د.ل';
 
-String formatLydShort(double amount) {
-  final formatter = NumberFormat('#,##0.00', 'en_US');
-  return formatter.format(amount);
-}
+String formatLydShort(double amount) => formatMoney(amount);
 
-String formatDate(DateTime date) {
-  return DateFormat('dd/MM/yyyy', 'ar').format(date);
-}
+String formatDate(DateTime date) => formatDateShort(date);
 
-String formatDateTime(DateTime date) {
-  return DateFormat('dd/MM/yyyy hh:mm a', 'ar').format(date);
-}
+String formatDateTime(DateTime date) => formatDateTimeShort(date);
 
-String formatMonthYear(DateTime date) {
-  return DateFormat('MMMM yyyy', 'ar').format(date);
-}
+String formatMonthYear(DateTime date) =>
+    '${kArabicMonths[date.month - 1]} ${latn('${date.year}')}';

@@ -9,8 +9,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../widgets/twela_design_system.dart';
-import '../theme/app_colors.dart';
+import '../design/format.dart';
+import '../design/tokens.dart';
 
 class UpdateInfo {
   final String version;
@@ -99,16 +99,13 @@ class UpdateService {
       final prefs = await SharedPreferences.getInstance();
       final now = DateTime.now().millisecondsSinceEpoch;
 
-      // Check if user selected "remind me later" — only show after 24 hours
       final remindLater = prefs.getInt(_remindLaterKey);
       if (remindLater != null && now < remindLater) {
-        return; // Still within remind-later window
+        return;
       }
 
-      // Check if user skipped this version
       final skipVersion = prefs.getString(_skipVersionKey);
 
-      // Only check once per 6 hours
       final lastCheck = prefs.getInt(_lastCheckKey);
       if (lastCheck != null && now - lastCheck < 6 * 60 * 60 * 1000) {
         return;
@@ -119,7 +116,6 @@ class UpdateService {
       final updateInfo = await checkForUpdate();
       if (updateInfo == null || !context.mounted) return;
 
-      // Don't show if user skipped this exact version
       if (skipVersion == updateInfo.version) return;
 
       if (!context.mounted) return;
@@ -130,16 +126,16 @@ class UpdateService {
   }
 
   static void _showUpdateDialog(BuildContext context, UpdateInfo updateInfo) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final c = context.inb;
+    final sem = context.sem;
 
     showDialog(
       context: context,
       barrierDismissible: true,
       builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
+        backgroundColor: c.surface,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(TwelaRadius.lg),
+          borderRadius: BorderRadius.circular(R.card),
         ),
         title: Row(
           children: [
@@ -147,22 +143,20 @@ class UpdateService {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                // ignore: deprecated_member_use
-                color: AppColors.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(TwelaRadius.sm),
+                color: sem.savings.withValues(alpha: 0.14),
+                borderRadius: BorderRadius.circular(R.inner),
               ),
-              child: const Icon(
-                Icons.system_update_outlined,
-                color: AppColors.primary,
-              ),
+              child: Icon(Icons.system_update_outlined, color: sem.savings),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: S.sm),
             Expanded(
               child: Text(
                 'تحديث جديد متاح',
                 style: TextStyle(
+                  fontFamily: InbFonts.arabic,
                   fontSize: 16,
-                  color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                  fontWeight: FontWeight.w700,
+                  color: c.fg,
                 ),
               ),
             ),
@@ -173,43 +167,49 @@ class UpdateService {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'الإصدار الجديد: ${updateInfo.version}',
+              'الإصدار الجديد: ${latn(updateInfo.version)}',
               style: TextStyle(
+                fontFamily: InbFonts.arabic,
                 fontWeight: FontWeight.w600,
-                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                color: c.fg,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: S.xs),
             Text(
-              'الإصدار الحالي: ${_currentVersionSync}',
+              'الإصدار الحالي: ${latn(_currentVersionSync)}',
               style: TextStyle(
+                fontFamily: InbFonts.arabic,
                 fontSize: 13,
-                color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                color: c.muted,
               ),
             ),
             if (updateInfo.releaseNotes.isNotEmpty) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: S.md),
               Text(
                 'ملاحظات الإصدار:',
                 style: TextStyle(
+                  fontFamily: InbFonts.arabic,
                   fontWeight: FontWeight.w600,
                   fontSize: 13,
-                  color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                  color: c.fg,
                 ),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: S.sm),
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(S.md),
                 decoration: BoxDecoration(
-                  color: isDark ? AppColors.darkBackground : AppColors.borderLight,
-                  borderRadius: BorderRadius.circular(TwelaRadius.sm),
+                  color: c.paper,
+                  borderRadius: BorderRadius.circular(R.inner),
+                  border: Border.all(color: c.line),
                 ),
                 child: Text(
-                  updateInfo.releaseNotes,
+                  latn(updateInfo.releaseNotes),
                   style: TextStyle(
+                    fontFamily: InbFonts.arabic,
                     fontSize: 13,
-                    color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                    height: 1.6,
+                    color: c.muted,
                   ),
                 ),
               ),
@@ -219,24 +219,25 @@ class UpdateService {
         actions: [
           TextButton(
             onPressed: () async {
-              // Remind me later — show again after 24 hours
               final prefs = await SharedPreferences.getInstance();
               await prefs.setInt(
                 _remindLaterKey,
-                DateTime.now().add(const Duration(hours: 24)).millisecondsSinceEpoch,
+                DateTime.now()
+                    .add(const Duration(hours: 24))
+                    .millisecondsSinceEpoch,
               );
               if (ctx.mounted) Navigator.pop(ctx);
             },
             child: Text(
               'ذكرني لاحقاً',
               style: TextStyle(
-                color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                fontFamily: InbFonts.arabic,
+                color: c.muted,
               ),
             ),
           ),
           TextButton(
             onPressed: () async {
-              // Skip this version
               final prefs = await SharedPreferences.getInstance();
               await prefs.setString(_skipVersionKey, updateInfo.version);
               if (ctx.mounted) Navigator.pop(ctx);
@@ -244,7 +245,8 @@ class UpdateService {
             child: Text(
               'تخطى',
               style: TextStyle(
-                color: isDark ? AppColors.darkTextTertiary : AppColors.textTertiary,
+                fontFamily: InbFonts.arabic,
+                color: c.muted,
               ),
             ),
           ),
@@ -254,13 +256,20 @@ class UpdateService {
               _showDownloadProgress(context, updateInfo);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
+              backgroundColor: c.fg,
+              foregroundColor: c.paper,
+              elevation: 0,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(TwelaRadius.sm),
+                borderRadius: BorderRadius.circular(R.pill),
               ),
             ),
-            child: const Text('تحديث الآن'),
+            child: Text(
+              'تحديث الآن',
+              style: TextStyle(
+                fontFamily: InbFonts.arabic,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ),
         ],
       ),
@@ -274,9 +283,9 @@ class UpdateService {
     _currentVersionSync = packageInfo.version;
   }
 
-  static void _showDownloadProgress(BuildContext context, UpdateInfo updateInfo) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+  static void _showDownloadProgress(
+      BuildContext context, UpdateInfo updateInfo) {
+    final c = context.inb;
     double progress = 0;
     String status = 'جاري التحميل...';
 
@@ -290,29 +299,37 @@ class UpdateService {
           dialogSetState = setDialogState;
 
           return AlertDialog(
-            backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
+            backgroundColor: c.surface,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(TwelaRadius.lg),
+              borderRadius: BorderRadius.circular(R.card),
             ),
             title: Text(
               status,
               style: TextStyle(
-                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                fontFamily: InbFonts.arabic,
+                fontWeight: FontWeight.w700,
+                color: c.fg,
               ),
             ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                LinearProgressIndicator(
-                  value: progress > 0 ? progress : null,
-                  backgroundColor: isDark ? AppColors.darkBorder : AppColors.border,
-                  color: AppColors.primary,
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(R.pill),
+                  child: LinearProgressIndicator(
+                    value: progress > 0 ? progress : null,
+                    minHeight: 6,
+                    backgroundColor: c.line,
+                    color: c.fg,
+                  ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: S.md),
                 Text(
-                  progress > 0 ? '${(progress * 100).toInt()}%' : '',
+                  progress > 0 ? latn('${(progress * 100).toInt()}%') : '',
                   style: TextStyle(
-                    color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                    fontFamily: InbFonts.mono,
+                    fontWeight: FontWeight.w700,
+                    color: c.muted,
                   ),
                 ),
               ],

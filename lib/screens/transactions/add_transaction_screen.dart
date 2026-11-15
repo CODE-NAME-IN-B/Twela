@@ -202,9 +202,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w500,
-              color: isDark
-                  ? AppColors.darkTextTertiary
-                  : AppColors.textTertiary,
+              color:
+                  isDark ? AppColors.darkTextTertiary : AppColors.textTertiary,
             ),
           ),
           const SizedBox(height: 8),
@@ -212,9 +211,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             controller: _noteController,
             style: TextStyle(
               fontSize: 14,
-              color: isDark
-                  ? AppColors.darkTextPrimary
-                  : AppColors.textPrimary,
+              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
             ),
             decoration: InputDecoration(
               hintText: 'أضف ملاحظة...',
