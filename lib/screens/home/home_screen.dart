@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../design/screen.dart';
+import '../../design/tokens.dart';
 import '../../providers/twela_provider.dart';
 import '../../providers/app_settings_provider.dart';
 import '../../theme/app_colors.dart';
@@ -45,21 +46,14 @@ class _HomeScreenState extends State<HomeScreen> {
     final appSettings = context.watch<AppSettingsProvider>();
 
     final content = Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-          colors: isDark
-              ? [const Color(0xFF1E1B4B), DaftarTheme.darkSurface]
-              : [AppColors.primary.withAlpha(20), DaftarTheme.lightSurface],
-        ),
-      ),
+      decoration: BoxDecoration(color: context.inb.paper),
       child: RefreshIndicator(
         onRefresh: () async {},
         color: AppColors.primary,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
+          padding: const EdgeInsetsDirectional.only(
+              start: 20, top: 16, end: 20, bottom: 100),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -277,7 +271,7 @@ class _HomeScreenState extends State<HomeScreen> {
           decoration: BoxDecoration(
             color: isDark
                 ? AppColors.darkSurface.withAlpha(128)
-                : Colors.white.withAlpha(153),
+                : context.inb.surface,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
               color: isDark
@@ -497,7 +491,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
         decoration: BoxDecoration(
-          color: isDark ? AppColors.darkSurface : Colors.white,
+          color: context.inb.surface,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: isDark ? AppColors.darkBorder : AppColors.border,

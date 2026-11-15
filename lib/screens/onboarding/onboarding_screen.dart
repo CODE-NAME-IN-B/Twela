@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import '../../design/tokens.dart';
 import '../../providers/twela_provider.dart';
 import '../../services/storage_service.dart';
 import '../../services/notification_service.dart';
@@ -85,6 +86,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Widget _buildWelcomePage(ThemeData theme, bool isDark) {
+    final c = context.inb;
     final message = getRandomMotivationalMessage();
 
     return Padding(
@@ -96,9 +98,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             width: 120,
             height: 120,
             decoration: BoxDecoration(
-              color: isDark
-                  ? theme.colorScheme.primary.withOpacity(0.1)
-                  : const Color(0xFFECFDF5),
+              color: c.surface,
               shape: BoxShape.circle,
               border: Border.all(
                 color: theme.colorScheme.primary.withOpacity(0.15),
@@ -128,7 +128,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Text(
             'تتبع مصاريفك بسهولة\nبالدينار الليبي',
             style: theme.textTheme.bodyLarge?.copyWith(
-              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+              color: c.muted,
             ),
             textAlign: TextAlign.center,
           ),
@@ -149,8 +149,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             child: Text(
               message,
               style: theme.textTheme.bodySmall?.copyWith(
-                color:
-                    isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                color: c.muted,
                 fontStyle: FontStyle.italic,
               ),
               textAlign: TextAlign.center,
@@ -176,6 +175,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Widget _buildBalancePage(ThemeData theme, bool isDark) {
+    final c = context.inb;
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -192,7 +192,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Text(
             'أدخل رصيدك الحالي لكل محفظة',
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+              color: c.muted,
             ),
           ),
           const SizedBox(height: 40),
@@ -211,7 +211,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             controller: _bankController,
             icon: Icons.account_balance_outlined,
             label: 'محفظة المصرف',
-            color: const Color(0xFF10B981),
+            color: theme.colorScheme.primary,
           ),
           const Spacer(),
           SizedBox(
@@ -235,9 +235,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     required String label,
     required Color color,
   }) {
-    final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final borderColor =
-        isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
+    final c = context.inb;
+    final surfaceColor = c.surface;
+    final borderColor = c.line;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -265,9 +265,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 Text(
                   label,
                   style: theme.textTheme.titleSmall?.copyWith(
-                    color: isDark
-                        ? const Color(0xFF94A3B8)
-                        : const Color(0xFF64748B),
+                    color: c.muted,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -287,9 +285,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     focusedBorder: InputBorder.none,
                     contentPadding: EdgeInsets.zero,
                     hintStyle: TextStyle(
-                      color: isDark
-                          ? const Color(0xFF64748B)
-                          : const Color(0xFF94A3B8),
+                      color: c.muted,
                     ),
                   ),
                 ),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../design/tokens.dart';
 import '../../providers/twela_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../providers/app_settings_provider.dart';
@@ -99,7 +99,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           slivers: [
             SliverToBoxAdapter(child: _buildHeroCard(context, theme, isDark)),
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
+              padding: const EdgeInsetsDirectional.only(
+                  start: 20, top: 0, end: 20, bottom: 100),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
                   _buildSearchBar(context, theme, isDark),
@@ -179,7 +180,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final days = provider.daysSinceFirstUse;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+      padding: const EdgeInsetsDirectional.only(
+          start: 20, top: 16, end: 20, bottom: 0),
       child: DaftarCard(
         showDiagonalCut: true,
         padding: const EdgeInsets.all(20),
@@ -228,9 +230,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 color: DaftarTheme.accent,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.account_balance_wallet_rounded,
-                color: Colors.white,
+                color: context.inb.onIsland,
                 size: 26,
               ),
             ),
@@ -412,7 +414,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: Container(
                   width: 36,
                   height: 36,
-                  margin: const EdgeInsets.only(left: 8),
+                  margin: const EdgeInsetsDirectional.only(start: 8),
                   decoration: BoxDecoration(
                     color: color,
                     shape: BoxShape.circle,
@@ -426,7 +428,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   child: isSelected
-                      ? const Icon(Icons.check, color: Colors.white, size: 18)
+                      ? Icon(Icons.check, color: context.inb.onIsland, size: 18)
                       : null,
                 ),
               );
@@ -610,13 +612,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: isDark
-                    ? [AppColors.darkBackground, AppColors.darkSurface]
-                    : [AppColors.borderLight, const Color(0xFFECFDF5)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              color: context.inb.surface,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
                 color: primaryColor.withAlpha(50),
@@ -629,23 +625,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   width: 72,
                   height: 72,
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [primaryColor, primaryColor.withAlpha(180)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
+                    color: primaryColor.withAlpha(40),
                     shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: primaryColor.withAlpha(80),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.code_rounded,
-                    color: Colors.white,
+                    color: context.inb.onIsland,
                     size: 36,
                   ),
                 ),
@@ -714,24 +699,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     decoration: BoxDecoration(
                       color: primaryColor,
                       borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: primaryColor.withAlpha(80),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(Icons.code_outlined,
-                            color: Colors.white, size: 16),
+                            color: context.inb.onIsland, size: 16),
                         SizedBox(width: 8),
                         Text(
                           'github.com/CODE-NAME-IN-B',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: context.inb.onIsland,
                             fontWeight: FontWeight.w600,
                             fontSize: 13,
                           ),
@@ -861,12 +839,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Center(
       child: Text(
         'Twela v${_currentVersion.isNotEmpty ? _currentVersion : '1.1.9'}',
-        style: GoogleFonts.silkscreen(
+        style: TextStyle(
+          fontFamily: InbFonts.pixel,
           fontSize: 12,
-          fontWeight: FontWeight.w500,
-          color: Theme.of(context).brightness == Brightness.dark
-              ? Colors.white.withAlpha(64)
-              : Colors.black.withAlpha(51),
+          fontWeight: FontWeight.w400,
+          color: context.inb.muted,
         ),
       ),
     );
@@ -895,7 +872,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
+        backgroundColor: context.inb.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
@@ -999,7 +976,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
+              foregroundColor: context.inb.onIsland,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -1026,7 +1003,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           dialogSetState = setDialogState;
 
           return AlertDialog(
-            backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
+            backgroundColor: context.inb.surface,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             title: Text(

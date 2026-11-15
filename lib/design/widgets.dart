@@ -802,6 +802,71 @@ class InbIconButton extends StatelessWidget {
 }
 
 /// The one toast in the app: ink pill at the bottom, optional undo.
+/// Loading placeholder: a soft pulsing block in the line color.
+///
+/// One shape covers every loading state (rows, cards, headline numbers).
+/// When `MediaQuery.disableAnimations` is on, it renders as a static block —
+/// no motion without consent.
+class InbSkeleton extends StatefulWidget {
+  const InbSkeleton({
+    super.key,
+    this.width,
+    this.height = 16,
+    this.radius = R.inner,
+  });
+
+  final double? width;
+  final double height;
+  final double radius;
+
+  @override
+  State<InbSkeleton> createState() => _InbSkeletonState();
+}
+
+class _InbSkeletonState extends State<InbSkeleton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: Motion.base,
+  );
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _controller.stop();
+    } else if (!_controller.isAnimating) {
+      _controller.repeat(reverse: true);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.inb;
+    final box = Container(
+      width: widget.width,
+      height: widget.height,
+      decoration: BoxDecoration(
+        color: c.line,
+        borderRadius: BorderRadius.circular(widget.radius),
+      ),
+    );
+    if (MediaQuery.disableAnimationsOf(context)) return box;
+    return FadeTransition(
+      opacity: Tween<double>(begin: 0.5, end: 1.0).animate(
+        CurvedAnimation(parent: _controller, curve: Motion.emphasized),
+      ),
+      child: box,
+    );
+  }
+}
+
 Future<void> showInbToast(
   BuildContext context,
   String message, {

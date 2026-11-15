@@ -51,7 +51,8 @@ void main() {
 
     test('last day of previous month is excluded', () {
       final now = DateTime.now();
-      final lastMonth = DateTime(now.year, now.month, 1).subtract(const Duration(days: 1));
+      final lastMonth =
+          DateTime(now.year, now.month, 1).subtract(const Duration(days: 1));
       expect(isIncludedInMonth(lastMonth), false);
     });
   });
@@ -148,9 +149,8 @@ void main() {
         ),
       ];
 
-      final relatedTxs = transactions
-          .where((t) => t.relatedId == 'debt-1')
-          .toList();
+      final relatedTxs =
+          transactions.where((t) => t.relatedId == 'debt-1').toList();
 
       expect(relatedTxs.length, 2);
       expect(relatedTxs[0].id, 'tx1');
@@ -189,7 +189,8 @@ void main() {
       ];
 
       final savingsTxs = transactions
-          .where((t) => t.relatedId == 'goal-1' && t.type == TransactionType.savings)
+          .where((t) =>
+              t.relatedId == 'goal-1' && t.type == TransactionType.savings)
           .toList();
 
       expect(savingsTxs.length, 2);

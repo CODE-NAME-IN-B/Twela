@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design/tokens.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
@@ -33,7 +34,8 @@ class _DataExportScreenState extends State<DataExportScreen> {
         title: const Text('البيانات'),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
+        padding: const EdgeInsetsDirectional.only(
+            start: 20, top: 16, end: 20, bottom: 100),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -62,7 +64,7 @@ class _DataExportScreenState extends State<DataExportScreen> {
                   icon: Icons.download_outlined,
                   title: 'استيراد البيانات',
                   subtitle: 'استعادة بيانات من نسخة احتياطية',
-                  color: const Color(0xFF8B5CF6),
+                  color: context.inb.indigo,
                   isLoading: _isImporting,
                   onTap: _importData,
                 ),
@@ -82,7 +84,7 @@ class _DataExportScreenState extends State<DataExportScreen> {
                   icon: Icons.share_outlined,
                   title: 'مشاركة كملف',
                   subtitle: 'مشاركة ملف JSON للبيانات',
-                  color: const Color(0xFF06B6D4),
+                  color: context.sem.savings,
                   onTap: _shareData,
                 ),
                 const SizedBox(height: 12),
@@ -93,7 +95,7 @@ class _DataExportScreenState extends State<DataExportScreen> {
                   icon: Icons.copy_outlined,
                   title: 'نسخ البيانات',
                   subtitle: 'نسخ البيانات كنص JSON',
-                  color: const Color(0xFFF59E0B),
+                  color: context.sem.warning,
                   onTap: _copyData,
                 ),
               ],
@@ -108,9 +110,7 @@ class _DataExportScreenState extends State<DataExportScreen> {
                 Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? const Color(0xFFEF4444).withOpacity(0.1)
-                        : const Color(0xFFFEF2F2),
+                    color: context.sem.danger.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: AppColors.danger.withOpacity(0.2),
@@ -153,10 +153,10 @@ class _DataExportScreenState extends State<DataExportScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        color: context.inb.surface,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+          color: context.inb.line,
         ),
       ),
       child: Column(
@@ -191,7 +191,7 @@ class _DataExportScreenState extends State<DataExportScreen> {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFB),
+          color: context.inb.surface,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -228,9 +228,7 @@ class _DataExportScreenState extends State<DataExportScreen> {
                   Text(
                     subtitle,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: isDark
-                          ? const Color(0xFF94A3B8)
-                          : const Color(0xFF64748B),
+                      color: context.inb.muted,
                     ),
                   ),
                 ],

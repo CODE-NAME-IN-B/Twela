@@ -18,7 +18,6 @@ dependencies:
   intl: ^0.20.2
   uuid: ^4.2.1
   fl_chart: ^0.66.0
-  google_fonts: ^6.1.0
   http: ^1.2.0
   package_info_plus: ^10.2.2
   url_launcher: ^6.2.4
@@ -48,4 +47,28 @@ flutter:
   uses-material-design: true
   assets:
     - assets/logo/
-    - assets/fonts/
+  fonts:
+    - family: IBM Plex Sans Arabic
+      fonts:
+        - asset: assets/fonts/IBMPlexSansArabic-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/IBMPlexSansArabic-Bold.ttf
+          weight: 700
+    - family: Space Mono
+      fonts:
+        - asset: assets/fonts/SpaceMono-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/SpaceMono-Bold.ttf
+          weight: 700
+    - family: Unbounded
+      fonts:
+        - asset: assets/fonts/Unbounded-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Unbounded-Bold.ttf
+          weight: 700
+    - family: Silkscreen
+      fonts:
+        - asset: assets/fonts/Silkscreen-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Silkscreen-Bold.ttf
+          weight: 700

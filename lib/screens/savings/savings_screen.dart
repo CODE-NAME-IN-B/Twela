@@ -25,7 +25,7 @@ class SavingsScreen extends StatelessWidget {
         title: const Text('الحصالة'),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(left: 16),
+            padding: const EdgeInsetsDirectional.only(start: 16),
             child: Container(
               decoration: BoxDecoration(
                 color: AppColors.savingsSurface,
@@ -64,7 +64,8 @@ class SavingsScreen extends StatelessWidget {
             }
 
             return SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
+              padding: const EdgeInsetsDirectional.only(
+                  start: 20, top: 16, end: 20, bottom: 100),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

@@ -86,7 +86,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
         title: Text(widget.debt.personName),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(left: 16),
+            padding: const EdgeInsetsDirectional.only(start: 16),
             child: Container(
               decoration: BoxDecoration(
                 color: isDark
@@ -108,7 +108,8 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
             final debt = provider.getDebtById(widget.debt.id) ?? widget.debt;
 
             return SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
+              padding: const EdgeInsetsDirectional.only(
+                  start: 20, top: 0, end: 20, bottom: 100),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

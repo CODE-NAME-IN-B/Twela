@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design/tokens.dart';
 import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../design/screen.dart';
@@ -42,7 +43,8 @@ class StatsScreen extends StatelessWidget {
         }
 
         return SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
+          padding: const EdgeInsetsDirectional.only(
+              start: 20, top: 16, end: 20, bottom: 100),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -202,7 +204,7 @@ class StatsScreen extends StatelessWidget {
                     titleStyle: daftarNumberStyle(
                       context,
                       fontSize: 12,
-                      color: Colors.white,
+                      color: context.inb.onIsland,
                     ),
                   );
                 }).toList(),

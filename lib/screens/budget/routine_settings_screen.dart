@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design/tokens.dart';
 import 'package:provider/provider.dart';
 import '../../theme/app_colors.dart';
 import '../../providers/routine_provider.dart';
@@ -22,7 +23,8 @@ class RoutineSettingsScreen extends StatelessWidget {
       body: Consumer<RoutineProvider>(
         builder: (context, provider, _) {
           return SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
+            padding: const EdgeInsetsDirectional.only(
+                start: 20, top: 16, end: 20, bottom: 100),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -69,10 +71,10 @@ class RoutineSettingsScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        color: context.inb.surface,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+          color: context.inb.line,
           width: 1,
         ),
       ),
@@ -127,11 +129,10 @@ class RoutineSettingsScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1E293B) : Colors.white,
+              color: context.inb.surface,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color:
-                    isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                color: context.inb.line,
                 width: 1,
               ),
             ),
@@ -139,9 +140,7 @@ class RoutineSettingsScreen extends StatelessWidget {
               child: Text(
                 'لا توجد أنماط',
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: isDark
-                      ? const Color(0xFF94A3B8)
-                      : const Color(0xFF64748B),
+                  color: context.inb.muted,
                 ),
               ),
             ),
@@ -168,10 +167,10 @@ class RoutineSettingsScreen extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        color: context.inb.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+          color: context.inb.line,
           width: 1,
         ),
       ),
@@ -181,9 +180,7 @@ class RoutineSettingsScreen extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: isDark
-                  ? theme.colorScheme.primary.withOpacity(0.15)
-                  : const Color(0xFFECFDF5),
+              color: theme.colorScheme.primary.withOpacity(0.12),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(

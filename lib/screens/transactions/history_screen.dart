@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../design/screen.dart';
+import '../../design/tokens.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/daftar_theme.dart';
 import '../../providers/twela_provider.dart';
@@ -110,7 +111,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
+      backgroundColor: isDark ? AppColors.darkSurface : AppColors.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -201,11 +202,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final c = context.inb;
 
     final content = Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+          padding: const EdgeInsetsDirectional.only(
+              start: 20, top: 8, end: 20, bottom: 0),
           child: TextField(
             controller: _searchController,
             style: theme.textTheme.bodyMedium,
@@ -228,8 +231,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 borderSide: BorderSide.none,
               ),
               filled: true,
-              fillColor:
-                  isDark ? const Color(0xFF2A2622) : const Color(0xFFF0EDE6),
+              fillColor: c.surface,
             ),
             onChanged: (value) => setState(() => _searchQuery = value),
           ),
@@ -270,23 +272,17 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           width: 80,
                           height: 80,
                           decoration: BoxDecoration(
-                            color: isDark
-                                ? const Color(0xFF2A2622)
-                                : const Color(0xFFF0EDE6),
+                            color: c.surface,
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: isDark
-                                  ? const Color(0xFF3A3530)
-                                  : const Color(0xFFE8E4DB),
+                              color: c.line,
                               width: 1,
                             ),
                           ),
                           child: Icon(
                             Icons.receipt_long_outlined,
                             size: 36,
-                            color: isDark
-                                ? const Color(0xFF9A9186)
-                                : AppColors.primary,
+                            color: c.muted,
                           ),
                         ),
                         const SizedBox(height: 20),
@@ -304,9 +300,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               ? 'جرّب البحث بكلمات أخرى'
                               : 'ابدأ بتسجيل أول صرف أو دخل',
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: isDark
-                                ? const Color(0xFF9A9186)
-                                : const Color(0xFF8A8178),
+                            color: c.muted,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -326,7 +320,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
               }
 
               return ListView.separated(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 100),
+                padding: const EdgeInsetsDirectional.only(
+                    start: 20, top: 8, end: 20, bottom: 100),
                 itemCount: transactions.length,
                 separatorBuilder: (_, __) => Container(
                   height: 1,
@@ -429,7 +424,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Widget _buildFilterChip(TransactionFilter filter, String label) {
     final isSelected = _filter == filter;
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final c = context.inb;
 
     return GestureDetector(
       onTap: () => setState(() => _filter = filter),
@@ -437,16 +432,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected
-              ? theme.colorScheme.primary
-              : (isDark ? const Color(0xFF2A2622) : const Color(0xFFF0EDE6)),
+          color: isSelected ? theme.colorScheme.primary : (c.surface),
           borderRadius: BorderRadius.circular(20),
           border: isSelected
               ? null
               : Border.all(
-                  color: isDark
-                      ? const Color(0xFF3A3530)
-                      : const Color(0xFFE8E4DB),
+                  color: c.line,
                 ),
         ),
         child: Text(
@@ -454,9 +445,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           style: TextStyle(
             fontSize: 13,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-            color: isSelected
-                ? Colors.white
-                : (isDark ? const Color(0xFF9A9186) : const Color(0xFF8A8178)),
+            color: isSelected ? c.onIsland : (c.muted),
           ),
         ),
       ),

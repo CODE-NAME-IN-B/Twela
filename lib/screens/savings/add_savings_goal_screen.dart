@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design/tokens.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../providers/savings_provider.dart';
@@ -74,7 +75,8 @@ class _AddSavingsGoalScreenState extends State<AddSavingsGoalScreen> {
         title: const Text('إنشاء حصالة'),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
+        padding: const EdgeInsetsDirectional.only(
+            start: 20, top: 0, end: 20, bottom: 100),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -112,9 +114,7 @@ class _AddSavingsGoalScreenState extends State<AddSavingsGoalScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: isDark
-                    ? theme.colorScheme.primary.withOpacity(0.1)
-                    : const Color(0xFFECFDF5),
+                color: theme.colorScheme.primary.withOpacity(0.12),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Row(
@@ -131,9 +131,7 @@ class _AddSavingsGoalScreenState extends State<AddSavingsGoalScreen> {
                         Text(
                           'هدفك',
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: isDark
-                                ? const Color(0xFF94A3B8)
-                                : const Color(0xFF64748B),
+                            color: context.inb.muted,
                           ),
                         ),
                         Text(
@@ -176,10 +174,10 @@ class _AddSavingsGoalScreenState extends State<AddSavingsGoalScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        color: context.inb.surface,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+          color: context.inb.line,
         ),
       ),
       child: Column(

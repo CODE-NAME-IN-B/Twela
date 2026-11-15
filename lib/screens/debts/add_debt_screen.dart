@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design/tokens.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -85,7 +86,8 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
         title: Text(_isGiven ? 'أعطيت مالًا لشخص' : 'استلمت مالًا من شخص'),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
+        padding: const EdgeInsetsDirectional.only(
+            start: 20, top: 0, end: 20, bottom: 100),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -151,10 +153,10 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        color: context.inb.surface,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+          color: context.inb.line,
           width: 1,
         ),
       ),

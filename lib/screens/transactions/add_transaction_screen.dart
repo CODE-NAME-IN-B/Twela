@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design/tokens.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -108,7 +109,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
+          padding: const EdgeInsetsDirectional.only(
+              start: 20, top: 0, end: 20, bottom: 100),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -167,7 +169,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 20),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurface : Colors.white,
+        color: context.inb.surface,
         borderRadius: BorderRadius.circular(TwelaRadius.lg),
         border: Border.all(
           color: isDark ? AppColors.darkBorder : AppColors.borderLight,
@@ -187,7 +189,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurface : Colors.white,
+        color: context.inb.surface,
         borderRadius: BorderRadius.circular(TwelaRadius.lg),
         border: Border.all(
           color: isDark ? AppColors.darkBorder : AppColors.borderLight,

@@ -512,11 +512,11 @@ Future<void> showDepositSheet(BuildContext context, SavingsGoal goal) async {
         title: 'ادخار',
         subtitle: goal.name,
         child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            S.md,
-            0,
-            S.md,
-            S.md + MediaQuery.of(ctx).viewInsets.bottom,
+          padding: EdgeInsetsDirectional.only(
+            start: S.md,
+            top: 0,
+            end: S.md,
+            bottom: S.md + MediaQuery.of(ctx).viewInsets.bottom,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,

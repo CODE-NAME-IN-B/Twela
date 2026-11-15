@@ -8,10 +8,10 @@ Functional contract: `re_v1.md` (UI/UX reconstruction v10) — every P0/P1/P2 it
 
 ## Phase 0: Bootstrap
 - [x] DESIGN.md created (values marked inferred or confirmed)
-- [ ] `lib/design/` installed from the skill's `reference/` (`tokens.dart`, `theme.dart`, `motion.dart`, `widgets.dart`)
-- [ ] `google_fonts` added — **already present** in `pubspec.yaml` (`^6.1.0`), no change needed
-- [ ] Four font families vendored to `assets/fonts/` + `fonts:` block in `pubspec.yaml` (IBM Plex Sans Arabic, Space Mono, Unbounded, Silkscreen) — offline-first requirement
-- [ ] `buildInbTheme` wired for light and dark in `lib/app.dart` (`theme:` / `darkTheme:`), RTL verified
+- [x] `lib/design/` installed from the skill's `reference/` (`tokens.dart`, `theme.dart`, `motion.dart`, `widgets.dart`)
+- [x] ~~`google_fonts`~~ **removed** — fonts are vendored, never fetched (offline-first); the only use was replaced with `InbFonts.pixel`
+- [x] Four font families vendored to `assets/fonts/` + `fonts:` block in `pubspec.yaml` (IBM Plex Sans Arabic, Space Mono, Unbounded, Silkscreen) — offline-first requirement *(2026-11-15: `fonts:` block was missing — fonts were raw assets only, `fontFamily` never resolved; fixed and verified in `FontManifest.json`; `google_fonts` dependency removed)*
+- [x] `buildInbTheme` wired for light and dark in `lib/app.dart` (`theme:` / `darkTheme:`), RTL verified
 - [x] Coverage matrix below filled for THIS product
 
 ## Phase 1: Source coverage matrix
@@ -49,35 +49,35 @@ Every reference must be represented. "Required" items are never skipped. For "op
 > "لا أستطيع أن أدخر هذه… أحولها مثلًا إلى الشخص الذي متدين منه… وألغي مثلًا الادخار أو أحدثه أو أعدله أو أوقفه مؤقتًا أو أعيده"
 
 ### 2.1 Data model
-- [ ] `SavingsEntryType { deposit, withdrawal }` + `SavingsEntry.type`, `.linkedDebtId`, `.linkedDebtName`
-- [ ] `SavingsEntry.copyWith` + `SavingsEntry.create` updated, `toJson`/`fromJson` backward compatible (old entries default to `deposit`)
-- [ ] `TransactionType.savingsWithdrawal` added **at the end of the enum** so existing stored `type.index` values stay valid
-- [ ] `TwelaProvider.cashBalance` / `bankBalance` treat `savingsWithdrawal` as a credit
-- [ ] `SavingsGoal.copyWith` accepts `startDate`; `SavingsGoal.status` keeps `active|paused|completed|deleted`
-- [ ] `StorageService` unchanged (same list serialisation), verified against existing user data
+- [x] `SavingsEntryType { deposit, withdrawal }` + `SavingsEntry.type`, `.linkedDebtId`, `.linkedDebtName`
+- [x] `SavingsEntry.copyWith` + `SavingsEntry.create` updated, `toJson`/`fromJson` backward compatible (old entries default to `deposit`)
+- [x] `TransactionType.savingsWithdrawal` added **at the end of the enum** so existing stored `type.index` values stay valid
+- [x] `TwelaProvider.cashBalance` / `bankBalance` treat `savingsWithdrawal` as a credit
+- [x] `SavingsGoal.copyWith` accepts `startDate`; `SavingsGoal.status` keeps `active|paused|completed|deleted`
+- [x] `StorageService` unchanged (same list serialisation), verified against existing user data
 
 ### 2.2 Provider (logic, no UI)
-- [ ] `SavingsProvider.getNetForGoal(id)` = deposits − withdrawals; `savedAmount` derived, never trusted from storage
-- [ ] `SavingsProvider.addEntry` handles both deposit and withdrawal
-- [ ] `SavingsProvider.withdrawToWallet(goalId, amount, walletType)`
-- [ ] `SavingsProvider.transferToDebt(goalId, amount, debtId, debtName)` → withdrawal entry + `debtPayment` ledger transaction on the debt
-- [ ] `SavingsProvider.updateGoal` reachable and correct (recompute `savedAmount` from entries)
-- [ ] `SavingsProvider.pauseGoal` / `resumeGoal` reachable (already implemented, verify semantics)
-- [ ] `SavingsProvider.deleteGoal` → soft delete (`status = deleted`) + ledger reversal, **keeps** entries for undo
-- [ ] `SavingsProvider.restoreGoal` → rebuilds goal, entries and ledger transactions
-- [ ] `SavingsProvider.removeEntry(entryId)` → removes the entry and reverses its ledger transaction (undoable)
-- [ ] `DebtProvider` gains a `payFromSavings` hook or accepts an external payment so a savings transfer does not double-count
-- [ ] Unit tests: withdrawal, transfer-to-debt, goal edit, pause/resume, delete+undo, restore, net amount never negative
+- [x] `SavingsProvider.getNetForGoal(id)` = deposits − withdrawals; `savedAmount` derived, never trusted from storage *(named `netForGoal`)*
+- [x] `SavingsProvider.addEntry` handles both deposit and withdrawal *(split into `addDeposit` + `withdrawToWallet`)*
+- [x] `SavingsProvider.withdrawToWallet(goalId, amount, walletType)`
+- [x] `SavingsProvider.transferToDebt(goalId, amount, debtId, debtName)` → withdrawal entry + `debtPayment` ledger transaction on the debt
+- [x] `SavingsProvider.updateGoal` reachable and correct (recompute `savedAmount` from entries)
+- [x] `SavingsProvider.pauseGoal` / `resumeGoal` reachable (already implemented, verify semantics)
+- [x] `SavingsProvider.deleteGoal` → soft delete (`status = deleted`) + ledger reversal, **keeps** entries for undo
+- [x] `SavingsProvider.restoreGoal` → rebuilds goal, entries and ledger transactions
+- [x] `SavingsProvider.removeEntry(entryId)` → removes the entry and reverses its ledger transaction (undoable)
+- [x] `DebtProvider` gains a `payFromSavings` hook or accepts an external payment so a savings transfer does not double-count *(`DebtProvider.applyPayment(…, relatedEntryId:)` accepts the external payment)*
+- [x] Unit tests: withdrawal, transfer-to-debt, goal edit, pause/resume, delete+undo, restore, net amount never negative *(2026-11-15: `test/providers/savings_lifecycle_test.dart` — 15 tests: deposit, withdraw, transfer-to-debt, edit, pause/resume, delete+undo, remove-entry undo, net never negative, legacy JSON)*
 
 ### 2.3 Arabic & typography workstream
-- [ ] Vendor IBM Plex Sans Arabic / Space Mono / Unbounded / Silkscreen into `assets/fonts/`, declare in `pubspec.yaml`
-- [ ] `lib/design/` typography: `arabicDisplay()` (700, 56–64, height 1, `letterSpacing: 0`), `monoStyle()`, `microStyle()`, `displayStyle()`
-- [ ] `lib/design/format.dart`: `Money` widget + `latn()` guard; ban `DateFormat(..., 'ar')`; Arabic month names constant
-- [ ] `lib/utils/formatters.dart` rewritten on top of the new helpers (Latin digits, `د.ل` suffix, `dd/MM/yyyy`)
+- [x] Vendor IBM Plex Sans Arabic / Space Mono / Unbounded / Silkscreen into `assets/fonts/`, declare in `pubspec.yaml`
+- [x] `lib/design/` typography: `arabicDisplay()` (700, 56–64, height 1, `letterSpacing: 0`), `monoStyle()`, `microStyle()`, `displayStyle()`
+- [x] `lib/design/format.dart`: `Money` widget + `latn()` guard; ban `DateFormat(..., 'ar')`; Arabic month names constant
+- [x] `lib/utils/formatters.dart` rewritten on top of the new helpers (Latin digits, `د.ل` suffix, `dd/MM/yyyy`)
 - [ ] Every screen's copy moved to `lib/l10n/app_ar.arb` + `app_en.arb`; `AppLocalizations` used everywhere; no hardcoded Arabic left in `lib/screens/`
-- [ ] `EdgeInsetsDirectional` / `AlignmentDirectional` / `PositionedDirectional` everywhere; `EdgeInsets.fromLTRB` removed from `lib/screens/`
-- [ ] `chevron_left` → `chevron_right` (auto-mirrors to forward in RTL) in every drill-in affordance
-- [ ] `flutter_localizations` + `intl` date initialisation for the new formatters
+- [x] `EdgeInsetsDirectional` / `AlignmentDirectional` / `PositionedDirectional` everywhere; `EdgeInsets.fromLTRB` removed from `lib/screens/` *(2026-11-15: 0 `EdgeInsets.fromLTRB` / `only(left:)` left in `lib/screens/`; also 0 `Positioned(left/right)` and 0 absolute `Alignment.*`)*
+- [x] `chevron_left` → `chevron_right` (auto-mirrors to forward in RTL) in every drill-in affordance *(0 `chevron_left` anywhere; drill-in uses `Icons.chevron_right`)*
+- [x] `flutter_localizations` + `intl` date initialisation for the new formatters *(`flutter_localizations` + `intl` in pubspec, delegates wired in `lib/app.dart`)*
 
 ### 2.4 Navigation & system UI (from `re_v1.md` P0/P1)
 - [ ] Shared `InbScreen` scaffold wrapper: one place that handles `SafeArea`, `MediaQuery.padding.top`, status-bar icon brightness and edge-to-edge
@@ -93,9 +93,9 @@ Every reference must be represented. "Required" items are never skipped. For "op
 For each screen, copy this block and tick it:
 
 ### 3.1 `lib/design/` design system
-- [ ] Design system: tokens copied from the skill, plus `Money`, `arabicDisplay`, `latn`, `InbScreen`, `InbSheet`, `InbChip`, `InbEmptyState`, `InbSkeleton`
-- [ ] No business logic inside `lib/design/` — data in, callbacks out
-- [ ] `const` constructors, `dart format`, `flutter analyze` zero warnings
+- [x] Design system: tokens copied from the skill, plus `Money`, `arabicDisplay`, `latn`, `InbScreen`, `InbSheet`, `InbChip`, `InbEmptyState`, `InbSkeleton` *(`InbSkeleton` added 2026-11-15 — honors `disableAnimations`)*
+- [x] No business logic inside `lib/design/` — data in, callbacks out
+- [x] `const` constructors, `dart format`, `flutter analyze` zero warnings *(2026-11-15: `dart format` clean, `flutter analyze` 0 errors / 0 warnings, 57/57 tests green)*
 
 ### 3.2 Onboarding
 - [ ] Screen: onboarding — INB wordmark splash, 3 slides, footer wordmark
@@ -256,3 +256,5 @@ For each screen, copy this block and tick it:
 ## Log
 <!-- date | what changed | why -->
 - 2026-11-14 | Created `DESIGN.md` + `DESIGN-PLAN.md`; merged `re_v1.md` (functional) with the inb-design skill (visual); mapped the six missing savings actions to model + provider + screen work | user asked for both plans at once and reported the savings lifecycle gap |
+- 2026-11-15 | **Stage أ done:** `fonts:` block added to `pubspec.yaml` (families never resolved — root cause of the "Arabic broken" report), `google_fonts` removed, `flutter test` 42/42 green, `FontManifest.json` verified, analyze 0 errors/0 warnings | user's plan choice: أ ثم ب ثم ج ثم د |
+- 2026-11-15 | **Stage ب done:** screens now have **0** raw `Color(0xFF…)`, **0** `Colors.white/black`, **0** decorative gradients (home + settings), **0** `boxShadow`, **0** `EdgeInsets.fromLTRB`/`only(left:)`; all replaced with `context.inb.*` / `context.sem.*` / `EdgeInsetsDirectional`. `InbSkeleton` added to `lib/design/`. 15 new savings-lifecycle tests (plan box 70). Remaining 14 literals = **documented deviation**: `models/category.dart` (10 category accent swatches) + `models/app_settings.dart` (4 accent choices) are *data*, not surfaces. analyze 0/0, 57/57 tests green | audit rule "no hard-coded design values" vs. user-selectable accent/category palettes |
