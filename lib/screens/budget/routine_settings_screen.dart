@@ -7,6 +7,7 @@ import '../../providers/twela_provider.dart';
 import '../../models/routine_pattern.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../design/format.dart';
+import '../../design/motion.dart';
 
 class RoutineSettingsScreen extends StatelessWidget {
   const RoutineSettingsScreen({super.key});
@@ -21,7 +22,7 @@ class RoutineSettingsScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.routineSettings),
       ),
-      body: Consumer<RoutineProvider>(
+      body: Reveal(child: Consumer<RoutineProvider>(
         builder: (context, provider, _) {
           return SingleChildScrollView(
             padding: const EdgeInsetsDirectional.only(
@@ -63,7 +64,7 @@ class RoutineSettingsScreen extends StatelessWidget {
             ),
           );
         },
-      ),
+      )),
     );
   }
 
@@ -103,7 +104,7 @@ class RoutineSettingsScreen extends StatelessWidget {
           Switch(
             value: provider.isEnabled,
             onChanged: (_) => provider.toggleEnabled(),
-            activeColor: AppColors.primary,
+            activeThumbColor: AppColors.primary,
           ),
         ],
       ),
@@ -182,7 +183,7 @@ class RoutineSettingsScreen extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withOpacity(0.12),
+              color: theme.colorScheme.primary.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(

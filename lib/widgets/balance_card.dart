@@ -38,7 +38,12 @@ class BalanceCard extends StatelessWidget {
         children: [
           Text('الرصيد الكلي', style: microStyle(context)),
           const SizedBox(height: S.sm),
-          Money(provider.totalBalance, size: 40, color: context.inb.onIsland),
+          Money(
+            provider.totalBalance,
+            size: 40,
+            color: context.inb.onIsland,
+            animate: true,
+          ),
           const SizedBox(height: S.md),
           Row(
             children: [

@@ -11,6 +11,8 @@ import '../../widgets/twela_design_system.dart';
 import 'add_savings_goal_screen.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../design/format.dart';
+import '../../design/motion.dart';
+import '../../design/tokens.dart';
 
 class SavingsScreen extends StatelessWidget {
   const SavingsScreen({super.key});
@@ -45,7 +47,7 @@ class SavingsScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: SafeArea(
+      body: Reveal(child: SafeArea(
         child: Consumer<SavingsProvider>(
           builder: (context, provider, _) {
             final activeGoals = provider.activeGoals;
@@ -99,7 +101,7 @@ class SavingsScreen extends StatelessWidget {
             );
           },
         ),
-      ),
+      )),
     );
   }
 
@@ -107,7 +109,7 @@ class SavingsScreen extends StatelessWidget {
       BuildContext context, SavingsGoal goal, ThemeData theme, bool isDark) {
     final progress = goal.progress.clamp(0.0, 1.0);
 
-    return GestureDetector(
+    return PressScale(
       onTap: () => _showGoalDetails(context, goal, theme, isDark),
       child: Padding(
         padding: const EdgeInsets.only(bottom: 12),
@@ -120,10 +122,13 @@ class SavingsScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
-                    child: Text(
-                      goal.name,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
+                    child: Hero(
+                      tag: 'goal-${goal.id}',
+                      child: Text(
+                        goal.name,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
@@ -194,15 +199,20 @@ class SavingsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: LinearProgressIndicator(
-                  value: progress,
-                  backgroundColor:
-                      isDark ? AppColors.darkBorder : AppColors.borderLight,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    goal.isCompleted ? AppColors.income : AppColors.savings,
+                borderRadius: BorderRadius.circular(S.xs),
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0, end: progress),
+                  duration: Motion.slow,
+                  curve: Motion.emphasized,
+                  builder: (_, v, __) => LinearProgressIndicator(
+                    value: v,
+                    backgroundColor:
+                        isDark ? AppColors.darkBorder : AppColors.borderLight,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      goal.isCompleted ? AppColors.income : AppColors.savings,
+                    ),
+                    minHeight: 6,
                   ),
-                  minHeight: 6,
                 ),
               ),
               const SizedBox(height: 8),

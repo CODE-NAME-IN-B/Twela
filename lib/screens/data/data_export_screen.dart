@@ -12,6 +12,7 @@ import '../../providers/twela_provider.dart';
 import '../../providers/debt_provider.dart';
 import '../../providers/savings_provider.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../design/motion.dart';
 
 class DataExportScreen extends StatefulWidget {
   const DataExportScreen({super.key});
@@ -34,7 +35,8 @@ class _DataExportScreenState extends State<DataExportScreen> {
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.data),
       ),
-      body: SingleChildScrollView(
+      body: Reveal(
+          child: SingleChildScrollView(
         padding: const EdgeInsetsDirectional.only(
             start: 20, top: 16, end: 20, bottom: 100),
         child: Column(
@@ -111,10 +113,10 @@ class _DataExportScreenState extends State<DataExportScreen> {
                 Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: context.sem.danger.withOpacity(0.12),
+                    color: context.sem.danger.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: AppColors.danger.withOpacity(0.2),
+                      color: AppColors.danger.withValues(alpha: 0.2),
                     ),
                   ),
                   child: Row(
@@ -140,7 +142,7 @@ class _DataExportScreenState extends State<DataExportScreen> {
             ),
           ],
         ),
-      ),
+      )),
     );
   }
 
@@ -187,7 +189,7 @@ class _DataExportScreenState extends State<DataExportScreen> {
     bool isLoading = false,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
+    return PressScale(
       onTap: isLoading ? null : onTap,
       child: Container(
         padding: const EdgeInsets.all(14),
@@ -201,7 +203,7 @@ class _DataExportScreenState extends State<DataExportScreen> {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: isLoading
@@ -252,10 +254,10 @@ class _DataExportScreenState extends State<DataExportScreen> {
       final file = File('${tempDir.path}/twela_backup_$timestamp.json');
       await file.writeAsString(jsonStr);
 
-      await Share.shareXFiles(
-        [XFile(file.path)],
+      await SharePlus.instance.share(ShareParams(
+        files: [XFile(file.path)],
         text: AppLocalizations.of(context)!.twelaBackup,
-      );
+      ));
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -347,8 +349,10 @@ class _DataExportScreenState extends State<DataExportScreen> {
       final storage = context.read<StorageService>();
       final jsonStr = await DataExportService.exportToJson(storage);
       final file = await DataExportService.saveExportToFile(jsonStr);
-      await Share.shareXFiles([XFile(file.path)],
-          text: AppLocalizations.of(context)!.twelaBackup);
+      await SharePlus.instance.share(ShareParams(
+        files: [XFile(file.path)],
+        text: AppLocalizations.of(context)!.twelaBackup,
+      ));
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

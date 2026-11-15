@@ -8,6 +8,7 @@ import '../../services/notification_service.dart';
 import '../../models/wallet_settings.dart';
 import '../../utils/motivational_messages.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../design/motion.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -73,7 +74,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      body: SafeArea(
+      body: Reveal(
+          child: SafeArea(
         child: PageView(
           controller: _pageController,
           onPageChanged: (_) {},
@@ -82,7 +84,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             _buildBalancePage(theme, isDark),
           ],
         ),
-      ),
+      )),
     );
   }
 
@@ -102,7 +104,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               color: c.surface,
               shape: BoxShape.circle,
               border: Border.all(
-                color: theme.colorScheme.primary.withOpacity(0.15),
+                color: theme.colorScheme.primary.withValues(alpha: 0.15),
                 width: 1,
               ),
             ),
@@ -139,11 +141,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
               color: isDark
-                  ? theme.colorScheme.primary.withOpacity(0.06)
-                  : theme.colorScheme.primary.withOpacity(0.04),
+                  ? theme.colorScheme.primary.withValues(alpha: 0.06)
+                  : theme.colorScheme.primary.withValues(alpha: 0.04),
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: theme.colorScheme.primary.withOpacity(0.12),
+                color: theme.colorScheme.primary.withValues(alpha: 0.12),
                 width: 1,
               ),
             ),
@@ -253,7 +255,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: color),

@@ -9,6 +9,7 @@ import '../../widgets/twela_design_system.dart';
 import '../../widgets/daftar_card.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../design/format.dart';
+import '../../design/motion.dart';
 
 class DebtsScreen extends StatelessWidget {
   const DebtsScreen({
@@ -72,7 +73,7 @@ class DebtsScreen extends StatelessWidget {
     );
 
     if (embedded) {
-      return InbScreen(embedded: true, child: content);
+      return InbScreen(embedded: true, child: Reveal(child: content));
     }
 
     return Scaffold(
@@ -113,7 +114,7 @@ class _DebtTile extends StatelessWidget {
     final progress =
         debt.totalAmount > 0 ? debt.paidAmount / debt.totalAmount : 0.0;
 
-    return GestureDetector(
+    return PressScale(
       onTap: () =>
           Navigator.pushNamed(context, '/debt-detail', arguments: debt),
       child: DaftarCard(
@@ -129,10 +130,10 @@ class _DebtTile extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: debt.isGiven
                         ? (isDark
-                            ? AppColors.debt.withOpacity(0.15)
+                            ? AppColors.debt.withValues(alpha: 0.15)
                             : AppColors.debtSurface)
                         : (isDark
-                            ? AppColors.income.withOpacity(0.15)
+                            ? AppColors.income.withValues(alpha: 0.15)
                             : AppColors.incomeSurface),
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -152,10 +153,13 @@ class _DebtTile extends StatelessWidget {
                       Row(
                         children: [
                           Expanded(
-                            child: Text(
-                              debt.personName,
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w600,
+                            child: Hero(
+                              tag: 'debt-${debt.id}',
+                              child: Text(
+                                debt.personName,
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ),
@@ -165,10 +169,10 @@ class _DebtTile extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: debt.isGiven
                                   ? (isDark
-                                      ? AppColors.debt.withOpacity(0.12)
+                                      ? AppColors.debt.withValues(alpha: 0.12)
                                       : AppColors.debtSurface)
                                   : (isDark
-                                      ? AppColors.income.withOpacity(0.12)
+                                      ? AppColors.income.withValues(alpha: 0.12)
                                       : AppColors.incomeSurface),
                               borderRadius: BorderRadius.circular(6),
                             ),
@@ -229,7 +233,7 @@ class _DebtTile extends StatelessWidget {
                             horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
                           color: isDark
-                              ? AppColors.success.withOpacity(0.12)
+                              ? AppColors.success.withValues(alpha: 0.12)
                               : AppColors.successSurface,
                           borderRadius: BorderRadius.circular(6),
                         ),

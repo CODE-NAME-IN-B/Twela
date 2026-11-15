@@ -38,7 +38,7 @@ class ExpenseCategory {
       'name': name,
       'iconCodePoint': icon.codePoint,
       'iconFontFamily': icon.fontFamily,
-      'colorValue': color.value,
+      'colorValue': color.toARGB32(),
       'monthlyLimit': monthlyLimit,
     };
   }

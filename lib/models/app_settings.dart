@@ -52,7 +52,7 @@ class AppSettings {
       'glassMode': glassMode,
       'showGlyphBar': showGlyphBar,
       'gpsCurrency': gpsCurrency,
-      'accentColor': accentColor.value,
+      'accentColor': accentColor.toARGB32(),
     };
   }
 

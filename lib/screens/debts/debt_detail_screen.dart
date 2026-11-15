@@ -13,6 +13,7 @@ import '../../widgets/twela_design_system.dart';
 import '../../widgets/daftar_card.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../design/format.dart';
+import '../../design/motion.dart';
 
 class DebtDetailScreen extends StatefulWidget {
   final Debt debt;
@@ -93,7 +94,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
             child: Container(
               decoration: BoxDecoration(
                 color: isDark
-                    ? AppColors.danger.withOpacity(0.12)
+                    ? AppColors.danger.withValues(alpha: 0.12)
                     : AppColors.dangerSurface,
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -105,7 +106,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
           ),
         ],
       ),
-      body: SafeArea(
+      body: Reveal(child: SafeArea(
         child: Consumer<DebtProvider>(
           builder: (context, provider, _) {
             final debt = provider.getDebtById(widget.debt.id) ?? widget.debt;
@@ -129,7 +130,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
             );
           },
         ),
-      ),
+      )),
     );
   }
 
@@ -152,10 +153,13 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      debt.personName,
-                      style: theme.textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
+                    Hero(
+                      tag: 'debt-${debt.id}',
+                      child: Text(
+                        debt.personName,
+                        style: theme.textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 6),
@@ -165,10 +169,10 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                       decoration: BoxDecoration(
                         color: debt.isGiven
                             ? (isDark
-                                ? AppColors.debt.withOpacity(0.12)
+                                ? AppColors.debt.withValues(alpha: 0.12)
                                 : AppColors.debtSurface)
                             : (isDark
-                                ? AppColors.income.withOpacity(0.12)
+                                ? AppColors.income.withValues(alpha: 0.12)
                                 : AppColors.incomeSurface),
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -193,10 +197,10 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                 decoration: BoxDecoration(
                   color: debt.isPaidOff
                       ? (isDark
-                          ? AppColors.success.withOpacity(0.12)
+                          ? AppColors.success.withValues(alpha: 0.12)
                           : AppColors.successSurface)
                       : (isDark
-                          ? AppColors.debt.withOpacity(0.12)
+                          ? AppColors.debt.withValues(alpha: 0.12)
                           : AppColors.debtSurface),
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -304,7 +308,9 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isDark ? color.withOpacity(0.08) : color.withOpacity(0.06),
+        color: isDark
+            ? color.withValues(alpha: 0.08)
+            : color.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
@@ -332,7 +338,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
       return DaftarCard(
         padding: const EdgeInsets.all(24),
         backgroundColor: isDark
-            ? AppColors.success.withOpacity(0.08)
+            ? AppColors.success.withValues(alpha: 0.08)
             : AppColors.successSurface,
         showShadow: false,
         child: Row(
@@ -365,7 +371,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                 height: 36,
                 decoration: BoxDecoration(
                   color: isDark
-                      ? AppColors.debt.withOpacity(0.12)
+                      ? AppColors.debt.withValues(alpha: 0.12)
                       : AppColors.debtSurface,
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -448,7 +454,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                     height: 32,
                     decoration: BoxDecoration(
                       color: isDark
-                          ? AppColors.success.withOpacity(0.12)
+                          ? AppColors.success.withValues(alpha: 0.12)
                           : AppColors.successSurface,
                       borderRadius: BorderRadius.circular(8),
                     ),

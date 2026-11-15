@@ -11,6 +11,7 @@ import '../../utils/formatters.dart';
 import '../transactions/add_transaction_screen.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../design/format.dart';
+import '../../design/motion.dart';
 
 enum TransactionFilter { all, income, expense, debt, savings }
 
@@ -391,7 +392,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           decimals: 2,
                         ),
                         const SizedBox(width: 4),
-                        GestureDetector(
+                        PressScale(
                           onTap: () => _showEditMenu(transaction),
                           child: Padding(
                             padding: const EdgeInsets.all(8),
@@ -416,7 +417,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
 
     if (widget.embedded) {
-      return InbScreen(embedded: true, child: content);
+      return InbScreen(embedded: true, child: Reveal(child: content));
     }
 
     return Scaffold(
@@ -434,7 +435,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final theme = Theme.of(context);
     final c = context.inb;
 
-    return GestureDetector(
+    return PressScale(
       onTap: () => setState(() => _filter = filter),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),

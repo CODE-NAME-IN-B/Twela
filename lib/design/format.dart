@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'motion.dart';
 import 'theme.dart';
 import 'tokens.dart';
 
@@ -102,6 +103,7 @@ class Money extends StatelessWidget {
     this.showCurrency = true,
     this.signed = false,
     this.currency = 'د.ل',
+    this.animate = false,
   });
 
   final double amount;
@@ -113,19 +115,33 @@ class Money extends StatelessWidget {
   final bool signed;
   final String currency;
 
+  /// Counts up once on first build ([CountUp] behaviour for amounts).
+  final bool animate;
+
+  String _text(BuildContext context, double v) {
+    final prefix = signed ? (v < 0 ? '−' : '+') : '';
+    return '$prefix${formatMoney(v, decimals: decimals)}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final c = color ?? context.inb.fg;
-    final prefix = signed ? (amount < 0 ? '−' : '+') : '';
+    final numberStyle =
+        monoStyle(context, size: size, weight: weight, color: c);
+    final number = (animate && !reduceMotion(context))
+        ? TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: amount),
+            duration: Motion.slow * 1.4,
+            curve: Motion.emphasized,
+            builder: (_, v, __) => Text(_text(context, v), style: numberStyle),
+          )
+        : Text(_text(context, amount), style: numberStyle);
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.baseline,
       textBaseline: TextBaseline.alphabetic,
       children: [
-        Text(
-          '$prefix${formatMoney(amount, decimals: decimals)}',
-          style: monoStyle(context, size: size, weight: weight, color: c),
-        ),
+        number,
         if (showCurrency) ...[
           const SizedBox(width: 4),
           Text(

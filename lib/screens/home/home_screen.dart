@@ -13,6 +13,7 @@ import '../../widgets/limit_progress_bar.dart';
 import '../../utils/motivational_messages.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../design/format.dart';
+import '../../design/motion.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -80,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     if (widget.embedded) {
-      return InbScreen(embedded: true, child: content);
+      return InbScreen(embedded: true, child: Reveal(child: content));
     }
 
     return Scaffold(
@@ -208,7 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildNotificationButton(
       BuildContext context, ThemeData theme, bool isDark) {
-    return GestureDetector(
+    return PressScale(
       onTap: () {
         if (widget.onOpenSettings != null) {
           widget.onOpenSettings!();
@@ -501,7 +502,7 @@ class _HomeScreenState extends State<HomeScreen> {
     required Color color,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
+    return PressScale(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),

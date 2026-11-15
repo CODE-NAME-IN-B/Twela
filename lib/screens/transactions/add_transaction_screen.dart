@@ -12,6 +12,7 @@ import '../../widgets/twela_design_system.dart';
 import '../../widgets/wallet_toggle.dart';
 import '../../widgets/category_picker.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../design/motion.dart';
 
 class AddTransactionScreen extends StatefulWidget {
   final TransactionType? initialType;
@@ -109,7 +110,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
           ),
         ),
       ),
-      body: SafeArea(
+      body: Reveal(
+          child: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsetsDirectional.only(
               start: 20, top: 0, end: 20, bottom: 100),
@@ -163,7 +165,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             ],
           ),
         ),
-      ),
+      )),
     );
   }
 

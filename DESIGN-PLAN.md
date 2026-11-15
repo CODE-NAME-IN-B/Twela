@@ -227,21 +227,21 @@ For each screen, copy this block and tick it:
 - [ ] No hidden critical actions: every money action is a visible button with a 48 px target
 
 ## Phase 5: Motion
-- [ ] `PressScale` on every tappable, `Reveal` once per screen, `CountUp` on the balance and on goal progress only
-- [ ] `InbPageTransition` and `Hero` where an item opens into its detail (goal tile → goal detail, debt row → debt detail)
-- [ ] Domain motion: progress bars animate to the new value, the coin stack tilts on touch, ETA/countdown n/a
-- [ ] No stagger on lists (ERP rule), no looping motion
+- [x] `PressScale` on every tappable, `Reveal` once per screen, `CountUp` on the balance and on goal progress only *(2026-11-15: 9 raw `GestureDetector` taps in screens replaced with `PressScale`; the design widgets already route taps through it. `Reveal` now wraps the body of all 16 screens; `CountUp` = `Money(animate: true)` on exactly 2 headline numbers — home balance + savings hero)*
+- [x] `InbPageTransition` and `Hero` where an item opens into its detail (goal tile → goal detail, debt row → debt detail) *(2026-11-15: `InbPageTransition` wired in `lib/design/theme.dart`; `Hero` added goal tile → goal detail and debt row → debt detail)*
+- [x] Domain motion: progress bars animate to the new value, the coin stack tilts on touch, ETA/countdown n/a *(2026-11-15: savings list progress bar animates via `TweenAnimationBuilder`. Coin stack and ETA/countdown are **N/A** — neither exists in this product)*
+- [x] No stagger on lists (ERP rule), no looping motion *(2026-11-15: no per-row stagger — `Reveal` wraps whole-screen bodies. The only cascade is 4 top-level sections on savings detail (the skill's own `Reveal(index:)` pattern). The only looping motion is `InbSkeleton` while loading, and it stops under `disableAnimations`)*
 - [ ] Tested on a low-end phone; if choppy, remove blur layers or reduce `Reveal` first
 
 ## Phase 6: Cleanliness and audit
-- [ ] Run `audit`: no hard-coded colors, radii, spacing or font sizes outside `lib/design/`; `Color(0xFF…)` appears only in `lib/design/tokens.dart`
-- [ ] `dart format` and `flutter analyze` clean
+- [ ] Run `audit`: no hard-coded colors, radii, spacing or font sizes outside `lib/design/`; `Color(0xFF…)` appears only in `lib/design/tokens.dart` **not ticked** — deviation recorded: 14 `Color(0xFF…)` remain outside `lib/design/`, all of them in `lib/models/category.dart` (10 user-picked swatches) + `lib/models/app_settings.dart` (4 user-picked accents); these are *data*, not surfaces (DESIGN.md Decisions, 2026-11-15). 60 `BorderRadius.circular` / 38 `fontSize` / 81 `EdgeInsets` literals in screens also still open
+- [x] `dart format` and `flutter analyze` clean *(2026-11-15: `dart format` 0 changes, `flutter analyze` **No issues found**)*
 - [ ] Duplicated widgets merged, unused styles deleted (`DaftarCard`, `TwelaDesignSystem`, `app_theme.dart` retire into `lib/design/`)
-- [ ] No `withOpacity` deprecation warnings (use `withValues`)
+- [x] No `withOpacity` deprecation warnings (use `withValues`) *(2026-11-15: 27 `withOpacity` → `withValues(alpha:)`, 5 `activeColor` → `activeThumbColor`, 4 `.value` → `.toARGB32()`, 2 `Share.shareXFiles` → `SharePlus.instance.share(ShareParams(...))`; analyze now **0 issues**)*
 
 ## Phase 7: Verification
-- [ ] `flutter analyze` → zero issues
-- [ ] `flutter test` → all green (existing 5 test files + the new savings lifecycle tests)
+- [x] `flutter analyze` → zero issues *(2026-11-15: **No issues found** — was 39 before the deprecation pass)*
+- [x] `flutter test` → all green (existing 5 test files + the new savings lifecycle tests) *(2026-11-15: **57/57** across 6 test files)*
 - [ ] `flutter build apk --release --no-tree-shake-icons` → succeeds
 - [ ] Manual pass: Home → History → Debts → Stats → Settings, and the `+` sheet (دخل / مصروف / دين / ادخار)
 - [ ] Manual pass: create goal → deposit → withdraw to wallet → transfer to debt → edit → pause → resume → delete → undo → restore
@@ -251,11 +251,16 @@ For each screen, copy this block and tick it:
 ## Phase 8: Sign-off
 - [ ] Matrix has no empty "Where" cell and no unexplained N/A
 - [ ] SKILL.md done checklist passes
-- [ ] Decisions logged in `DESIGN.md`
+- [x] Decisions logged in `DESIGN.md` *(2026-11-15: 6 new decisions — literal carve-out, gradient/shadow/white removal, `InbSkeleton`, fonts vendored, money atomic, savings lifecycle)*
 
 ## Log
 <!-- date | what changed | why -->
 - 2026-11-14 | Created `DESIGN.md` + `DESIGN-PLAN.md`; merged `re_v1.md` (functional) with the inb-design skill (visual); mapped the six missing savings actions to model + provider + screen work | user asked for both plans at once and reported the savings lifecycle gap |
 - 2026-11-15 | **Stage أ done:** `fonts:` block added to `pubspec.yaml` (families never resolved — root cause of the "Arabic broken" report), `google_fonts` removed, `flutter test` 42/42 green, `FontManifest.json` verified, analyze 0 errors/0 warnings | user's plan choice: أ ثم ب ثم ج ثم د |
+- 2026-11-15 | **Stage د done (code):** deprecation sweep → `flutter analyze` **No issues found** (was 39): 27 `withOpacity`→`withValues`, 5 `activeColor`→`activeThumbColor`, 4 `.value`→`.toARGB32()`, 2 `Share.shareXFiles`→`SharePlus.instance.share(ShareParams(...))`. 
+Motion pass: `Reveal` added to the 13 screens that lacked it (all 16 now have it, wrapping the screen body — no per-row stagger), 9 raw `GestureDetector` taps → `PressScale`, `Money(animate: true)` on exactly 2 headline numbers (home balance, savings hero), savings list progress bar → `TweenAnimationBuilder`, `Hero` on goal tile→detail and debt row→detail. 
+Gates: `dart format` 0 changes, analyze 0 issues, 57/57 tests. Version 2.0.1+22 | plan Phase 5 (4 boxes) + Phase 6 (2) + Phase 7 (2) + Phase 8 (1) |
+- 2026-11-15 | **Known issue found in the emulator, NOT fixed in 2.0.1:** every `TextField` using `suffixText: د.ل` (onboarding wallets, add transaction, settings budget, debt detail payment, savings deposit) pins the currency to the **far end of a full-width RTL field**, so the number renders at the right edge and `د.ل` at the left edge with ~500 px of empty space between them — the exact "التنسيق مضروب" symptom. 
+Correct order (number rightmost, currency to its left) and adjacency are mutually exclusive in a full-width stock `TextField`; the fix needs a narrow/hugging money field. Left for the user test pass rather than shipped untested | reported during the release pass, user chose to test personally |
 - 2026-11-15 | **Stage ج done:** full l10n migration — every hardcoded Arabic string in `lib/screens/` (341 occurrences, 263 unique) moved to `app_ar.arb`/`app_en.arb` (286 keys), `AppLocalizations.delegate` added, ICU placeholders for the 22 dynamic strings, `const` fallout auto-fixed, 3 money-in-sentence strings rebuilt as label + `Money` rows, 3 unused keys pruned. Screens: **0** Arabic literals. analyze 0/0, `dart format` clean, 57/57 tests | plan box 77 + DESIGN.md rule 4 (Money is atomic) |
 - 2026-11-15 | **Stage ب done:** screens now have **0** raw `Color(0xFF…)`, **0** `Colors.white/black`, **0** decorative gradients (home + settings), **0** `boxShadow`, **0** `EdgeInsets.fromLTRB`/`only(left:)`; all replaced with `context.inb.*` / `context.sem.*` / `EdgeInsetsDirectional`. `InbSkeleton` added to `lib/design/`. 15 new savings-lifecycle tests (plan box 70). Remaining 14 literals = **documented deviation**: `models/category.dart` (10 category accent swatches) + `models/app_settings.dart` (4 accent choices) are *data*, not surfaces. analyze 0/0, 57/57 tests green | audit rule "no hard-coded design values" vs. user-selectable accent/category palettes |

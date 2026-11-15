@@ -9,6 +9,7 @@ import '../../models/debt.dart';
 import '../../models/transaction.dart';
 import '../../widgets/wallet_toggle.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../design/motion.dart';
 
 class AddDebtScreen extends StatefulWidget {
   const AddDebtScreen({super.key});
@@ -88,7 +89,8 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
             ? AppLocalizations.of(context)!.lentMoney
             : AppLocalizations.of(context)!.borrowedMoney),
       ),
-      body: SingleChildScrollView(
+      body: Reveal(
+          child: SingleChildScrollView(
         padding: const EdgeInsetsDirectional.only(
             start: 20, top: 0, end: 20, bottom: 100),
         child: Column(
@@ -139,7 +141,7 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
             ),
           ],
         ),
-      ),
+      )),
     );
   }
 

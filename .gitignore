@@ -69,4 +69,5 @@ key.properties
 
 # Android build state (machine-local)
 /android/.gradle/
+/android/.kotlin/
 /android/local.properties

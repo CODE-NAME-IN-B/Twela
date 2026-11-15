@@ -13,6 +13,7 @@ import '../../utils/formatters.dart';
 import '../../widgets/twela_design_system.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../design/format.dart' show Money;
+import '../../design/motion.dart';
 
 class StatsScreen extends StatelessWidget {
   const StatsScreen({
@@ -62,7 +63,7 @@ class StatsScreen extends StatelessWidget {
     );
 
     if (embedded) {
-      return InbScreen(embedded: true, child: content);
+      return InbScreen(embedded: true, child: Reveal(child: content));
     }
 
     return Scaffold(
@@ -142,7 +143,7 @@ class StatsScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.05),
+        color: color.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -291,7 +292,7 @@ class StatsScreen extends StatelessWidget {
                     width: 36,
                     height: 36,
                     decoration: BoxDecoration(
-                      color: catColor.withOpacity(0.1),
+                      color: catColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(

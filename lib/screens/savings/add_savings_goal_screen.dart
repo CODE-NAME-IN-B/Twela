@@ -7,6 +7,7 @@ import '../../providers/app_settings_provider.dart';
 import '../../models/savings_goal.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../design/format.dart';
+import '../../design/motion.dart';
 
 class AddSavingsGoalScreen extends StatefulWidget {
   const AddSavingsGoalScreen({super.key});
@@ -77,7 +78,8 @@ class _AddSavingsGoalScreenState extends State<AddSavingsGoalScreen> {
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.createSavingsGoal),
       ),
-      body: SingleChildScrollView(
+      body: Reveal(
+          child: SingleChildScrollView(
         padding: const EdgeInsetsDirectional.only(
             start: 20, top: 0, end: 20, bottom: 100),
         child: Column(
@@ -117,7 +119,7 @@ class _AddSavingsGoalScreenState extends State<AddSavingsGoalScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withOpacity(0.12),
+                color: theme.colorScheme.primary.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Row(
@@ -175,7 +177,7 @@ class _AddSavingsGoalScreenState extends State<AddSavingsGoalScreen> {
             ),
           ],
         ),
-      ),
+      )),
     );
   }
 

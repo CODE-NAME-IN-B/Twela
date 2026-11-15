@@ -15,6 +15,7 @@ import '../../widgets/daftar_card.dart';
 import '../../widgets/twela_design_system.dart';
 import '../data/data_export_screen.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../design/motion.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -95,7 +96,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       backgroundColor:
           isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
-      body: SafeArea(
+      body: Reveal(
+          child: SafeArea(
         child: CustomScrollView(
           slivers: [
             SliverToBoxAdapter(child: _buildHeroCard(context, theme, isDark)),
@@ -180,7 +182,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ],
         ),
-      ),
+      )),
     );
   }
 
@@ -357,7 +359,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             trailing: Switch(
               value: appSettings.hapticFeedback,
               onChanged: (_) => appSettings.toggleHapticFeedback(),
-              activeColor: AppColors.primary,
+              activeThumbColor: AppColors.primary,
             ),
           ),
           TwelaSettingTile(
@@ -368,7 +370,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             trailing: Switch(
               value: appSettings.glassMode,
               onChanged: (_) => appSettings.toggleGlassMode(),
-              activeColor: AppColors.primary,
+              activeThumbColor: AppColors.primary,
             ),
           ),
           TwelaSettingTile(
@@ -379,7 +381,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             trailing: Switch(
               value: appSettings.showGlyphBar,
               onChanged: (_) => appSettings.toggleGlyphBar(),
-              activeColor: AppColors.primary,
+              activeThumbColor: AppColors.primary,
             ),
           ),
         ],
@@ -417,8 +419,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Row(
             children: List.generate(AppSettings.accentOptions.length, (index) {
               final color = AppSettings.accentOptions[index];
-              final isSelected = appSettings.accentColor.value == color.value;
-              return GestureDetector(
+              final isSelected =
+                  appSettings.accentColor.toARGB32() == color.toARGB32();
+              return PressScale(
                 onTap: () => appSettings.setAccentColor(color),
                 child: Container(
                   width: 36,
@@ -694,7 +697,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                GestureDetector(
+                PressScale(
                   onTap: () async {
                     final uri = Uri.parse('https://github.com/CODE-NAME-IN-B');
                     if (await canLaunchUrl(uri)) {

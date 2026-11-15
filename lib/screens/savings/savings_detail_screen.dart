@@ -45,13 +45,16 @@ class SavingsDetailScreen extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(bottom: S.md),
-            child: InbPageHeader(
-              title: goal.name,
-              subtitle: goal.isPaused
-                  ? AppLocalizations.of(context)!.pausedTemporarily
-                  : (goal.isCompleted
-                      ? AppLocalizations.of(context)!.isCompleted
-                      : AppLocalizations.of(context)!.active),
+            child: Hero(
+              tag: 'goal-${goal.id}',
+              child: InbPageHeader(
+                title: goal.name,
+                subtitle: goal.isPaused
+                    ? AppLocalizations.of(context)!.pausedTemporarily
+                    : (goal.isCompleted
+                        ? AppLocalizations.of(context)!.isCompleted
+                        : AppLocalizations.of(context)!.active),
+              ),
             ),
           ),
           Expanded(
@@ -167,6 +170,7 @@ class _Hero extends StatelessWidget {
             goal.savedAmount,
             size: 40,
             color: c.fg,
+            animate: true,
           ),
           const SizedBox(height: S.xs),
           Row(
