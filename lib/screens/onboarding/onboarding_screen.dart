@@ -7,6 +7,7 @@ import '../../services/storage_service.dart';
 import '../../services/notification_service.dart';
 import '../../models/wallet_settings.dart';
 import '../../utils/motivational_messages.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -117,7 +118,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
           const SizedBox(height: 32),
           Text(
-            'مرحباً بك في Twela',
+            AppLocalizations.of(context)!.welcomeToTwela,
             style: theme.textTheme.displaySmall?.copyWith(
               fontWeight: FontWeight.w700,
               color: theme.colorScheme.onSurface,
@@ -126,7 +127,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
           const SizedBox(height: 12),
           Text(
-            'تتبع مصاريفك بسهولة\nبالدينار الليبي',
+            AppLocalizations.of(context)!.welcomeSubtitle,
             style: theme.textTheme.bodyLarge?.copyWith(
               color: c.muted,
             ),
@@ -165,7 +166,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   curve: Curves.easeInOut,
                 );
               },
-              child: const Text('ابدأ'),
+              child: Text(AppLocalizations.of(context)!.start),
             ),
           ),
           const SizedBox(height: 40),
@@ -182,7 +183,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            'الرصيد الابتدائي',
+            AppLocalizations.of(context)!.openingBalance,
             style: theme.textTheme.displaySmall?.copyWith(
               fontWeight: FontWeight.w700,
               color: theme.colorScheme.onSurface,
@@ -190,7 +191,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'أدخل رصيدك الحالي لكل محفظة',
+            AppLocalizations.of(context)!.enterOpeningBalance,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: c.muted,
             ),
@@ -201,7 +202,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             isDark: isDark,
             controller: _cashController,
             icon: Icons.money_outlined,
-            label: 'محفظة الكاش',
+            label: AppLocalizations.of(context)!.cashWallet,
             color: theme.colorScheme.primary,
           ),
           const SizedBox(height: 16),
@@ -210,7 +211,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             isDark: isDark,
             controller: _bankController,
             icon: Icons.account_balance_outlined,
-            label: 'محفظة المصرف',
+            label: AppLocalizations.of(context)!.bankWallet,
             color: theme.colorScheme.primary,
           ),
           const Spacer(),
@@ -218,7 +219,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: _completeOnboarding,
-              child: const Text('حفظ والمتابعة'),
+              child: Text(AppLocalizations.of(context)!.saveAndContinue),
             ),
           ),
           const SizedBox(height: 40),
@@ -278,7 +279,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                   decoration: InputDecoration(
                     hintText: '0.00',
-                    suffixText: 'د.ل',
+                    suffixText: AppLocalizations.of(context)!.currencyLyd,
                     isDense: true,
                     border: InputBorder.none,
                     enabledBorder: InputBorder.none,

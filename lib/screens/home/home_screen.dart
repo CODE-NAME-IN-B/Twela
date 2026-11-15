@@ -10,8 +10,9 @@ import '../../widgets/balance_card.dart';
 import '../../widgets/daftar_card.dart';
 import '../../widgets/wallet_mini_card.dart';
 import '../../widgets/limit_progress_bar.dart';
-import '../../utils/formatters.dart';
 import '../../utils/motivational_messages.dart';
+import '../../l10n/generated/app_localizations.dart';
+import '../../design/format.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -189,19 +190,19 @@ class _HomeScreenState extends State<HomeScreen> {
     final hour = DateTime.now().hour;
 
     if (hour >= 5 && hour < 7) {
-      return 'الفجر يناديك';
+      return AppLocalizations.of(context)!.moodDawn;
     } else if (hour >= 7 && hour < 12) {
-      return 'صباح النشاط';
+      return AppLocalizations.of(context)!.moodMorning;
     } else if (hour >= 12 && hour < 14) {
-      return 'ظهيرة مثالية';
+      return AppLocalizations.of(context)!.moodNoon;
     } else if (hour >= 14 && hour < 17) {
-      return 'مساء النشاط';
+      return AppLocalizations.of(context)!.moodEvening;
     } else if (hour >= 17 && hour < 19) {
-      return 'وقت الراحة';
+      return AppLocalizations.of(context)!.moodRest;
     } else if (hour >= 19 && hour < 22) {
-      return 'مساء جميل';
+      return AppLocalizations.of(context)!.moodNiceEvening;
     } else {
-      return 'مساء الخير';
+      return AppLocalizations.of(context)!.moodGoodEvening;
     }
   }
 
@@ -252,17 +253,19 @@ class _HomeScreenState extends State<HomeScreen> {
         if (monthlyBudget != null && monthlyBudget > 0) {
           final percent = ((monthSpent / monthlyBudget) * 100).round();
           if (percent >= 100) {
-            message = 'تجاوزت ميزانيتك الشهرية';
+            message = AppLocalizations.of(context)!.budgetExceeded;
             icon = Icons.warning_amber_outlined;
           } else if (percent >= 80) {
-            message = 'وصلت $percent% من ميزانيتك';
+            message =
+                AppLocalizations.of(context)!.reachedPercentOfBudget(percent);
             icon = Icons.info_outline;
           } else {
-            message = 'صرفت $percent% من ميزانيتك';
+            message =
+                AppLocalizations.of(context)!.spentPercentOfBudget(percent);
             icon = Icons.check_circle_outline;
           }
         } else {
-          message = 'بقي $daysLeft يوم على نهاية الشهر';
+          message = AppLocalizations.of(context)!.daysLeftInMonth(daysLeft);
           icon = Icons.calendar_today_outlined;
         }
 
@@ -313,7 +316,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Expanded(
               child: WalletMiniCard(
-                title: 'كاش',
+                title: AppLocalizations.of(context)!.cash,
                 amount: provider.cashBalance,
                 icon: Icons.money_outlined,
                 color: AppColors.primary,
@@ -322,7 +325,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: WalletMiniCard(
-                title: 'مصرف',
+                title: AppLocalizations.of(context)!.bank,
                 amount: provider.bankBalance,
                 icon: Icons.account_balance_outlined,
                 color: AppColors.success,
@@ -373,7 +376,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(width: 10),
                       Text(
-                        'صرف اليوم',
+                        AppLocalizations.of(context)!.spentToday,
                         style: theme.textTheme.titleMedium?.copyWith(
                           color: isDark
                               ? AppColors.darkTextPrimary
@@ -382,12 +385,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
-                  Text(
-                    formatLyd(todaySpent),
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w700,
-                    ),
+                  Money(
+                    todaySpent,
+                    size: 18,
+                    weight: FontWeight.w700,
+                    color: AppColors.primary,
                   ),
                 ],
               ),
@@ -401,13 +403,26 @@ class _HomeScreenState extends State<HomeScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'الحد: ${formatLyd(dailyLimit)}',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: isDark
-                            ? AppColors.darkTextSecondary
-                            : AppColors.textSecondary,
-                      ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '${AppLocalizations.of(context)!.limit}: ',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: isDark
+                                ? AppColors.darkTextSecondary
+                                : AppColors.textSecondary,
+                          ),
+                        ),
+                        Money(
+                          dailyLimit,
+                          size: 13,
+                          weight: FontWeight.w400,
+                          color: isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.textSecondary,
+                        ),
+                      ],
                     ),
                     Text(
                       dailyLimit > 0
@@ -436,7 +451,7 @@ class _HomeScreenState extends State<HomeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'إجراءات سريعة',
+          AppLocalizations.of(context)!.quickActions,
           style: theme.textTheme.headlineSmall?.copyWith(
             color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
           ),
@@ -450,7 +465,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 theme: theme,
                 isDark: isDark,
                 icon: Icons.arrow_upward_rounded,
-                label: 'إضافة صرف',
+                label: AppLocalizations.of(context)!.addExpense,
                 color: AppColors.expense,
                 onTap: () => Navigator.pushNamed(context, '/add-transaction'),
               ),
@@ -462,7 +477,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 theme: theme,
                 isDark: isDark,
                 icon: Icons.arrow_downward_rounded,
-                label: 'إضافة دخل',
+                label: AppLocalizations.of(context)!.addIncome,
                 color: AppColors.income,
                 onTap: () => Navigator.pushNamed(
                   context,

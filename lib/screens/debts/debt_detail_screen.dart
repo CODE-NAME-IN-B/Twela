@@ -11,6 +11,8 @@ import '../../utils/formatters.dart';
 import '../../utils/daftar_number_style.dart';
 import '../../widgets/twela_design_system.dart';
 import '../../widgets/daftar_card.dart';
+import '../../l10n/generated/app_localizations.dart';
+import '../../design/format.dart';
 
 class DebtDetailScreen extends StatefulWidget {
   final Debt debt;
@@ -34,14 +36,16 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
     final amount = double.tryParse(_paymentController.text);
     if (amount == null || amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('يرجى إدخال مبلغ صحيح')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.enterValidAmount)),
       );
       return;
     }
 
     if (amount > widget.debt.remaining) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('المبلغ أكبر من المتبقي')),
+        SnackBar(
+            content:
+                Text(AppLocalizations.of(context)!.amountExceedsRemaining)),
       );
       return;
     }
@@ -54,7 +58,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
 
     _paymentController.clear();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('تم إضافة الدفعة')),
+      SnackBar(content: Text(AppLocalizations.of(context)!.paymentAdded)),
     );
   }
 
@@ -62,10 +66,9 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
     showDialog(
       context: context,
       builder: (ctx) => TwelaConfirmDialog(
-        title: 'حذف الدين',
-        message:
-            'هل أنت متأكد من حذف هذا الدين؟ سيتم حذف جميع المعاملات المرتبطة به.',
-        confirmLabel: 'حذف',
+        title: AppLocalizations.of(context)!.deleteDebt,
+        message: AppLocalizations.of(context)!.deleteDebtBody,
+        confirmLabel: AppLocalizations.of(context)!.delete,
         onConfirm: () {
           context.read<DebtProvider>().removeDebt(widget.debt.id);
           Navigator.pop(context);
@@ -170,7 +173,9 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        debt.isGiven ? 'أنا أعطيت' : 'أنا استلمت',
+                        debt.isGiven
+                            ? AppLocalizations.of(context)!.iGave
+                            : AppLocalizations.of(context)!.iReceived,
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -196,7 +201,9 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  debt.isPaidOff ? 'تم السداد' : 'نشط',
+                  debt.isPaidOff
+                      ? AppLocalizations.of(context)!.paid
+                      : AppLocalizations.of(context)!.activeShort,
                   style: TextStyle(
                     color: debt.isPaidOff ? AppColors.success : AppColors.debt,
                     fontWeight: FontWeight.w600,
@@ -221,7 +228,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
               Expanded(
                 child: _buildAmountCard(
                   context,
-                  'الإجمالي',
+                  AppLocalizations.of(context)!.total,
                   debt.totalAmount,
                   AppColors.debt,
                   isDark,
@@ -232,7 +239,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
               Expanded(
                 child: _buildAmountCard(
                   context,
-                  'المدفوع',
+                  AppLocalizations.of(context)!.paidAmount,
                   debt.paidAmount,
                   AppColors.success,
                   isDark,
@@ -243,7 +250,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
               Expanded(
                 child: _buildAmountCard(
                   context,
-                  'المتبقي',
+                  AppLocalizations.of(context)!.remaining,
                   debt.remaining,
                   debt.isPaidOff ? AppColors.success : AppColors.debt,
                   isDark,
@@ -263,7 +270,8 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '${(progress * 100).toStringAsFixed(0)}% مكتمل',
+                AppLocalizations.of(context)!
+                    .percentComplete((progress * 100).toStringAsFixed(0)),
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: isDark
                       ? AppColors.darkTextSecondary
@@ -306,14 +314,12 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
             style: theme.textTheme.bodySmall?.copyWith(color: color),
           ),
           const SizedBox(height: 4),
-          Text(
-            formatLydShort(amount),
-            style: daftarNumberStyle(
-              context,
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: color,
-            ),
+          Money(
+            amount,
+            size: 14,
+            weight: FontWeight.w700,
+            color: color,
+            showCurrency: false,
           ),
         ],
       ),
@@ -336,7 +342,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                 color: AppColors.success, size: 28),
             const SizedBox(width: 10),
             Text(
-              'تم سداد الدين بالكامل',
+              AppLocalizations.of(context)!.debtFullyPaid,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: AppColors.success,
                 fontWeight: FontWeight.w600,
@@ -368,7 +374,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
               ),
               const SizedBox(width: 12),
               Text(
-                'تسجيل دفعة',
+                AppLocalizations.of(context)!.recordPayment,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
@@ -394,7 +400,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                     ? AppColors.darkTextTertiary
                     : AppColors.textTertiary,
               ),
-              suffixText: 'د.ل',
+              suffixText: AppLocalizations.of(context)!.currencyLyd,
               suffixStyle: TextStyle(
                 fontSize: 14,
                 color: isDark
@@ -407,7 +413,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
           ),
           const SizedBox(height: 12),
           TwelaPrimaryButton(
-            label: 'تسجيل دفعة',
+            label: AppLocalizations.of(context)!.recordPayment,
             icon: Icons.check_circle_outline,
             color: AppColors.debt,
             onPressed: _addPayment,
@@ -430,7 +436,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TwelaSectionHeader(title: 'سجل الدفعات'),
+        TwelaSectionHeader(title: AppLocalizations.of(context)!.paymentHistory),
         const SizedBox(height: 8),
         ...payments.map((tx) => DaftarCard(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -455,7 +461,7 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'دفعة',
+                          AppLocalizations.of(context)!.payment,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.w500,
                           ),
@@ -471,14 +477,11 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
                       ],
                     ),
                   ),
-                  Text(
-                    formatLyd(tx.amount),
-                    style: daftarNumberStyle(
-                      context,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.success,
-                    ),
+                  Money(
+                    tx.amount,
+                    size: 14,
+                    weight: FontWeight.w600,
+                    color: AppColors.success,
                   ),
                 ],
               ),

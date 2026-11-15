@@ -5,7 +5,8 @@ import 'package:provider/provider.dart';
 import '../../providers/savings_provider.dart';
 import '../../providers/app_settings_provider.dart';
 import '../../models/savings_goal.dart';
-import '../../utils/formatters.dart';
+import '../../l10n/generated/app_localizations.dart';
+import '../../design/format.dart';
 
 class AddSavingsGoalScreen extends StatefulWidget {
   const AddSavingsGoalScreen({super.key});
@@ -38,7 +39,9 @@ class _AddSavingsGoalScreenState extends State<AddSavingsGoalScreen> {
         duration == null ||
         duration <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('يرجى ملء جميع الحقول بشكل صحيح')),
+        SnackBar(
+            content:
+                Text(AppLocalizations.of(context)!.fillAllFieldsCorrectly)),
       );
       return;
     }
@@ -57,7 +60,7 @@ class _AddSavingsGoalScreenState extends State<AddSavingsGoalScreen> {
 
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('تم إنشاء الحصالة')),
+      SnackBar(content: Text(AppLocalizations.of(context)!.goalCreated)),
     );
   }
 
@@ -72,7 +75,7 @@ class _AddSavingsGoalScreenState extends State<AddSavingsGoalScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('إنشاء حصالة'),
+        title: Text(AppLocalizations.of(context)!.createSavingsGoal),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsetsDirectional.only(
@@ -82,8 +85,8 @@ class _AddSavingsGoalScreenState extends State<AddSavingsGoalScreen> {
           children: [
             _buildField(
               controller: _nameController,
-              label: 'اسم الحصالة',
-              hint: 'مثال: حصالة الشهر',
+              label: AppLocalizations.of(context)!.goalName,
+              hint: AppLocalizations.of(context)!.goalNameExample,
               icon: Icons.label_outline,
               theme: theme,
               isDark: isDark,
@@ -91,7 +94,7 @@ class _AddSavingsGoalScreenState extends State<AddSavingsGoalScreen> {
             const SizedBox(height: 16),
             _buildField(
               controller: _dailyTargetController,
-              label: 'المبلغ اليومي',
+              label: AppLocalizations.of(context)!.dailyAmount,
               hint: '20',
               icon: Icons.savings_outlined,
               keyboardType: TextInputType.number,
@@ -102,7 +105,7 @@ class _AddSavingsGoalScreenState extends State<AddSavingsGoalScreen> {
             const SizedBox(height: 16),
             _buildField(
               controller: _durationController,
-              label: 'المدة (بالأيام)',
+              label: AppLocalizations.of(context)!.durationDaysLabel,
               hint: '30',
               icon: Icons.calendar_today_outlined,
               keyboardType: TextInputType.number,
@@ -129,17 +132,32 @@ class _AddSavingsGoalScreenState extends State<AddSavingsGoalScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'هدفك',
+                          AppLocalizations.of(context)!.yourGoal,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: context.inb.muted,
                           ),
                         ),
-                        Text(
-                          '${formatLydShort(targetAmount)} خلال $duration يوم',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            color: theme.colorScheme.primary,
-                          ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
+                          textBaseline: TextBaseline.alphabetic,
+                          children: [
+                            Money(
+                              targetAmount,
+                              size: 16,
+                              weight: FontWeight.w700,
+                              color: theme.colorScheme.primary,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              AppLocalizations.of(context)!
+                                  .withinDays(duration),
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -152,7 +170,7 @@ class _AddSavingsGoalScreenState extends State<AddSavingsGoalScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _saveGoal,
-                child: const Text('إنشاء الحصالة'),
+                child: Text(AppLocalizations.of(context)!.createGoal),
               ),
             ),
           ],

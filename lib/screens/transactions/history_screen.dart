@@ -8,8 +8,9 @@ import '../../providers/twela_provider.dart';
 import '../../models/transaction.dart';
 import '../../widgets/twela_design_system.dart';
 import '../../utils/formatters.dart';
-import '../../utils/daftar_number_style.dart';
 import '../transactions/add_transaction_screen.dart';
+import '../../l10n/generated/app_localizations.dart';
+import '../../design/format.dart';
 
 enum TransactionFilter { all, income, expense, debt, savings }
 
@@ -90,19 +91,19 @@ class _HistoryScreenState extends State<HistoryScreen> {
   String _typeLabel(TransactionType type) {
     switch (type) {
       case TransactionType.income:
-        return 'دخل';
+        return AppLocalizations.of(context)!.income;
       case TransactionType.expense:
-        return 'مصروف';
+        return AppLocalizations.of(context)!.expenseShort;
       case TransactionType.debtGiven:
-        return 'دين (إعطاء)';
+        return AppLocalizations.of(context)!.debtGiven;
       case TransactionType.debtReceived:
-        return 'دين (استلام)';
+        return AppLocalizations.of(context)!.debtReceived;
       case TransactionType.debtPayment:
-        return 'دين (سداد)';
+        return AppLocalizations.of(context)!.debtRepayment;
       case TransactionType.savings:
-        return 'ادخار';
+        return AppLocalizations.of(context)!.savings;
       case TransactionType.savingsWithdrawal:
-        return 'سحب من ادخار';
+        return AppLocalizations.of(context)!.withdrawFromSavings;
     }
   }
 
@@ -138,7 +139,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       : AppColors.textSecondary,
                 ),
                 title: Text(
-                  'تعديل',
+                  AppLocalizations.of(context)!.edit,
                   style: TextStyle(
                     color: isDark
                         ? AppColors.darkTextPrimary
@@ -153,7 +154,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               ListTile(
                 leading: Icon(Icons.delete_outline, color: AppColors.danger),
                 title: Text(
-                  'حذف',
+                  AppLocalizations.of(context)!.delete,
                   style: TextStyle(color: AppColors.danger),
                 ),
                 onTap: () {
@@ -185,11 +186,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
     showDialog(
       context: context,
       builder: (ctx) => TwelaConfirmDialog(
-        title: 'حذف المعاملة',
-        message:
-            'هل أنت متأكد من حذف هذه المعاملة؟ لا يمكن التراجع عن هذا الإجراء.',
-        confirmLabel: 'حذف',
-        cancelLabel: 'إلغاء',
+        title: AppLocalizations.of(context)!.deleteTransaction,
+        message: AppLocalizations.of(context)!.deleteTransactionBody,
+        confirmLabel: AppLocalizations.of(context)!.delete,
+        cancelLabel: AppLocalizations.of(context)!.cancel,
         onConfirm: () async {
           await context.read<TwelaProvider>().removeTransaction(transaction.id);
           if (mounted) setState(() {});
@@ -213,7 +213,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             controller: _searchController,
             style: theme.textTheme.bodyMedium,
             decoration: InputDecoration(
-              hintText: 'بحث...',
+              hintText: AppLocalizations.of(context)!.searchHint,
               prefixIcon: const Icon(Icons.search_outlined, size: 20),
               suffixIcon: _searchQuery.isNotEmpty
                   ? IconButton(
@@ -243,15 +243,20 @@ class _HistoryScreenState extends State<HistoryScreen> {
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 20),
             children: [
-              _buildFilterChip(TransactionFilter.all, 'الكل'),
+              _buildFilterChip(
+                  TransactionFilter.all, AppLocalizations.of(context)!.all),
               const SizedBox(width: 8),
-              _buildFilterChip(TransactionFilter.income, 'دخل'),
+              _buildFilterChip(TransactionFilter.income,
+                  AppLocalizations.of(context)!.income),
               const SizedBox(width: 8),
-              _buildFilterChip(TransactionFilter.expense, 'مصروف'),
+              _buildFilterChip(TransactionFilter.expense,
+                  AppLocalizations.of(context)!.expenseShort),
               const SizedBox(width: 8),
-              _buildFilterChip(TransactionFilter.debt, 'ديون'),
+              _buildFilterChip(TransactionFilter.debt,
+                  AppLocalizations.of(context)!.debtsShort),
               const SizedBox(width: 8),
-              _buildFilterChip(TransactionFilter.savings, 'ادخار'),
+              _buildFilterChip(TransactionFilter.savings,
+                  AppLocalizations.of(context)!.savings),
             ],
           ),
         ),
@@ -288,8 +293,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         const SizedBox(height: 20),
                         Text(
                           _searchQuery.isNotEmpty
-                              ? 'لا توجد نتائج للبحث'
-                              : 'لا توجد حركات بعد',
+                              ? AppLocalizations.of(context)!.noSearchResults
+                              : AppLocalizations.of(context)!.noEntriesYet,
                           style: theme.textTheme.headlineSmall?.copyWith(
                             color: theme.colorScheme.onSurface,
                           ),
@@ -297,8 +302,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         const SizedBox(height: 8),
                         Text(
                           _searchQuery.isNotEmpty
-                              ? 'جرّب البحث بكلمات أخرى'
-                              : 'ابدأ بتسجيل أول صرف أو دخل',
+                              ? AppLocalizations.of(context)!.tryOtherKeywords
+                              : AppLocalizations.of(context)!
+                                  .recordFirstTransaction,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: c.muted,
                           ),
@@ -310,7 +316,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             onPressed: () => Navigator.pushNamed(
                                 context, '/add-transaction'),
                             icon: const Icon(Icons.add),
-                            label: const Text('إضافة عملية'),
+                            label: Text(
+                                AppLocalizations.of(context)!.addTransaction),
                           ),
                         ],
                       ],
@@ -373,14 +380,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           ),
                         ),
                         const SizedBox(width: 12),
-                        Text(
-                          '$prefix${formatLydShort(transaction.amount)} د.ل',
-                          style: daftarNumberStyle(
-                            context,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: color,
-                          ),
+                        Money(
+                          transaction.isExpense
+                              ? -transaction.amount
+                              : transaction.amount,
+                          signed: prefix.isNotEmpty,
+                          size: 15,
+                          weight: FontWeight.w600,
+                          color: color,
+                          decimals: 2,
                         ),
                         const SizedBox(width: 4),
                         GestureDetector(
@@ -415,7 +423,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       backgroundColor:
           isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
       appBar: AppBar(
-        title: const Text('السجل'),
+        title: Text(AppLocalizations.of(context)!.history),
       ),
       body: SafeArea(child: content),
     );

@@ -8,6 +8,7 @@ import '../../providers/app_settings_provider.dart';
 import '../../models/debt.dart';
 import '../../models/transaction.dart';
 import '../../widgets/wallet_toggle.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 class AddDebtScreen extends StatefulWidget {
   const AddDebtScreen({super.key});
@@ -51,7 +52,7 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
         amount == null ||
         amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('يرجى ملء جميع الحقول')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.fillAllFields)),
       );
       return;
     }
@@ -83,7 +84,9 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text(_isGiven ? 'أعطيت مالًا لشخص' : 'استلمت مالًا من شخص'),
+        title: Text(_isGiven
+            ? AppLocalizations.of(context)!.lentMoney
+            : AppLocalizations.of(context)!.borrowedMoney),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsetsDirectional.only(
@@ -94,8 +97,8 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
             _buildField(
               context,
               controller: _personController,
-              label: 'اسم الشخص',
-              hint: 'أدخل اسم الشخص',
+              label: AppLocalizations.of(context)!.personName,
+              hint: AppLocalizations.of(context)!.enterPersonName,
               icon: Icons.person_outline,
               isDark: isDark,
               theme: theme,
@@ -104,8 +107,8 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
             _buildField(
               context,
               controller: _descriptionController,
-              label: 'وصف الدين',
-              hint: 'أدخل وصف الدين',
+              label: AppLocalizations.of(context)!.debtDescription,
+              hint: AppLocalizations.of(context)!.enterDebtDescription,
               icon: Icons.description_outlined,
               isDark: isDark,
               theme: theme,
@@ -114,8 +117,8 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
             _buildField(
               context,
               controller: _amountController,
-              label: 'المبلغ',
-              hint: 'أدخل المبلغ',
+              label: AppLocalizations.of(context)!.amount,
+              hint: AppLocalizations.of(context)!.enterAmount,
               icon: Icons.money_outlined,
               keyboardType: TextInputType.number,
               isDark: isDark,
@@ -131,7 +134,7 @@ class _AddDebtScreenState extends State<AddDebtScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _saveDebt,
-                child: const Text('حفظ'),
+                child: Text(AppLocalizations.of(context)!.save),
               ),
             ),
           ],

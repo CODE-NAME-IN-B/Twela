@@ -11,6 +11,7 @@ import '../../models/savings_entry.dart';
 import '../../models/savings_goal.dart';
 import '../../providers/app_settings_provider.dart';
 import '../../providers/savings_provider.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// The goal detail: everything you can do to one savings goal.
 ///
@@ -28,9 +29,9 @@ class SavingsDetailScreen extends StatelessWidget {
     if (goal == null) {
       return InbScreen(
         child: InbErrorState(
-          title: 'الحصالة غير موجودة',
-          subtitle: 'ربما تم حذفها. عد إلى القائمة لاختيار حصالة أخرى.',
-          retryLabel: 'رجوع',
+          title: AppLocalizations.of(context)!.goalNotFound,
+          subtitle: AppLocalizations.of(context)!.goalNotFoundBody,
+          retryLabel: AppLocalizations.of(context)!.back,
           onRetry: () => Navigator.of(context).maybePop(),
         ),
       );
@@ -47,8 +48,10 @@ class SavingsDetailScreen extends StatelessWidget {
             child: InbPageHeader(
               title: goal.name,
               subtitle: goal.isPaused
-                  ? 'موقوفة مؤقتًا'
-                  : (goal.isCompleted ? 'اكتملت' : 'نشطة'),
+                  ? AppLocalizations.of(context)!.pausedTemporarily
+                  : (goal.isCompleted
+                      ? AppLocalizations.of(context)!.isCompleted
+                      : AppLocalizations.of(context)!.active),
             ),
           ),
           Expanded(
@@ -64,7 +67,7 @@ class SavingsDetailScreen extends StatelessWidget {
                 Reveal(
                   index: 3,
                   child: InbSectionHeader(
-                    title: 'سجل الحركة',
+                    title: AppLocalizations.of(context)!.activityLog,
                     trailing: Text(
                       '${entries.length}',
                       style: monoStyle(context,
@@ -75,8 +78,8 @@ class SavingsDetailScreen extends StatelessWidget {
                 if (entries.isEmpty)
                   InbEmptyState(
                     icon: Icons.receipt_long_outlined,
-                    title: 'لا توجد حركات بعد',
-                    subtitle: 'ابدأ بالادخار اليومي لتظهر الحركات هنا.',
+                    title: AppLocalizations.of(context)!.noEntriesYet,
+                    subtitle: AppLocalizations.of(context)!.noEntriesYetBody,
                   )
                 else
                   for (final entry in entries)
@@ -118,7 +121,9 @@ class _Hero extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(child: Text('المُدَّخر', style: microStyle(context))),
+              Expanded(
+                  child: Text(AppLocalizations.of(context)!.savedSoFar,
+                      style: microStyle(context))),
               if (done)
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -128,7 +133,7 @@ class _Hero extends StatelessWidget {
                     borderRadius: BorderRadius.circular(R.pill),
                   ),
                   child: Text(
-                    'مكتمل',
+                    AppLocalizations.of(context)!.completedShort,
                     style: TextStyle(
                       fontFamily: InbFonts.arabic,
                       fontSize: 11,
@@ -146,7 +151,7 @@ class _Hero extends StatelessWidget {
                     borderRadius: BorderRadius.circular(R.pill),
                   ),
                   child: Text(
-                    'موقوف',
+                    AppLocalizations.of(context)!.pausedShort,
                     style: TextStyle(
                       fontFamily: InbFonts.arabic,
                       fontSize: 11,
@@ -167,7 +172,7 @@ class _Hero extends StatelessWidget {
           Row(
             children: [
               Text(
-                'من هدف',
+                AppLocalizations.of(context)!.ofGoal,
                 style: TextStyle(
                   fontFamily: InbFonts.arabic,
                   fontSize: 13,
@@ -207,7 +212,7 @@ class _Stats extends StatelessWidget {
       children: [
         Expanded(
           child: CellFrame(
-            label: 'المتبقي',
+            label: AppLocalizations.of(context)!.remaining,
             padding: const EdgeInsets.all(S.md),
             child: Money(goal.remainingAmount, size: 16, color: context.inb.fg),
           ),
@@ -215,7 +220,7 @@ class _Stats extends StatelessWidget {
         const SizedBox(width: S.sm),
         Expanded(
           child: CellFrame(
-            label: 'يومي',
+            label: AppLocalizations.of(context)!.daily,
             padding: const EdgeInsets.all(S.md),
             child: Money(goal.dailyTarget, size: 16, color: context.inb.fg),
           ),
@@ -223,7 +228,7 @@ class _Stats extends StatelessWidget {
         const SizedBox(width: S.sm),
         Expanded(
           child: CellFrame(
-            label: 'الأيام',
+            label: AppLocalizations.of(context)!.days,
             padding: const EdgeInsets.all(S.md),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -235,7 +240,7 @@ class _Stats extends StatelessWidget {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  'من ${goal.durationDays}',
+                  AppLocalizations.of(context)!.ofTotalDays(goal.durationDays),
                   style: TextStyle(
                     fontFamily: InbFonts.arabic,
                     fontSize: 11,
@@ -267,7 +272,9 @@ class _Actions extends StatelessWidget {
       children: [
         // One filled button per screen: ادخار.
         InbButton(
-          label: paused ? 'الحصالة موقوفة' : 'ادخِر',
+          label: paused
+              ? AppLocalizations.of(context)!.goalPaused
+              : AppLocalizations.of(context)!.saveNow,
           icon: paused ? Icons.pause_circle_outline : Icons.savings_outlined,
           color: paused ? c.muted : sem.savings,
           onPressed: paused ? null : () => showDepositSheet(context, goal),
@@ -277,7 +284,7 @@ class _Actions extends StatelessWidget {
           children: [
             Expanded(
               child: InbGhostButton(
-                label: 'اسحب',
+                label: AppLocalizations.of(context)!.withdraw,
                 icon: Icons.north_east_rounded,
                 color: sem.savings,
                 onPressed: goal.savedAmount <= 0
@@ -292,7 +299,7 @@ class _Actions extends StatelessWidget {
             const SizedBox(width: S.sm),
             Expanded(
               child: InbGhostButton(
-                label: 'حوّل إلى دين',
+                label: AppLocalizations.of(context)!.transferToDebt,
                 icon: Icons.handshake_outlined,
                 color: sem.debt,
                 onPressed: goal.savedAmount <= 0
@@ -311,7 +318,7 @@ class _Actions extends StatelessWidget {
           children: [
             Expanded(
               child: InbGhostButton(
-                label: 'تعديل',
+                label: AppLocalizations.of(context)!.edit,
                 icon: Icons.edit_outlined,
                 onPressed: () => Navigator.pushNamed(
                   context,
@@ -323,7 +330,9 @@ class _Actions extends StatelessWidget {
             const SizedBox(width: S.sm),
             Expanded(
               child: InbGhostButton(
-                label: paused ? 'استأنف' : 'أوقف مؤقتًا',
+                label: paused
+                    ? AppLocalizations.of(context)!.resume
+                    : AppLocalizations.of(context)!.pause,
                 icon: paused ? Icons.play_arrow_rounded : Icons.pause_rounded,
                 onPressed: () => _togglePause(context),
               ),
@@ -332,7 +341,7 @@ class _Actions extends StatelessWidget {
         ),
         const SizedBox(height: S.sm),
         InbGhostButton(
-          label: 'احذف الحصالة',
+          label: AppLocalizations.of(context)!.deleteGoal,
           icon: Icons.delete_outline,
           color: sem.danger,
           onPressed: () => _deleteGoal(context),
@@ -346,10 +355,10 @@ class _Actions extends StatelessWidget {
     final goalId = goal.id;
     if (goal.isPaused) {
       provider.resumeGoal(goalId);
-      showInbToast(context, 'تم استئناف الحصالة');
+      showInbToast(context, AppLocalizations.of(context)!.goalResumed);
     } else {
       provider.pauseGoal(goalId);
-      showInbToast(context, 'تم إيقاف الحصالة مؤقتًا');
+      showInbToast(context, AppLocalizations.of(context)!.goalPausedToast);
     }
   }
 
@@ -365,8 +374,10 @@ class _Actions extends StatelessWidget {
 
     showInbToast(
       context,
-      hadMoney ? 'حُذفت الحصالة ورجع المبلغ إلى محفظتك' : 'حُذفت الحصالة',
-      undoLabel: 'تراجع',
+      hadMoney
+          ? AppLocalizations.of(context)!.goalDeletedUndo
+          : AppLocalizations.of(context)!.goalDeleted,
+      undoLabel: AppLocalizations.of(context)!.undo,
       onUndo: () => provider.restoreGoal(goalId),
     );
   }
@@ -388,15 +399,16 @@ class _EntryRow extends StatelessWidget {
     final IconData icon;
     if (entry.isDeposit) {
       tone = sem.savings;
-      label = 'ادخار';
+      label = AppLocalizations.of(context)!.savings;
       icon = Icons.south_west_rounded;
     } else if (entry.paysDebt) {
       tone = sem.debt;
-      label = 'سداد دين ${entry.linkedDebtName ?? ''}';
+      label = AppLocalizations.of(context)!
+          .debtRepaymentNote(entry.linkedDebtName ?? '');
       icon = Icons.handshake_outlined;
     } else {
       tone = sem.income;
-      label = 'سحب';
+      label = AppLocalizations.of(context)!.withdrawal;
       icon = Icons.north_east_rounded;
     }
 
@@ -437,7 +449,7 @@ class _EntryRow extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${formatDateShort(entry.date)} · ${entry.walletType == 'bank' ? 'مصرف' : 'كاش'}',
+                  '${formatDateShort(entry.date)} · ${entry.walletType == 'bank' ? AppLocalizations.of(context)!.bank : AppLocalizations.of(context)!.cash}',
                   style: TextStyle(
                     fontFamily: InbFonts.arabic,
                     fontSize: 12,
@@ -458,7 +470,7 @@ class _EntryRow extends StatelessWidget {
             icon: Icons.close_rounded,
             size: 36,
             color: c.muted,
-            tooltip: 'حذف الحركة',
+            tooltip: AppLocalizations.of(context)!.deleteEntry,
             onPressed: () => _removeEntry(context),
           ),
         ],
@@ -476,8 +488,8 @@ class _EntryRow extends StatelessWidget {
 
     showInbToast(
       context,
-      'حُذفت الحركة',
-      undoLabel: 'تراجع',
+      AppLocalizations.of(context)!.entryDeleted,
+      undoLabel: AppLocalizations.of(context)!.undo,
       onUndo: () async {
         // Rebuild the entry and its movements.
         final restored = SavingsEntry.create(
@@ -509,7 +521,7 @@ Future<void> showDepositSheet(BuildContext context, SavingsGoal goal) async {
     backgroundColor: Colors.transparent,
     builder: (ctx) => StatefulBuilder(
       builder: (ctx, setSheetState) => InbSheet(
-        title: 'ادخار',
+        title: AppLocalizations.of(context)!.savings,
         subtitle: goal.name,
         child: Padding(
           padding: EdgeInsetsDirectional.only(
@@ -535,14 +547,15 @@ Future<void> showDepositSheet(BuildContext context, SavingsGoal goal) async {
                   autofocus: true,
                 ),
               ),
-              const SizedBox(height: S.md),
+              SizedBox(height: S.md),
               Row(
                 children: [
-                  for (final w in const [
-                    ('cash', 'كاش'),
-                    ('bank', 'مصرف')
+                  for (final w in [
+                    ('cash', AppLocalizations.of(context)!.cash),
+                    ('bank', AppLocalizations.of(context)!.bank)
                   ]) ...[
-                    if (w != ('cash', 'كاش')) const SizedBox(width: S.sm),
+                    if (w != ('cash', AppLocalizations.of(context)!.cash))
+                      const SizedBox(width: S.sm),
                     Expanded(
                       child: InbChip(
                         label: w.$2,
@@ -566,14 +579,15 @@ Future<void> showDepositSheet(BuildContext context, SavingsGoal goal) async {
               ],
               const SizedBox(height: S.md),
               InbButton(
-                label: 'ادخِر',
+                label: AppLocalizations.of(context)!.saveNow,
                 icon: Icons.savings_outlined,
                 color: context.sem.savings,
                 onPressed: () async {
                   final amount =
                       double.tryParse(controller.text.replaceAll(',', ''));
                   if (amount == null || amount <= 0) {
-                    setSheetState(() => error = 'أدخل مبلغًا أكبر من صفر');
+                    setSheetState(() => error =
+                        AppLocalizations.of(context)!.enterAmountAboveZero);
                     return;
                   }
                   await provider.addDeposit(
@@ -583,7 +597,8 @@ Future<void> showDepositSheet(BuildContext context, SavingsGoal goal) async {
                   );
                   if (!ctx.mounted) return;
                   Navigator.pop(ctx);
-                  showInbToast(context, 'تم تسجيل الادخار');
+                  showInbToast(
+                      context, AppLocalizations.of(context)!.depositRecorded);
                 },
               ),
             ],
@@ -595,9 +610,6 @@ Future<void> showDepositSheet(BuildContext context, SavingsGoal goal) async {
 
   controller.dispose();
 }
-
-/// Re-exported so the list screen can reuse the same delete/undo wording.
-String savingsUndoLabel() => 'تراجع';
 
 /// Convenience for the haptic setting used across the savings flow.
 bool savingsHapticsOn(BuildContext context) =>

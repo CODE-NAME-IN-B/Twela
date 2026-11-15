@@ -9,6 +9,8 @@ import '../../models/savings_goal.dart';
 import '../../utils/formatters.dart';
 import '../../widgets/twela_design_system.dart';
 import 'add_savings_goal_screen.dart';
+import '../../l10n/generated/app_localizations.dart';
+import '../../design/format.dart';
 
 class SavingsScreen extends StatelessWidget {
   const SavingsScreen({super.key});
@@ -22,7 +24,7 @@ class SavingsScreen extends StatelessWidget {
       backgroundColor:
           isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
       appBar: AppBar(
-        title: const Text('الحصالة'),
+        title: Text(AppLocalizations.of(context)!.savingsGoal),
         actions: [
           Padding(
             padding: const EdgeInsetsDirectional.only(start: 16),
@@ -52,9 +54,9 @@ class SavingsScreen extends StatelessWidget {
             if (activeGoals.isEmpty && completedGoals.isEmpty) {
               return TwelaEmptyState(
                 icon: Icons.savings_outlined,
-                title: 'لم تنشئ حصالة بعد',
-                subtitle: 'أنشئ حصالة لادخار المال بشكل يومي',
-                actionLabel: 'إنشاء حصالة',
+                title: AppLocalizations.of(context)!.noGoalsYet,
+                subtitle: AppLocalizations.of(context)!.noGoalsYetBody,
+                actionLabel: AppLocalizations.of(context)!.createSavingsGoal,
                 onAction: () => Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -71,7 +73,7 @@ class SavingsScreen extends StatelessWidget {
                 children: [
                   if (activeGoals.isNotEmpty) ...[
                     Text(
-                      'نشطة',
+                      AppLocalizations.of(context)!.active,
                       style: theme.textTheme.headlineSmall,
                     ),
                     const SizedBox(height: 12),
@@ -81,7 +83,7 @@ class SavingsScreen extends StatelessWidget {
                   if (completedGoals.isNotEmpty) ...[
                     const SizedBox(height: 28),
                     Text(
-                      'مكتملة',
+                      AppLocalizations.of(context)!.completed,
                       style: theme.textTheme.headlineSmall?.copyWith(
                         color: isDark
                             ? AppColors.darkTextSecondary
@@ -135,7 +137,9 @@ class SavingsScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
-                      goal.isCompleted ? 'مكتمل' : 'نشط',
+                      goal.isCompleted
+                          ? AppLocalizations.of(context)!.completedShort
+                          : AppLocalizations.of(context)!.activeShort,
                       style: TextStyle(
                         fontSize: 11,
                         color: goal.isCompleted
@@ -151,13 +155,32 @@ class SavingsScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    '${formatLydShort(goal.savedAmount)} / ${formatLydShort(goal.targetAmount)}',
-                    style: daftarNumberStyle(
-                      context,
-                      fontSize: 18,
-                      color: theme.colorScheme.onSurface,
-                    ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Money(
+                        goal.savedAmount,
+                        size: 18,
+                        weight: FontWeight.w700,
+                        color: theme.colorScheme.onSurface,
+                        showCurrency: false,
+                      ),
+                      Text(
+                        ' / ',
+                        style: daftarNumberStyle(
+                          context,
+                          fontSize: 18,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                      ),
+                      Money(
+                        goal.targetAmount,
+                        size: 18,
+                        weight: FontWeight.w700,
+                        color: theme.colorScheme.onSurface,
+                        showCurrency: false,
+                      ),
+                    ],
                   ),
                   Text(
                     '${(progress * 100).toStringAsFixed(0)}%',
@@ -186,16 +209,31 @@ class SavingsScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    '${formatLydShort(goal.dailyTarget)} / يوم',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: isDark
-                          ? AppColors.darkTextSecondary
-                          : AppColors.textSecondary,
-                    ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Money(
+                        goal.dailyTarget,
+                        size: 13,
+                        weight: FontWeight.w400,
+                        showCurrency: false,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary,
+                      ),
+                      Text(
+                        ' / ${AppLocalizations.of(context)!.daily}',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
                   ),
                   Text(
-                    '${goal.daysElapsed} من ${goal.durationDays} يوم',
+                    AppLocalizations.of(context)!
+                        .daysOfTotal(goal.daysElapsed, goal.durationDays),
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: isDark
                           ? AppColors.darkTextSecondary
@@ -262,7 +300,8 @@ class SavingsScreen extends StatelessWidget {
                     icon: const Icon(Icons.savings_outlined),
                     label: Text.rich(TextSpan(
                       children: [
-                        const TextSpan(text: 'ادخر '),
+                        TextSpan(
+                            text: AppLocalizations.of(context)!.saveAction),
                         TextSpan(
                           text: formatLyd(goal.dailyTarget),
                           style: daftarNumberStyle(context, fontSize: 14),
@@ -274,7 +313,7 @@ class SavingsScreen extends StatelessWidget {
                 const SizedBox(height: 16),
               ],
               Text(
-                'سجل الادخار',
+                AppLocalizations.of(context)!.savingsLog,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -282,7 +321,7 @@ class SavingsScreen extends StatelessWidget {
               const SizedBox(height: 12),
               if (entries.isEmpty)
                 Text(
-                  'لا توجد عمليات ادخار بعد',
+                  AppLocalizations.of(context)!.noDepositsYet,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: isDark
                         ? AppColors.darkTextSecondary
@@ -305,13 +344,11 @@ class SavingsScreen extends StatelessWidget {
                             formatDate(entry.date),
                             style: theme.textTheme.bodySmall,
                           ),
-                          Text(
-                            formatLyd(entry.amount),
-                            style: daftarNumberStyle(
-                              context,
-                              fontSize: 14,
-                              color: AppColors.income,
-                            ),
+                          Money(
+                            entry.amount,
+                            size: 14,
+                            weight: FontWeight.w600,
+                            color: AppColors.income,
                           ),
                         ],
                       ),
@@ -333,20 +370,20 @@ class SavingsScreen extends StatelessWidget {
         backgroundColor:
             isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('ادخار - ${goal.name}'),
+        title: Text(AppLocalizations.of(context)!.depositToGoal(goal.name)),
         content: TextField(
           controller: controller,
           keyboardType: TextInputType.number,
           autofocus: true,
-          decoration: const InputDecoration(
-            hintText: 'المبلغ',
-            suffixText: 'د.ل',
+          decoration: InputDecoration(
+            hintText: AppLocalizations.of(context)!.amount,
+            suffixText: AppLocalizations.of(context)!.currencyLyd,
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('إلغاء'),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -357,11 +394,13 @@ class SavingsScreen extends StatelessWidget {
                     .addDeposit(goalId: goal.id, amount: amount);
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('تم تسجيل الادخار')),
+                  SnackBar(
+                      content:
+                          Text(AppLocalizations.of(context)!.depositRecorded)),
                 );
               }
             },
-            child: const Text('ادخر'),
+            child: Text(AppLocalizations.of(context)!.deposit),
           ),
         ],
       ),

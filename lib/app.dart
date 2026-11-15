@@ -25,6 +25,7 @@ import 'screens/savings/savings_detail_screen.dart';
 import 'screens/savings/savings_editor_screen.dart';
 import 'screens/savings/savings_withdraw_screen.dart';
 import 'screens/data/data_export_screen.dart';
+import 'l10n/generated/app_localizations.dart';
 import 'models/debt.dart';
 import 'models/transaction.dart';
 
@@ -51,6 +52,7 @@ class TwelaApp extends StatelessWidget {
           themeMode: themeProvider.themeMode,
           locale: const Locale('ar', 'LY'),
           localizationsDelegates: const [
+            AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,

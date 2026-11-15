@@ -8,6 +8,7 @@ import '../../design/tokens.dart';
 import '../../design/widgets.dart';
 import '../../models/savings_goal.dart';
 import '../../providers/savings_provider.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// Create a goal, or edit an existing one.
 ///
@@ -90,7 +91,11 @@ class _SavingsEditorScreenState extends State<SavingsEditorScreen> {
     }
 
     Navigator.of(context).maybePop();
-    showInbToast(context, _editing ? 'تم حفظ التعديلات' : 'أُنشئت الحصالة');
+    showInbToast(
+        context,
+        _editing
+            ? AppLocalizations.of(context)!.changesSaved
+            : AppLocalizations.of(context)!.goalWasCreated);
   }
 
   @override
@@ -106,8 +111,12 @@ class _SavingsEditorScreenState extends State<SavingsEditorScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           InbPageHeader(
-            title: _editing ? 'تعديل الحصالة' : 'حصالة جديدة',
-            subtitle: _editing ? goal?.name : 'حدّد المبلغ والزمن',
+            title: _editing
+                ? AppLocalizations.of(context)!.editGoal
+                : AppLocalizations.of(context)!.newGoal,
+            subtitle: _editing
+                ? goal?.name
+                : AppLocalizations.of(context)!.setAmountAndTime,
           ),
           const SizedBox(height: S.lg),
           Expanded(
@@ -116,13 +125,13 @@ class _SavingsEditorScreenState extends State<SavingsEditorScreen> {
               children: [
                 InbTextField(
                   controller: _name,
-                  label: 'الاسم',
-                  hint: 'مثال: عطلة الصيف',
+                  label: AppLocalizations.of(context)!.name,
+                  hint: AppLocalizations.of(context)!.nameExample,
                 ),
                 const SizedBox(height: S.lg),
                 InbTextField(
                   controller: _daily,
-                  label: 'المبلغ اليومي',
+                  label: AppLocalizations.of(context)!.dailyAmount,
                   hint: '0.00',
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
@@ -130,20 +139,20 @@ class _SavingsEditorScreenState extends State<SavingsEditorScreen> {
                 const SizedBox(height: S.lg),
                 InbTextField(
                   controller: _days,
-                  label: 'المدة (أيام)',
+                  label: AppLocalizations.of(context)!.durationLabel,
                   hint: '30',
                   keyboardType: TextInputType.number,
                 ),
                 const SizedBox(height: S.lg),
                 if (target > 0)
                   CellFrame(
-                    label: 'الهدف الكلي',
+                    label: AppLocalizations.of(context)!.totalTarget,
                     child: Money(target, size: 22, color: c.fg),
                   ),
                 if (!_valid) ...[
                   const SizedBox(height: S.sm),
                   Text(
-                    'املأ الحقول الثلاثة بقيم صحيحة',
+                    AppLocalizations.of(context)!.fillThreeFields,
                     style: TextStyle(
                       fontFamily: InbFonts.arabic,
                       fontSize: 13,
@@ -157,7 +166,9 @@ class _SavingsEditorScreenState extends State<SavingsEditorScreen> {
           Reveal(
             index: 1,
             child: InbButton(
-              label: _editing ? 'احفظ التعديلات' : 'أنشئ الحصالة',
+              label: _editing
+                  ? AppLocalizations.of(context)!.saveChanges
+                  : AppLocalizations.of(context)!.createGoalAction,
               icon: Icons.check_rounded,
               onPressed: _save,
             ),

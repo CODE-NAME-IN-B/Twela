@@ -11,6 +11,7 @@ import '../../theme/daftar_theme.dart';
 import '../../widgets/twela_design_system.dart';
 import '../../widgets/wallet_toggle.dart';
 import '../../widgets/category_picker.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 class AddTransactionScreen extends StatefulWidget {
   final TransactionType? initialType;
@@ -43,21 +44,22 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   Color get _semanticColor =>
       _type == TransactionType.expense ? AppColors.expense : AppColors.income;
 
-  String get _title =>
-      _type == TransactionType.expense ? 'إضافة صرف' : 'إضافة دخل';
+  String get _title => _type == TransactionType.expense
+      ? AppLocalizations.of(context)!.addExpense
+      : AppLocalizations.of(context)!.addIncome;
 
   void _saveTransaction() {
     final amount = double.tryParse(_amountController.text);
     if (amount == null || amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('يرجى إدخال مبلغ صحيح')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.enterValidAmount)),
       );
       return;
     }
 
     if (_type == TransactionType.expense && _selectedCategoryId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('يرجى اختيار التصنيف')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.chooseCategory)),
       );
       return;
     }
@@ -109,15 +111,16 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsetsDirectional.only(
+          padding: EdgeInsetsDirectional.only(
               start: 20, top: 0, end: 20, bottom: 100),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TwelaSegmentedControl<TransactionType>(
-                segments: const {
-                  TransactionType.expense: 'صرف',
-                  TransactionType.income: 'دخل',
+                segments: {
+                  TransactionType.expense:
+                      AppLocalizations.of(context)!.expense,
+                  TransactionType.income: AppLocalizations.of(context)!.income,
                 },
                 selected: _type,
                 onSelected: (type) => setState(() => _type = type),
@@ -133,7 +136,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               const SizedBox(height: 28),
               if (_type == TransactionType.expense) ...[
                 Text(
-                  'التصنيف',
+                  AppLocalizations.of(context)!.category,
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -152,7 +155,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               _buildNoteField(isDark),
               const SizedBox(height: 32),
               TwelaPrimaryButton(
-                label: 'حفظ المعملة',
+                label: AppLocalizations.of(context)!.saveTransaction,
                 color: _semanticColor,
                 icon: Icons.check_rounded,
                 onPressed: _saveTransaction,
@@ -179,7 +182,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       child: TwelaAmountField(
         controller: _amountController,
         accentColor: _semanticColor,
-        suffixText: 'د.ل',
+        suffixText: AppLocalizations.of(context)!.currencyLyd,
       ),
     );
   }
@@ -200,7 +203,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'ملاحظة (اختياري)',
+            AppLocalizations.of(context)!.noteOptional,
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w500,
@@ -216,7 +219,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
             ),
             decoration: InputDecoration(
-              hintText: 'أضف ملاحظة...',
+              hintText: AppLocalizations.of(context)!.addNoteHint,
               hintStyle: TextStyle(
                 color: isDark
                     ? AppColors.darkTextTertiary

@@ -11,6 +11,7 @@ import '../../services/data_export_service.dart';
 import '../../providers/twela_provider.dart';
 import '../../providers/debt_provider.dart';
 import '../../providers/savings_provider.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 class DataExportScreen extends StatefulWidget {
   const DataExportScreen({super.key});
@@ -31,7 +32,7 @@ class _DataExportScreenState extends State<DataExportScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('البيانات'),
+        title: Text(AppLocalizations.of(context)!.data),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsetsDirectional.only(
@@ -43,15 +44,15 @@ class _DataExportScreenState extends State<DataExportScreen> {
               context,
               theme: theme,
               isDark: isDark,
-              title: 'النسخ الاحتياطي',
+              title: AppLocalizations.of(context)!.backup,
               children: [
                 _buildActionCard(
                   context,
                   theme: theme,
                   isDark: isDark,
                   icon: Icons.upload_file_outlined,
-                  title: 'تصدير البيانات',
-                  subtitle: 'حفظ نسخة احتياطية من جميع بياناتك',
+                  title: AppLocalizations.of(context)!.exportData,
+                  subtitle: AppLocalizations.of(context)!.exportDataSubtitle,
                   color: theme.colorScheme.primary,
                   isLoading: _isExporting,
                   onTap: _exportData,
@@ -62,8 +63,8 @@ class _DataExportScreenState extends State<DataExportScreen> {
                   theme: theme,
                   isDark: isDark,
                   icon: Icons.download_outlined,
-                  title: 'استيراد البيانات',
-                  subtitle: 'استعادة بيانات من نسخة احتياطية',
+                  title: AppLocalizations.of(context)!.importData,
+                  subtitle: AppLocalizations.of(context)!.importDataSubtitle,
                   color: context.inb.indigo,
                   isLoading: _isImporting,
                   onTap: _importData,
@@ -75,15 +76,15 @@ class _DataExportScreenState extends State<DataExportScreen> {
               context,
               theme: theme,
               isDark: isDark,
-              title: 'مشاركة',
+              title: AppLocalizations.of(context)!.share,
               children: [
                 _buildActionCard(
                   context,
                   theme: theme,
                   isDark: isDark,
                   icon: Icons.share_outlined,
-                  title: 'مشاركة كملف',
-                  subtitle: 'مشاركة ملف JSON للبيانات',
+                  title: AppLocalizations.of(context)!.shareAsFile,
+                  subtitle: AppLocalizations.of(context)!.shareAsFileSubtitle,
                   color: context.sem.savings,
                   onTap: _shareData,
                 ),
@@ -93,8 +94,8 @@ class _DataExportScreenState extends State<DataExportScreen> {
                   theme: theme,
                   isDark: isDark,
                   icon: Icons.copy_outlined,
-                  title: 'نسخ البيانات',
-                  subtitle: 'نسخ البيانات كنص JSON',
+                  title: AppLocalizations.of(context)!.copyData,
+                  subtitle: AppLocalizations.of(context)!.copyDataSubtitle,
                   color: context.sem.warning,
                   onTap: _copyData,
                 ),
@@ -105,7 +106,7 @@ class _DataExportScreenState extends State<DataExportScreen> {
               context,
               theme: theme,
               isDark: isDark,
-              title: 'تنبيه',
+              title: AppLocalizations.of(context)!.alert,
               children: [
                 Container(
                   padding: const EdgeInsets.all(14),
@@ -126,7 +127,7 @@ class _DataExportScreenState extends State<DataExportScreen> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          'سيتم استبدال جميع البيانات الحالية عند الاستيراد. تأكد من إنشاء نسخة احتياطية أولاً.',
+                          AppLocalizations.of(context)!.importWarning,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: AppColors.danger,
                           ),
@@ -253,12 +254,13 @@ class _DataExportScreenState extends State<DataExportScreen> {
 
       await Share.shareXFiles(
         [XFile(file.path)],
-        text: 'نسخة احتياطية من Twela',
+        text: AppLocalizations.of(context)!.twelaBackup,
       );
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('خطأ في التصدير: $e')),
+          SnackBar(
+              content: Text(AppLocalizations.of(context)!.exportFailed(e))),
         );
       }
     } finally {
@@ -283,7 +285,7 @@ class _DataExportScreenState extends State<DataExportScreen> {
       if (data == null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('ملف غير صالح')),
+            SnackBar(content: Text(AppLocalizations.of(context)!.invalidFile)),
           );
         }
         return;
@@ -293,18 +295,17 @@ class _DataExportScreenState extends State<DataExportScreen> {
         final confirmed = await showDialog<bool>(
           context: context,
           builder: (ctx) => AlertDialog(
-            title: const Text('تأكيد الاستيراد'),
-            content:
-                const Text('سيتم استبدال جميع البيانات الحالية. هل أنت متأكد؟'),
+            title: Text(AppLocalizations.of(context)!.confirmImport),
+            content: Text(AppLocalizations.of(context)!.confirmImportBody),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('إلغاء'),
+                child: Text(AppLocalizations.of(context)!.cancel),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(ctx, true),
                 child: Text(
-                  'استيراد',
+                  AppLocalizations.of(context)!.import,
                   style: TextStyle(color: AppColors.danger),
                 ),
               ),
@@ -323,7 +324,8 @@ class _DataExportScreenState extends State<DataExportScreen> {
           }
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('تم الاستيراد بنجاح')),
+              SnackBar(
+                  content: Text(AppLocalizations.of(context)!.importSucceeded)),
             );
           }
         }
@@ -331,7 +333,8 @@ class _DataExportScreenState extends State<DataExportScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('خطأ في الاستيراد: $e')),
+          SnackBar(
+              content: Text(AppLocalizations.of(context)!.importFailed(e))),
         );
       }
     } finally {
@@ -345,11 +348,11 @@ class _DataExportScreenState extends State<DataExportScreen> {
       final jsonStr = await DataExportService.exportToJson(storage);
       final file = await DataExportService.saveExportToFile(jsonStr);
       await Share.shareXFiles([XFile(file.path)],
-          text: 'نسخة احتياطية من Twela');
+          text: AppLocalizations.of(context)!.twelaBackup);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('خطأ في المشاركة: $e')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.shareFailed(e))),
         );
       }
     }
@@ -362,13 +365,13 @@ class _DataExportScreenState extends State<DataExportScreen> {
       await Clipboard.setData(ClipboardData(text: jsonStr));
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تم نسخ البيانات')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.dataCopied)),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('خطأ في النسخ: $e')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.copyFailed(e))),
         );
       }
     }

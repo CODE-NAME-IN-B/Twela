@@ -9,6 +9,7 @@ import '../../design/widgets.dart';
 import '../../models/savings_goal.dart';
 import '../../providers/debt_provider.dart';
 import '../../providers/savings_provider.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// Pull money out of a goal — back to a wallet, or straight onto a debt.
 ///
@@ -54,11 +55,12 @@ class _SavingsWithdrawScreenState extends State<SavingsWithdrawScreen> {
         amount == null ||
         amount <= 0 ||
         amount > goal.savedAmount) {
-      setState(() => _error = 'أدخل مبلغًا صحيحًا ضمن المتوفر');
+      setState(() =>
+          _error = AppLocalizations.of(context)!.enterAmountWithinAvailable);
       return;
     }
     if (_toDebt && _debtId == null) {
-      setState(() => _error = 'اختر الدين المراد سداده');
+      setState(() => _error = AppLocalizations.of(context)!.chooseDebtToPay);
       return;
     }
 
@@ -79,13 +81,16 @@ class _SavingsWithdrawScreenState extends State<SavingsWithdrawScreen> {
     done.then((ok) {
       if (!mounted) return;
       if (!ok) {
-        setState(() => _error = 'تعذّرت العملية، حاول مجددًا');
+        setState(
+            () => _error = AppLocalizations.of(context)!.operationFailedRetry);
         return;
       }
       Navigator.of(context).maybePop();
       showInbToast(
         context,
-        _toDebt ? 'حوّلت المبلغ إلى الدين' : 'أعدت المبلغ إلى محفظتك',
+        _toDebt
+            ? AppLocalizations.of(context)!.transferredToDebt
+            : AppLocalizations.of(context)!.returnedToWallet,
       );
     });
   }
@@ -100,9 +105,9 @@ class _SavingsWithdrawScreenState extends State<SavingsWithdrawScreen> {
     if (goal == null) {
       return InbScreen(
         child: InbErrorState(
-          title: 'الحصالة غير موجودة',
-          subtitle: 'ربما تم حذفها. عد إلى القائمة لاختيار حصالة أخرى.',
-          retryLabel: 'رجوع',
+          title: AppLocalizations.of(context)!.goalNotFound,
+          subtitle: AppLocalizations.of(context)!.goalNotFoundBody,
+          retryLabel: AppLocalizations.of(context)!.back,
           onRetry: () => Navigator.of(context).maybePop(),
         ),
       );
@@ -113,7 +118,9 @@ class _SavingsWithdrawScreenState extends State<SavingsWithdrawScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           InbPageHeader(
-            title: _toDebt ? 'حوّل إلى دين' : 'اسحب من الحصالة',
+            title: _toDebt
+                ? AppLocalizations.of(context)!.transferToDebt
+                : AppLocalizations.of(context)!.withdrawFromGoal,
             subtitle: goal.name,
           ),
           const SizedBox(height: S.lg),
@@ -122,7 +129,7 @@ class _SavingsWithdrawScreenState extends State<SavingsWithdrawScreen> {
               padding: EdgeInsets.zero,
               children: [
                 CellFrame(
-                  label: 'المتوفر في الحصالة',
+                  label: AppLocalizations.of(context)!.availableInGoal,
                   child: Money(goal.savedAmount, size: 26, color: sem.savings),
                 ),
                 const SizedBox(height: S.lg),
@@ -139,12 +146,12 @@ class _SavingsWithdrawScreenState extends State<SavingsWithdrawScreen> {
                     autofocus: true,
                   ),
                 ),
-                const SizedBox(height: S.md),
+                SizedBox(height: S.md),
                 Row(
                   children: [
-                    for (final w in const [
-                      ('cash', 'كاش'),
-                      ('bank', 'مصرف')
+                    for (final w in [
+                      ('cash', AppLocalizations.of(context)!.cash),
+                      ('bank', AppLocalizations.of(context)!.bank)
                     ]) ...[
                       if (w.$1 != 'cash') const SizedBox(width: S.sm),
                       Expanded(
@@ -159,13 +166,14 @@ class _SavingsWithdrawScreenState extends State<SavingsWithdrawScreen> {
                 ),
                 if (_toDebt) ...[
                   const SizedBox(height: S.lg),
-                  InbSectionHeader(title: 'الدين المستحق'),
+                  InbSectionHeader(
+                      title: AppLocalizations.of(context)!.debtDue),
                   const SizedBox(height: S.sm),
                   if (debts.isEmpty)
-                    const InbEmptyState(
+                    InbEmptyState(
                       icon: Icons.handshake_outlined,
-                      title: 'لا توجد ديون نشطة',
-                      subtitle: 'أضف دينًا أولًا لتتمكن من السداد منه.',
+                      title: AppLocalizations.of(context)!.noActiveDebts,
+                      subtitle: AppLocalizations.of(context)!.addDebtFirst,
                     )
                   else
                     for (final debt in debts)
@@ -201,13 +209,27 @@ class _SavingsWithdrawScreenState extends State<SavingsWithdrawScreen> {
                                         ),
                                       ),
                                       const SizedBox(height: 2),
-                                      Text(
-                                        'المتبقي: ${formatMoney(debt.remaining)} د.ل',
-                                        style: TextStyle(
-                                          fontFamily: InbFonts.arabic,
-                                          fontSize: 12,
-                                          color: c.muted,
-                                        ),
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.baseline,
+                                        textBaseline: TextBaseline.alphabetic,
+                                        children: [
+                                          Text(
+                                            '${AppLocalizations.of(context)!.remaining}: ',
+                                            style: TextStyle(
+                                              fontFamily: InbFonts.arabic,
+                                              fontSize: 12,
+                                              color: c.muted,
+                                            ),
+                                          ),
+                                          Money(
+                                            debt.remaining,
+                                            size: 12,
+                                            weight: FontWeight.w400,
+                                            color: c.muted,
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
@@ -237,7 +259,9 @@ class _SavingsWithdrawScreenState extends State<SavingsWithdrawScreen> {
           Reveal(
             index: 1,
             child: InbButton(
-              label: _toDebt ? 'حوّل إلى الدين' : 'اسحب إلى المحفظة',
+              label: _toDebt
+                  ? AppLocalizations.of(context)!.transferToTheDebt
+                  : AppLocalizations.of(context)!.withdrawToWallet,
               icon:
                   _toDebt ? Icons.handshake_outlined : Icons.north_east_rounded,
               color: _toDebt ? sem.debt : sem.savings,

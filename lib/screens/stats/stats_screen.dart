@@ -11,6 +11,8 @@ import '../../providers/twela_provider.dart';
 import '../../models/transaction.dart';
 import '../../utils/formatters.dart';
 import '../../widgets/twela_design_system.dart';
+import '../../l10n/generated/app_localizations.dart';
+import '../../design/format.dart' show Money;
 
 class StatsScreen extends StatelessWidget {
   const StatsScreen({
@@ -37,8 +39,8 @@ class StatsScreen extends StatelessWidget {
         if (expenses.isEmpty) {
           return TwelaEmptyState(
             icon: Icons.bar_chart_outlined,
-            title: 'لا توجد بيانات كافية',
-            subtitle: 'ابدأ بتسجيل مصاريفك لرؤية الإحصائيات',
+            title: AppLocalizations.of(context)!.emptyStats,
+            subtitle: AppLocalizations.of(context)!.startTrackingExpenses,
           );
         }
 
@@ -67,7 +69,7 @@ class StatsScreen extends StatelessWidget {
       backgroundColor:
           isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
       appBar: AppBar(
-        title: const Text('الإحصائيات'),
+        title: Text(AppLocalizations.of(context)!.stats),
       ),
       body: SafeArea(child: content),
     );
@@ -81,7 +83,8 @@ class StatsScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'ملخص شهر ${formatMonthYear(DateTime.now())}',
+            AppLocalizations.of(context)!
+                .monthSummary(formatMonthYear(DateTime.now())),
             style: theme.textTheme.headlineSmall,
           ),
           const SizedBox(height: 20),
@@ -90,8 +93,13 @@ class StatsScreen extends StatelessWidget {
               Expanded(
                 child: _buildSummaryItem(
                   context,
-                  'الإجمالي',
-                  formatLyd(provider.totalBalance),
+                  AppLocalizations.of(context)!.total,
+                  Money(
+                    provider.totalBalance,
+                    size: 18,
+                    weight: FontWeight.w700,
+                    color: AppColors.info,
+                  ),
                   AppColors.info,
                   Icons.account_balance_wallet_outlined,
                   isDark,
@@ -102,8 +110,13 @@ class StatsScreen extends StatelessWidget {
               Expanded(
                 child: _buildSummaryItem(
                   context,
-                  'المصروفات',
-                  formatLyd(provider.monthSpent),
+                  AppLocalizations.of(context)!.spent,
+                  Money(
+                    provider.monthSpent,
+                    size: 18,
+                    weight: FontWeight.w700,
+                    color: AppColors.expense,
+                  ),
                   AppColors.expense,
                   Icons.arrow_upward_rounded,
                   isDark,
@@ -120,7 +133,7 @@ class StatsScreen extends StatelessWidget {
   Widget _buildSummaryItem(
     BuildContext context,
     String label,
-    String value,
+    Widget value,
     Color color,
     IconData icon,
     bool isDark,
@@ -148,15 +161,7 @@ class StatsScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          Text(
-            value,
-            style: daftarNumberStyle(
-              context,
-              fontSize: 18,
-              color: color,
-            ),
-            overflow: TextOverflow.ellipsis,
-          ),
+          value,
         ],
       ),
     );
@@ -183,7 +188,7 @@ class StatsScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'التوزيع حسب التصنيف',
+            AppLocalizations.of(context)!.distributionByCategory,
             style: theme.textTheme.headlineSmall,
           ),
           const SizedBox(height: 20),
@@ -232,7 +237,7 @@ class StatsScreen extends StatelessWidget {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    category?.name ?? 'غير معروف',
+                    category?.name ?? AppLocalizations.of(context)!.unknown,
                     style: theme.textTheme.bodySmall,
                   ),
                 ],
@@ -266,7 +271,7 @@ class StatsScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'أكبر المصروفات',
+            AppLocalizations.of(context)!.biggestExpenses,
             style: theme.textTheme.headlineSmall,
           ),
           const SizedBox(height: 16),
@@ -298,17 +303,15 @@ class StatsScreen extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      category?.name ?? 'غير معروف',
+                      category?.name ?? AppLocalizations.of(context)!.unknown,
                       style: theme.textTheme.titleSmall,
                     ),
                   ),
-                  Text(
-                    formatLyd(entry.value),
-                    style: daftarNumberStyle(
-                      context,
-                      fontSize: 14,
-                      color: AppColors.expense,
-                    ),
+                  Money(
+                    entry.value,
+                    size: 14,
+                    weight: FontWeight.w600,
+                    color: AppColors.expense,
                   ),
                 ],
               ),

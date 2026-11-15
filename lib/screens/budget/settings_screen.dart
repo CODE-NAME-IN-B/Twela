@@ -14,6 +14,7 @@ import '../../theme/daftar_theme.dart';
 import '../../widgets/daftar_card.dart';
 import '../../widgets/twela_design_system.dart';
 import '../data/data_export_screen.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -77,7 +78,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
     provider.updateBudgetSettings(settings);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('تم حفظ الإعدادات')),
+      SnackBar(content: Text(AppLocalizations.of(context)!.settingsSaved)),
     );
   }
 
@@ -105,62 +106,70 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 delegate: SliverChildListDelegate([
                   _buildSearchBar(context, theme, isDark),
                   const SizedBox(height: 16),
-                  if (_matchesSearch('المظهر') ||
-                      _matchesSearch('فاتح') ||
-                      _matchesSearch('داكن'))
+                  if (_matchesSearch(
+                          AppLocalizations.of(context)!.appearance) ||
+                      _matchesSearch(AppLocalizations.of(context)!.light) ||
+                      _matchesSearch(AppLocalizations.of(context)!.dark))
                     _buildThemeSection(context, theme, isDark),
-                  if (_matchesSearch('المظهر') ||
-                      _matchesSearch('فاتح') ||
-                      _matchesSearch('داكن'))
+                  if (_matchesSearch(
+                          AppLocalizations.of(context)!.appearance) ||
+                      _matchesSearch(AppLocalizations.of(context)!.light) ||
+                      _matchesSearch(AppLocalizations.of(context)!.dark))
                     const SizedBox(height: 16),
-                  if (_matchesSearch('ميزات') ||
-                      _matchesSearch('اهتزاز') ||
-                      _matchesSearch('زجاج') ||
-                      _matchesSearch('شريط') ||
-                      _matchesSearch('لون'))
+                  if (_matchesSearch(AppLocalizations.of(context)!.features) ||
+                      _matchesSearch(AppLocalizations.of(context)!.haptics) ||
+                      _matchesSearch(AppLocalizations.of(context)!.glass) ||
+                      _matchesSearch(AppLocalizations.of(context)!.bar) ||
+                      _matchesSearch(AppLocalizations.of(context)!.color))
                     _buildFeaturesSection(context, theme, isDark),
-                  if (_matchesSearch('ميزات') ||
-                      _matchesSearch('اهتزاز') ||
-                      _matchesSearch('زجاج') ||
-                      _matchesSearch('شريط') ||
-                      _matchesSearch('لون'))
+                  if (_matchesSearch(AppLocalizations.of(context)!.features) ||
+                      _matchesSearch(AppLocalizations.of(context)!.haptics) ||
+                      _matchesSearch(AppLocalizations.of(context)!.glass) ||
+                      _matchesSearch(AppLocalizations.of(context)!.bar) ||
+                      _matchesSearch(AppLocalizations.of(context)!.color))
                     const SizedBox(height: 16),
-                  if (_matchesSearch('تخصيص') || _matchesSearch('لون'))
+                  if (_matchesSearch(
+                          AppLocalizations.of(context)!.customization) ||
+                      _matchesSearch(AppLocalizations.of(context)!.color))
                     _buildCustomizationSection(context, theme, isDark),
-                  if (_matchesSearch('تخصيص') || _matchesSearch('لون'))
+                  if (_matchesSearch(
+                          AppLocalizations.of(context)!.customization) ||
+                      _matchesSearch(AppLocalizations.of(context)!.color))
                     const SizedBox(height: 16),
-                  if (_matchesSearch('ميزانية') ||
-                      _matchesSearch('شهري') ||
-                      _matchesSearch('يومي') ||
-                      _matchesSearch('حد') ||
-                      _matchesSearch('رصيد') ||
-                      _matchesSearch('منخفض'))
+                  if (_matchesSearch(AppLocalizations.of(context)!.budget) ||
+                      _matchesSearch(AppLocalizations.of(context)!.monthly) ||
+                      _matchesSearch(AppLocalizations.of(context)!.daily) ||
+                      _matchesSearch(AppLocalizations.of(context)!.limit) ||
+                      _matchesSearch(AppLocalizations.of(context)!.balance) ||
+                      _matchesSearch(AppLocalizations.of(context)!.low))
                     _buildBudgetSection(context, theme, isDark),
-                  if (_matchesSearch('ميزانية') ||
-                      _matchesSearch('شهري') ||
-                      _matchesSearch('يومي') ||
-                      _matchesSearch('حد') ||
-                      _matchesSearch('رصيد') ||
-                      _matchesSearch('منخفض'))
+                  if (_matchesSearch(AppLocalizations.of(context)!.budget) ||
+                      _matchesSearch(AppLocalizations.of(context)!.monthly) ||
+                      _matchesSearch(AppLocalizations.of(context)!.daily) ||
+                      _matchesSearch(AppLocalizations.of(context)!.limit) ||
+                      _matchesSearch(AppLocalizations.of(context)!.balance) ||
+                      _matchesSearch(AppLocalizations.of(context)!.low))
                     const SizedBox(height: 16),
-                  if (_matchesSearch('تحديث') || _matchesSearch('إصدار'))
+                  if (_matchesSearch(AppLocalizations.of(context)!.update) ||
+                      _matchesSearch(AppLocalizations.of(context)!.version))
                     _buildUpdateSection(context, theme, isDark),
-                  if (_matchesSearch('تحديث') || _matchesSearch('إصدار'))
+                  if (_matchesSearch(AppLocalizations.of(context)!.update) ||
+                      _matchesSearch(AppLocalizations.of(context)!.version))
                     const SizedBox(height: 16),
-                  if (_matchesSearch('بيانات') ||
-                      _matchesSearch('تصدير') ||
-                      _matchesSearch('استيراد'))
+                  if (_matchesSearch(AppLocalizations.of(context)!.dataLabel) ||
+                      _matchesSearch(AppLocalizations.of(context)!.export) ||
+                      _matchesSearch(AppLocalizations.of(context)!.import))
                     _buildDataSection(context, theme, isDark),
-                  if (_matchesSearch('بيانات') ||
-                      _matchesSearch('تصدير') ||
-                      _matchesSearch('استيراد'))
+                  if (_matchesSearch(AppLocalizations.of(context)!.dataLabel) ||
+                      _matchesSearch(AppLocalizations.of(context)!.export) ||
+                      _matchesSearch(AppLocalizations.of(context)!.import))
                     const SizedBox(height: 16),
                   _buildDeveloperSection(context, theme, isDark),
                   const SizedBox(height: 24),
                   SizedBox(
                     width: double.infinity,
                     child: TwelaPrimaryButton(
-                      label: 'حفظ الإعدادات',
+                      label: AppLocalizations.of(context)!.saveSettings,
                       onPressed: _saveSettings,
                     ),
                   ),
@@ -202,7 +211,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    '$days يوم معك',
+                    AppLocalizations.of(context)!.daysWithYou(days),
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: isDark
                           ? AppColors.darkTextSecondary
@@ -212,7 +221,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'تتبع مصاريفك بالدينار الليبي',
+                    AppLocalizations.of(context)!.tagline,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: isDark
                           ? AppColors.darkTextTertiary
@@ -253,7 +262,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
         ),
         decoration: InputDecoration(
-          hintText: 'بحث في الإعدادات...',
+          hintText: AppLocalizations.of(context)!.searchSettings,
           hintStyle: TextStyle(
             color: isDark ? AppColors.darkTextTertiary : AppColors.textTertiary,
           ),
@@ -301,18 +310,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'المظهر',
+            AppLocalizations.of(context)!.appearance,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
               color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           TwelaSegmentedControl<ThemeMode>(
-            segments: const {
-              ThemeMode.light: 'فاتح',
-              ThemeMode.dark: 'داكن',
-              ThemeMode.system: 'الجهاز',
+            segments: {
+              ThemeMode.light: AppLocalizations.of(context)!.light,
+              ThemeMode.dark: AppLocalizations.of(context)!.dark,
+              ThemeMode.system: AppLocalizations.of(context)!.device,
             },
             selected: themeProvider.themeMode,
             onSelected: (mode) => themeProvider.setThemeMode(mode),
@@ -333,7 +342,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'المميزات',
+            AppLocalizations.of(context)!.featureHighlights,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
               color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
@@ -342,8 +351,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 12),
           TwelaSettingTile(
             icon: Icons.vibration,
-            title: 'اهتزاز عند الحفظ',
-            subtitle: 'نبضة خفيفة عند إضافة أي عملية',
+            title: AppLocalizations.of(context)!.hapticOnSave,
+            subtitle: AppLocalizations.of(context)!.hapticOnSaveSubtitle,
             iconColor: AppColors.primary,
             trailing: Switch(
               value: appSettings.hapticFeedback,
@@ -353,8 +362,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           TwelaSettingTile(
             icon: Icons.blur_on_outlined,
-            title: 'وضع الزجاج',
-            subtitle: 'خلفيات شبه شفافة للبطاقات',
+            title: AppLocalizations.of(context)!.glassMode,
+            subtitle: AppLocalizations.of(context)!.glassModeSubtitle,
             iconColor: AppColors.info,
             trailing: Switch(
               value: appSettings.glassMode,
@@ -364,8 +373,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           TwelaSettingTile(
             icon: Icons.bar_chart_outlined,
-            title: 'شريط Glyph',
-            subtitle: 'معلومة سريعة أعلى الرصيد',
+            title: AppLocalizations.of(context)!.glyphBar,
+            subtitle: AppLocalizations.of(context)!.glyphBarSubtitle,
             iconColor: AppColors.warning,
             trailing: Switch(
               value: appSettings.showGlyphBar,
@@ -389,7 +398,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'التخصيص',
+            AppLocalizations.of(context)!.personalization,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
               color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
@@ -397,7 +406,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: 12),
           Text(
-            'لون التمييز',
+            AppLocalizations.of(context)!.accentColor,
             style: theme.textTheme.titleSmall?.copyWith(
               color: isDark
                   ? AppColors.darkTextSecondary
@@ -448,7 +457,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'الميزانية',
+            AppLocalizations.of(context)!.budgetTitle,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
               color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
@@ -460,8 +469,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             theme: theme,
             isDark: isDark,
             controller: _monthlyBudgetController,
-            label: 'الحد الشهري الإجمالي',
-            hint: 'أدخل المبلغ',
+            label: AppLocalizations.of(context)!.monthlyTotalLimit,
+            hint: AppLocalizations.of(context)!.enterAmount,
             icon: Icons.calendar_month_outlined,
           ),
           const SizedBox(height: 12),
@@ -470,8 +479,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             theme: theme,
             isDark: isDark,
             controller: _dailyLimitController,
-            label: 'حد الصرف اليومي',
-            hint: 'أدخل المبلغ',
+            label: AppLocalizations.of(context)!.dailySpendLimit,
+            hint: AppLocalizations.of(context)!.enterAmount,
             icon: Icons.today_outlined,
           ),
           const SizedBox(height: 12),
@@ -480,8 +489,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             theme: theme,
             isDark: isDark,
             controller: _lowBalanceController,
-            label: 'تنبيه الرصيد المنخفض',
-            hint: 'أدخل الحد الأدنى',
+            label: AppLocalizations.of(context)!.lowBalanceAlert,
+            hint: AppLocalizations.of(context)!.enterMinimum,
             icon: Icons.warning_outlined,
           ),
         ],
@@ -507,7 +516,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        suffixText: 'د.ل',
+        suffixText: AppLocalizations.of(context)!.currencyLyd,
         prefixIcon: Icon(icon, size: 20),
         labelStyle: TextStyle(
           color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
@@ -529,7 +538,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'البيانات',
+            AppLocalizations.of(context)!.data,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
               color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
@@ -538,8 +547,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 12),
           TwelaSettingTile(
             icon: Icons.sync_outlined,
-            title: 'تصدير واستيراد',
-            subtitle: 'نسخة احتياطية ومشاركة البيانات',
+            title: AppLocalizations.of(context)!.exportImport,
+            subtitle: AppLocalizations.of(context)!.exportImportSubtitle,
             iconColor: primaryColor,
             onTap: () => Navigator.push(
               context,
@@ -562,7 +571,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'التطبيق',
+            AppLocalizations.of(context)!.appSection,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
               color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
@@ -571,8 +580,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 12),
           TwelaSettingTile(
             icon: Icons.system_update_outlined,
-            title: 'التحقق من التحديثات',
-            subtitle: 'اضغط للتحقق من إصدار جديد',
+            title: AppLocalizations.of(context)!.checkForUpdates,
+            subtitle: AppLocalizations.of(context)!.checkForUpdatesSubtitle,
             iconColor: primaryColor,
             onTap: _isCheckingUpdate ? null : _checkForUpdate,
             trailing: _isCheckingUpdate
@@ -602,7 +611,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'المطور',
+            AppLocalizations.of(context)!.developer,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
               color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
@@ -723,7 +732,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'مشاريع',
+            AppLocalizations.of(context)!.projects,
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w600,
               color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
@@ -735,7 +744,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             theme: theme,
             isDark: isDark,
             name: 'Twela',
-            description: 'تطبيق تتبع المصاريف بالدينار الليبي',
+            description: AppLocalizations.of(context)!.appDescription,
             icon: Icons.account_balance_wallet_outlined,
             color: primaryColor,
             version:
@@ -747,7 +756,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             theme: theme,
             isDark: isDark,
             name: 'All Other Projects',
-            description: 'مشاريع مفتوحة المصدر متنوعة',
+            description: AppLocalizations.of(context)!.projectsSubtitle,
             icon: Icons.folder_outlined,
             color: isDark ? AppColors.darkTextTertiary : AppColors.textTertiary,
           ),
@@ -859,7 +868,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _showUpdateDialog(updateInfo);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('أنت تستخدم أحدث إصدار')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.youAreUpToDate)),
       );
     }
   }
@@ -891,7 +900,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                'تحديث متاح',
+                AppLocalizations.of(context)!.updateReady,
                 style: TextStyle(
                   fontSize: 18,
                   color: isDark
@@ -907,7 +916,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'الإصدار الجديد: ${updateInfo.version}',
+              AppLocalizations.of(context)!
+                  .newVersionAvailable(updateInfo.version),
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 color:
@@ -916,7 +926,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'الإصدار الحالي: $_currentVersion',
+              AppLocalizations.of(context)!.currentVersionIs(_currentVersion),
               style: TextStyle(
                 color: isDark
                     ? AppColors.darkTextSecondary
@@ -927,7 +937,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             if (updateInfo.releaseNotes.isNotEmpty) ...[
               const SizedBox(height: 16),
               Text(
-                'ملاحظات الإصدار:',
+                AppLocalizations.of(context)!.releaseNotesHeader,
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 13,
@@ -961,7 +971,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
-              'لاحقاً',
+              AppLocalizations.of(context)!.later,
               style: TextStyle(
                 color: isDark
                     ? AppColors.darkTextSecondary
@@ -981,7 +991,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            child: const Text('تحديث الآن'),
+            child: Text(AppLocalizations.of(context)!.updateNow),
           ),
         ],
       ),
@@ -991,7 +1001,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _showDownloadProgress(UpdateInfo updateInfo) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     double progress = 0;
-    String status = 'جاري التحميل...';
+    String status = AppLocalizations.of(context)!.loading;
 
     late void Function(VoidCallback) dialogSetState;
 

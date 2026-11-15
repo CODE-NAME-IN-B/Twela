@@ -7,8 +7,8 @@ import '../../providers/debt_provider.dart';
 import '../../models/debt.dart';
 import '../../widgets/twela_design_system.dart';
 import '../../widgets/daftar_card.dart';
-import '../../utils/formatters.dart';
-import '../../utils/daftar_number_style.dart';
+import '../../l10n/generated/app_localizations.dart';
+import '../../design/format.dart';
 
 class DebtsScreen extends StatelessWidget {
   const DebtsScreen({
@@ -33,9 +33,9 @@ class DebtsScreen extends StatelessWidget {
         if (activeDebts.isEmpty && paidDebts.isEmpty) {
           return TwelaEmptyState(
             icon: Icons.handshake_outlined,
-            title: 'لا توجد ديون',
-            subtitle: 'أضف دين جديد للبدء في التتبع',
-            actionLabel: 'إضافة دين',
+            title: AppLocalizations.of(context)!.noDebts,
+            subtitle: AppLocalizations.of(context)!.addFirstDebt,
+            actionLabel: AppLocalizations.of(context)!.addDebt,
             onAction: () => Navigator.pushNamed(context, '/add-debt'),
           );
         }
@@ -47,13 +47,13 @@ class DebtsScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (activeDebts.isNotEmpty) ...[
-                TwelaSectionHeader(title: 'نشطة'),
+                TwelaSectionHeader(title: AppLocalizations.of(context)!.active),
                 ...activeDebts.map((debt) => _DebtTile(debt: debt)),
               ],
               if (paidDebts.isNotEmpty) ...[
                 const SizedBox(height: 28),
                 TwelaSectionHeader(
-                  title: 'تم السداد',
+                  title: AppLocalizations.of(context)!.paid,
                   trailing: Text(
                     '${paidDebts.length}',
                     style: theme.textTheme.bodySmall?.copyWith(
@@ -79,7 +79,7 @@ class DebtsScreen extends StatelessWidget {
       backgroundColor:
           isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
       appBar: AppBar(
-        title: const Text('الديون'),
+        title: Text(AppLocalizations.of(context)!.debts),
         actions: [
           Padding(
             padding: const EdgeInsetsDirectional.only(start: 16),
@@ -173,7 +173,9 @@ class _DebtTile extends StatelessWidget {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              debt.isGiven ? 'أنا أعطيت' : 'أنا استلمت',
+                              debt.isGiven
+                                  ? AppLocalizations.of(context)!.iGave
+                                  : AppLocalizations.of(context)!.iReceived,
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
@@ -205,13 +207,11 @@ class _DebtTile extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  formatLyd(debt.remaining),
-                  style: daftarNumberStyle(
-                    context,
-                    fontSize: 16,
-                    color: debt.isPaidOff ? AppColors.success : AppColors.debt,
-                  ),
+                Money(
+                  debt.remaining,
+                  size: 16,
+                  weight: FontWeight.w700,
+                  color: debt.isPaidOff ? AppColors.success : AppColors.debt,
                 ),
                 Row(
                   children: [
@@ -234,7 +234,7 @@ class _DebtTile extends StatelessWidget {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          'تم',
+                          AppLocalizations.of(context)!.done,
                           style: TextStyle(
                             fontSize: 11,
                             color: AppColors.success,

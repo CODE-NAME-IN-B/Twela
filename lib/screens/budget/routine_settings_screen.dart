@@ -5,7 +5,8 @@ import '../../theme/app_colors.dart';
 import '../../providers/routine_provider.dart';
 import '../../providers/twela_provider.dart';
 import '../../models/routine_pattern.dart';
-import '../../utils/formatters.dart';
+import '../../l10n/generated/app_localizations.dart';
+import '../../design/format.dart';
 
 class RoutineSettingsScreen extends StatelessWidget {
   const RoutineSettingsScreen({super.key});
@@ -18,7 +19,7 @@ class RoutineSettingsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('إعدادات الروتين'),
+        title: Text(AppLocalizations.of(context)!.routineSettings),
       ),
       body: Consumer<RoutineProvider>(
         builder: (context, provider, _) {
@@ -33,7 +34,7 @@ class RoutineSettingsScreen extends StatelessWidget {
                 if (provider.isEnabled) ...[
                   _buildPatternSection(
                     context,
-                    'اقتراحات',
+                    AppLocalizations.of(context)!.suggestions,
                     provider.suggestingPatterns,
                     provider,
                     isDark,
@@ -42,7 +43,7 @@ class RoutineSettingsScreen extends StatelessWidget {
                   const SizedBox(height: 20),
                   _buildPatternSection(
                     context,
-                    'تم التفعيل تلقائياً',
+                    AppLocalizations.of(context)!.enabledAutomatically,
                     provider.autoConfirmedPatterns,
                     provider,
                     isDark,
@@ -51,7 +52,7 @@ class RoutineSettingsScreen extends StatelessWidget {
                   const SizedBox(height: 20),
                   _buildPatternSection(
                     context,
-                    'قيد التعلم',
+                    AppLocalizations.of(context)!.learning,
                     provider.learningPatterns,
                     provider,
                     isDark,
@@ -86,14 +87,14 @@ class RoutineSettingsScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'يتعلم منك',
+                  AppLocalizations.of(context)!.learningFromYou,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'اكتشاف الأنماط المتكررة واقتراحها',
+                  AppLocalizations.of(context)!.patternsSubtitle,
                   style: theme.textTheme.bodySmall,
                 ),
               ],
@@ -138,7 +139,7 @@ class RoutineSettingsScreen extends StatelessWidget {
             ),
             child: Center(
               child: Text(
-                'لا توجد أنماط',
+                AppLocalizations.of(context)!.noPatterns,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: context.inb.muted,
                 ),
@@ -161,7 +162,8 @@ class RoutineSettingsScreen extends StatelessWidget {
   ) {
     final twelaProvider = context.read<TwelaProvider>();
     final category = twelaProvider.getCategoryById(pattern.categoryId);
-    final categoryName = category?.name ?? 'غير محدد';
+    final categoryName =
+        category?.name ?? AppLocalizations.of(context)!.unspecified;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -198,9 +200,22 @@ class RoutineSettingsScreen extends StatelessWidget {
                   categoryName,
                   style: theme.textTheme.titleSmall,
                 ),
-                Text(
-                  '${formatLydShort(pattern.approxAmount)} - ${pattern.occurrenceCount} مرات',
-                  style: theme.textTheme.bodySmall,
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Money(
+                      pattern.approxAmount,
+                      size: 13,
+                      weight: FontWeight.w400,
+                      showCurrency: false,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      AppLocalizations.of(context)!
+                          .timesRepeated(pattern.occurrenceCount),
+                      style: theme.textTheme.bodySmall,
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -211,7 +226,7 @@ class RoutineSettingsScreen extends StatelessWidget {
                 pattern.id,
                 PatternStatus.autoConfirmed,
               ),
-              child: const Text('تفعيل'),
+              child: Text(AppLocalizations.of(context)!.enable),
             ),
           IconButton(
             icon: const Icon(Icons.close, size: 18),
