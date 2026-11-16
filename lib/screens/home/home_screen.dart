@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../design/screen.dart';
+import '../../design/theme.dart';
 import '../../design/tokens.dart';
+import '../../design/widgets.dart';
 import '../../providers/twela_provider.dart';
+import '../../providers/savings_provider.dart';
 import '../../providers/app_settings_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/daftar_theme.dart';
@@ -21,12 +24,16 @@ class HomeScreen extends StatefulWidget {
     this.embedded = false,
     this.bottomBarHeight = 0,
     this.onOpenSettings,
+    this.onOpenMovement,
   });
 
   /// When true the tab shell owns the scaffold; this screen renders only its body.
   final bool embedded;
   final double bottomBarHeight;
   final VoidCallback? onOpenSettings;
+
+  /// Opens the movement sheet from the balance island's notch.
+  final VoidCallback? onOpenMovement;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -67,9 +74,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 _buildGlyphBar(context, theme, isDark),
               ],
               const SizedBox(height: 24),
-              const BalanceCard(),
+              BalanceCard(onAction: widget.onOpenMovement),
               const SizedBox(height: 20),
               _buildWalletCards(context),
+              const SizedBox(height: 20),
+              _buildSavingsTile(context),
               const SizedBox(height: 24),
               _buildTodaySpending(context, theme, isDark),
               const SizedBox(height: 24),
@@ -143,13 +152,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Twela',
-                  style: theme.textTheme.headlineLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: isDark
-                        ? AppColors.darkTextPrimary
-                        : AppColors.textPrimary,
-                  ),
+                  AppLocalizations.of(context)!.appTitle,
+                  style: arabicDisplay(context, size: 60),
                 ),
               ],
             ),
@@ -333,6 +337,82 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ],
+        );
+      },
+    );
+  }
+
+  /// The rose savings tile: the single promo tile per screen rule, and the
+  /// only entry point to the savings feature from home.
+  Widget _buildSavingsTile(BuildContext context) {
+    return Consumer<SavingsProvider>(
+      builder: (context, savings, _) {
+        final c = context.inb;
+        return BentoCard(
+          tone: BentoTone.rose,
+          onTap: () => Navigator.pushNamed(context, '/savings'),
+          padding: const EdgeInsets.all(S.md),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: c.onRose.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(R.inner),
+                ),
+                child: Icon(Icons.savings_outlined, color: c.onRose, size: 20),
+              ),
+              const SizedBox(width: S.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            AppLocalizations.of(context)!.savingsGoal,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontFamily: InbFonts.arabic,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: c.onRose,
+                            ),
+                          ),
+                        ),
+                        InbBadge('${savings.activeGoals.length}'),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        Text(
+                          AppLocalizations.of(context)!.savedSoFar,
+                          style: TextStyle(
+                            fontFamily: InbFonts.arabic,
+                            fontSize: 12,
+                            color: c.onRose.withValues(alpha: 0.7),
+                          ),
+                        ),
+                        const SizedBox(width: S.sm),
+                        Money(
+                          savings.totalSaved,
+                          size: 14,
+                          color: c.onRose,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: S.sm),
+              Icon(Icons.chevron_right, size: 18, color: c.onRose),
+            ],
+          ),
         );
       },
     );

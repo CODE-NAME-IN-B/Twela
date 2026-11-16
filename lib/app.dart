@@ -157,7 +157,8 @@ class _MainScreenState extends State<MainScreen> {
           HomeScreen(
               embedded: true,
               bottomBarHeight: reserved,
-              onOpenSettings: () => _goToSettings()),
+              onOpenSettings: () => _goToSettings(),
+              onOpenMovement: () => showMovementSheet(context)),
           HistoryScreen(embedded: true, bottomBarHeight: reserved),
           DebtsScreen(embedded: true, bottomBarHeight: reserved),
           StatsScreen(embedded: true, bottomBarHeight: reserved),
@@ -201,6 +202,8 @@ class _GlassNav extends StatelessWidget {
     final c = context.inb;
     final bottomInset = MediaQuery.of(context).padding.bottom;
 
+    // Five slots: four destinations with the movement action in the centre,
+    // so the action can never cover a destination.
     return Padding(
       padding: EdgeInsets.fromLTRB(S.md, 0, S.md, S.sm + bottomInset),
       child: GlassBar(
@@ -208,13 +211,15 @@ class _GlassNav extends StatelessWidget {
         child: LayoutBuilder(
           builder: (context, constraints) {
             final count = _items.length;
-            final slot = constraints.maxWidth / count;
+            final slot = constraints.maxWidth / (count + 1);
+            int slotOf(int destination) =>
+                destination < 2 ? destination : destination + 1;
             return Stack(
               children: [
                 AnimatedPositionedDirectional(
                   duration: Motion.base,
                   curve: Motion.emphasized,
-                  start: slot * index + 5,
+                  start: slot * slotOf(index) + 5,
                   top: 5,
                   bottom: 5,
                   width: slot - 10,
@@ -227,7 +232,8 @@ class _GlassNav extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    for (var i = 0; i < count; i++)
+                    for (var i = 0; i < count; i++) ...[
+                      if (i == 2) Expanded(child: _NavAction(onTap: onAction)),
                       Expanded(
                         child: _NavButton(
                           item: _items[i],
@@ -235,6 +241,7 @@ class _GlassNav extends StatelessWidget {
                           onTap: () => onSelected(i),
                         ),
                       ),
+                    ],
                   ],
                 ),
               ],
@@ -251,6 +258,35 @@ class _NavItem {
   final String label;
   final IconData icon;
   final IconData activeIcon;
+}
+
+/// The centre slot: a mint circle with a plus, opening the movement sheet.
+class _NavAction extends StatelessWidget {
+  const _NavAction({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.inb;
+    return Semantics(
+      button: true,
+      label: 'إضافة حركة',
+      child: PressScale(
+        onTap: onTap,
+        scale: 0.9,
+        child: Center(
+          child: Container(
+            width: 44,
+            height: 44,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(color: c.mint, shape: BoxShape.circle),
+            child: Icon(Icons.add_rounded, size: 24, color: c.island),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _NavButton extends StatelessWidget {
@@ -341,10 +377,10 @@ Future<void> showMovementSheet(BuildContext context) {
     ),
     _SheetAction(
       icon: Icons.savings_outlined,
-      label: 'إضافة ادخار',
-      hint: 'حصالة جديدة',
+      label: 'الادخار',
+      hint: 'الحصالة وإضافة هدف',
       color: sem.savings,
-      onTap: () => Navigator.pushNamed(context, '/savings-edit'),
+      onTap: () => Navigator.pushNamed(context, '/savings'),
     ),
   ];
 

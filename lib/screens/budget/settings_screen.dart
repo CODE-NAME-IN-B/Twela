@@ -7,7 +7,6 @@ import '../../providers/twela_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../providers/app_settings_provider.dart';
 import '../../models/budget_settings.dart';
-import '../../models/app_settings.dart';
 import '../../services/update_service.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/daftar_theme.dart';
@@ -16,6 +15,8 @@ import '../../widgets/twela_design_system.dart';
 import '../data/data_export_screen.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../design/motion.dart';
+import '../../design/theme.dart';
+import '../../design/widgets.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -204,12 +205,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 children: [
                   Text(
                     'Twela',
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: isDark
-                          ? AppColors.darkTextPrimary
-                          : AppColors.textPrimary,
-                    ),
+                    style: displayStyle(context, size: 22),
                   ),
                   const SizedBox(height: 6),
                   Text(
@@ -319,7 +315,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           SizedBox(height: 16),
-          TwelaSegmentedControl<ThemeMode>(
+          InbSegmentedControl<ThemeMode>(
             segments: {
               ThemeMode.light: AppLocalizations.of(context)!.light,
               ThemeMode.dark: AppLocalizations.of(context)!.dark,
@@ -417,8 +413,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: 10),
           Row(
-            children: List.generate(AppSettings.accentOptions.length, (index) {
-              final color = AppSettings.accentOptions[index];
+            children: List.generate(InbAccents.options.length, (index) {
+              final color = InbAccents.options[index];
               final isSelected =
                   appSettings.accentColor.toARGB32() == color.toARGB32();
               return PressScale(

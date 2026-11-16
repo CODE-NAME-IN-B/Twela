@@ -8,9 +8,13 @@ import '../design/widgets.dart';
 import '../models/transaction.dart';
 import '../providers/twela_provider.dart';
 
-/// The hero of the home screen: total balance on a dark island.
+/// The hero of the home screen: total balance on a dark island, framed in
+/// rose, with the `+` notch (movement sheet) and a doodle arrow pointing at it.
 class BalanceCard extends StatelessWidget {
-  const BalanceCard({super.key});
+  const BalanceCard({super.key, this.onAction});
+
+  /// Opens the movement sheet from the island's notch button.
+  final VoidCallback? onAction;
 
   bool _isToday(DateTime d) {
     final now = DateTime.now();
@@ -31,52 +35,63 @@ class BalanceCard extends StatelessWidget {
         )
         .fold(0.0, (sum, t) => sum + t.amount);
 
-    return IslandCard(
-      padding: const EdgeInsets.all(S.lg),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('الرصيد الكلي', style: microStyle(context)),
-          const SizedBox(height: S.sm),
-          Money(
-            provider.totalBalance,
-            size: 40,
-            color: context.inb.onIsland,
-            animate: true,
-          ),
-          const SizedBox(height: S.md),
-          Row(
-            children: [
-              Expanded(
-                  child:
-                      _IslandStat(label: 'كاش', value: provider.cashBalance)),
-              const SizedBox(width: S.sm),
-              Expanded(
-                  child:
-                      _IslandStat(label: 'مصرف', value: provider.bankBalance)),
-            ],
-          ),
-          const SizedBox(height: S.sm),
-          Row(
-            children: [
-              Expanded(
-                child: _IslandStat(
-                  label: 'دخل اليوم',
-                  value: todayIncome,
-                  tone: sem.income,
+    return RoseFrame(
+      child: IslandCard(
+        padding: EdgeInsetsDirectional.fromSTEB(S.lg, S.lg, S.lg, S.lg),
+        notchColor: context.inb.rose,
+        onAction: onAction,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('الرصيد الكلي', style: microStyle(context)),
+            const SizedBox(height: S.sm),
+            Money(
+              provider.totalBalance,
+              size: 40,
+              color: context.inb.onIsland,
+              animate: true,
+            ),
+            const SizedBox(height: S.md),
+            Row(
+              children: [
+                Expanded(
+                    child:
+                        _IslandStat(label: 'كاش', value: provider.cashBalance)),
+                const SizedBox(width: S.sm),
+                Expanded(
+                    child: _IslandStat(
+                        label: 'مصرف', value: provider.bankBalance)),
+              ],
+            ),
+            const SizedBox(height: S.sm),
+            Row(
+              children: [
+                Expanded(
+                  child: _IslandStat(
+                    label: 'دخل اليوم',
+                    value: todayIncome,
+                    tone: sem.income,
+                  ),
                 ),
-              ),
-              const SizedBox(width: S.sm),
-              Expanded(
-                child: _IslandStat(
-                  label: 'صرف اليوم',
-                  value: provider.todaySpent,
-                  tone: sem.expense,
+                const SizedBox(width: S.sm),
+                Expanded(
+                  child: _IslandStat(
+                    label: 'صرف اليوم',
+                    value: provider.todaySpent,
+                    tone: sem.expense,
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+            // Space the notch (bottom-start) needs, and the doodle arrow
+            // rising from the end side toward it.
+            const SizedBox(height: S.lg + S.sm),
+            Align(
+              alignment: AlignmentDirectional.centerEnd,
+              child: DoodleArrow(color: context.inb.mint),
+            ),
+          ],
+        ),
       ),
     );
   }

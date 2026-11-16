@@ -111,7 +111,7 @@ The current savings feature has a **model gap**, not just a UI gap: `SavingsProv
 | 15 | Add debt | amount focus | no | given / received semantic split |
 
 ## Navigation architecture
-- `MainScreen` keeps a single `Scaffold` with `extendBody: true`, a `GlassBar` bottom navigation (4 items + sliding ink indicator) and **no floating action button** — the `+` lives in the home island's notch and in a centred slot of the action sheet, so it can never cover a nav item (`re_v1.md` P1 v9 bug).
+- `MainScreen` keeps a single `Scaffold` with `extendBody: true`, a `GlassBar` bottom navigation (4 destinations + a centre `+` slot with a sliding ink indicator) and **no floating action button** — the `+` lives in the home island's notch and in the nav's centre slot, so it can never cover a nav item (`re_v1.md` P1 v9 bug).
 - Screens are pushed as routes on the root navigator; the bottom bar is hidden on pushed routes.
 - Every pushed route uses `InbPageTransition`.
 - `SafeArea` + `MediaQuery.padding.top` are handled once, in a shared `InbScreen` scaffold wrapper — no per-screen hardcoded top padding (`re_v1.md` P0).
@@ -129,3 +129,6 @@ The current savings feature has a **model gap**, not just a UI gap: `SavingsProv
 - 2026-11-15 — **No `Color(0xFF…)` outside `lib/design/tokens.dart`, except two documented data palettes.** `lib/models/category.dart` (10 category swatches) and `lib/models/app_settings.dart` (4 user-selectable accent colors) are *data the user picks from*, not surfaces; every surface, text and icon color in `lib/screens/` comes from `context.inb` / `context.sem`. *Why: the audit rule must be checkable — this is the only carve-out.*
 - 2026-11-15 — **Decorative gradients, box shadows and `Colors.white/black` removed from all screens.** Replaced with `c.paper` / `c.surface` / `c.line` and `c.onIsland` for icon/text on filled ink. *Why: INB base is warm paper + ink; the island glow is the only gradient allowed.*
 - 2026-11-15 — **`InbSkeleton` added to `lib/design/` as the single loading state**, static when `MediaQuery.disableAnimations` is on. *Why: plan box 96 and the four-states rule need one shared skeleton.*
+- 2026-11-16 — **Bottom nav becomes 5 slots: 4 destinations + a centre `+` slot.** The nav's `onAction` existed but was never rendered, which killed the movement sheet and the whole savings feature; the centre slot guarantees the action can never cover a destination (indicator math `slotOf(i) = i < 2 ? i : i + 1`). *Why: "no floating action button" is honoured, but an unrendered callback is worse than a FAB — the action must exist and be visible.*
+- 2026-11-16 — **"Island" is a max-1 rule, not min-1.** Only the home balance is an island; every other screen is flat paper. *Why: correction of the earlier checklist wording — the hero must be singular, one island per app.*
+- 2026-11-16 — **History edit reuses `AddTransactionScreen` with `existingTransaction:`** — the same screen creates and edits, preserving id/date/related-ids so ledger links survive. *Why: one screen, one filled button, no duplicate editor; editing must not break savings-transfer links.*

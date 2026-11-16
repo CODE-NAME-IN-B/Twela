@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../design/tokens.dart';
 import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../design/screen.dart';
@@ -183,6 +182,10 @@ class StatsScreen extends StatelessWidget {
 
     final totalSpent = categorySpending.values.fold(0.0, (sum, v) => sum + v);
 
+    // Largest slice first so the ring reads stable.
+    final sorted = categorySpending.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+
     return DaftarCard(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -193,29 +196,24 @@ class StatsScreen extends StatelessWidget {
             style: theme.textTheme.headlineSmall,
           ),
           const SizedBox(height: 20),
+          // No labels inside the ring: on thin slices they collide with the
+          // centre and with each other. Percentages live in the legend below.
           SizedBox(
             height: 220,
             child: PieChart(
               PieChartData(
-                sections: categorySpending.entries.map((entry) {
+                sections: sorted.map((entry) {
                   final category = provider.getCategoryById(entry.key);
-                  final percentage =
-                      totalSpent > 0 ? entry.value / totalSpent : 0.0;
 
                   return PieChartSectionData(
                     value: entry.value,
                     color: category?.color ?? AppColors.expense,
-                    radius: 90,
-                    title: '${(percentage * 100).toStringAsFixed(0)}%',
-                    titleStyle: daftarNumberStyle(
-                      context,
-                      fontSize: 12,
-                      color: context.inb.onIsland,
-                    ),
+                    radius: 88,
+                    showTitle: false,
                   );
                 }).toList(),
                 sectionsSpace: 2,
-                centerSpaceRadius: 45,
+                centerSpaceRadius: 48,
               ),
             ),
           ),
@@ -223,8 +221,10 @@ class StatsScreen extends StatelessWidget {
           Wrap(
             spacing: 16,
             runSpacing: 8,
-            children: categorySpending.entries.map((entry) {
+            children: sorted.map((entry) {
               final category = provider.getCategoryById(entry.key);
+              final percentage =
+                  totalSpent > 0 ? entry.value / totalSpent : 0.0;
               return Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -240,6 +240,15 @@ class StatsScreen extends StatelessWidget {
                   Text(
                     category?.name ?? AppLocalizations.of(context)!.unknown,
                     style: theme.textTheme.bodySmall,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    '${(percentage * 100).toStringAsFixed(0)}%',
+                    style: daftarNumberStyle(
+                      context,
+                      fontSize: 12,
+                      color: theme.colorScheme.onSurface,
+                    ),
                   ),
                 ],
               );

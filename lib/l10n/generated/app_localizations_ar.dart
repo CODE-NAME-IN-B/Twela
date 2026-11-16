@@ -30,7 +30,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get addDebtFirst => 'أضف دينًا أولًا لتتمكن من السداد منه.';
 
   @override
-  String get addExpense => 'إضافة صرف';
+  String get addExpense => 'إضافة مصروف';
 
   @override
   String get addFirstDebt => 'أضف دين جديد للبدء في التتبع';
@@ -696,7 +696,7 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get recordFirstTransaction => 'ابدأ بتسجيل أول صرف أو دخل';
+  String get recordFirstTransaction => 'ابدأ بتسجيل أول مصروف أو دخل';
 
   @override
   String get recordPayment => 'تسجيل دفعة';
@@ -885,7 +885,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get withdrawFromGoal => 'اسحب من الحصالة';
 
   @override
-  String get withdrawFromSavings => 'سحب من ادخار';
+  String get withdrawFromSavings => 'سحب من الادخار';
 
   @override
   String get withdrawToWallet => 'اسحب إلى المحفظة';

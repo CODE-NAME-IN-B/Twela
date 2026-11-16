@@ -143,7 +143,7 @@ abstract class AppLocalizations {
   /// No description provided for @addExpense.
   ///
   /// In ar, this message translates to:
-  /// **'إضافة صرف'**
+  /// **'إضافة مصروف'**
   String get addExpense;
 
   /// No description provided for @addFirstDebt.
@@ -1409,7 +1409,7 @@ abstract class AppLocalizations {
   /// No description provided for @recordFirstTransaction.
   ///
   /// In ar, this message translates to:
-  /// **'ابدأ بتسجيل أول صرف أو دخل'**
+  /// **'ابدأ بتسجيل أول مصروف أو دخل'**
   String get recordFirstTransaction;
 
   /// No description provided for @recordPayment.
@@ -1775,7 +1775,7 @@ abstract class AppLocalizations {
   /// No description provided for @withdrawFromSavings.
   ///
   /// In ar, this message translates to:
-  /// **'سحب من ادخار'**
+  /// **'سحب من الادخار'**
   String get withdrawFromSavings;
 
   /// No description provided for @withdrawToWallet.

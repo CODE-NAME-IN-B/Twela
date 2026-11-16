@@ -8,6 +8,7 @@ import '../../models/routine_pattern.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../design/format.dart';
 import '../../design/motion.dart';
+import '../../design/widgets.dart';
 
 class RoutineSettingsScreen extends StatelessWidget {
   const RoutineSettingsScreen({super.key});
@@ -128,24 +129,9 @@ class RoutineSettingsScreen extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         if (patterns.isEmpty)
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: context.inb.surface,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: context.inb.line,
-                width: 1,
-              ),
-            ),
-            child: Center(
-              child: Text(
-                AppLocalizations.of(context)!.noPatterns,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: context.inb.muted,
-                ),
-              ),
-            ),
+          InbEmptyState(
+            icon: Icons.autorenew_rounded,
+            title: AppLocalizations.of(context)!.noPatterns,
           )
         else
           ...patterns.map((pattern) =>
@@ -231,7 +217,15 @@ class RoutineSettingsScreen extends StatelessWidget {
             ),
           IconButton(
             icon: const Icon(Icons.close, size: 18),
-            onPressed: () => provider.removePattern(pattern.id),
+            onPressed: () {
+              provider.removePattern(pattern.id);
+              showInbToast(
+                context,
+                AppLocalizations.of(context)!.entryDeleted,
+                undoLabel: AppLocalizations.of(context)!.undo,
+                onUndo: () => provider.restorePattern(pattern),
+              );
+            },
           ),
         ],
       ),

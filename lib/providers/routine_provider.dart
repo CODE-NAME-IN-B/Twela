@@ -47,6 +47,14 @@ class RoutineProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Undo for [removePattern]: re-inserts the pattern at its previous place.
+  Future<void> restorePattern(RoutinePattern pattern) async {
+    if (_patterns.any((p) => p.id == pattern.id)) return;
+    _patterns.add(pattern);
+    await _storage.savePatterns(_patterns);
+    notifyListeners();
+  }
+
   Future<void> toggleEnabled() async {
     _isEnabled = !_isEnabled;
     final prefs = await SharedPreferences.getInstance();

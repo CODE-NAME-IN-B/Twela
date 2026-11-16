@@ -12,11 +12,21 @@ import '../../widgets/twela_design_system.dart';
 import '../../widgets/wallet_toggle.dart';
 import '../../widgets/category_picker.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../design/format.dart';
 import '../../design/motion.dart';
+import '../../design/widgets.dart' show showInbToast;
 
 class AddTransactionScreen extends StatefulWidget {
+  const AddTransactionScreen({
+    super.key,
+    this.initialType,
+    this.existingTransaction,
+  });
+
   final TransactionType? initialType;
-  const AddTransactionScreen({super.key, this.initialType});
+
+  /// When set, the screen edits this transaction instead of adding a new one.
+  final TwelaTransaction? existingTransaction;
 
   @override
   State<AddTransactionScreen> createState() => _AddTransactionScreenState();
@@ -32,7 +42,19 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   @override
   void initState() {
     super.initState();
-    _type = widget.initialType ?? TransactionType.expense;
+    final existing = widget.existingTransaction;
+    if (existing != null) {
+      // This screen handles income and expense only.
+      _type =
+          existing.isIncome ? TransactionType.income : TransactionType.expense;
+      _walletType = existing.walletType;
+      _selectedCategoryId =
+          existing.categoryId.isEmpty ? null : existing.categoryId;
+      _amountController.text = formatMoney(existing.amount);
+      _noteController.text = existing.note;
+    } else {
+      _type = widget.initialType ?? TransactionType.expense;
+    }
   }
 
   @override
@@ -45,12 +67,17 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   Color get _semanticColor =>
       _type == TransactionType.expense ? AppColors.expense : AppColors.income;
 
-  String get _title => _type == TransactionType.expense
-      ? AppLocalizations.of(context)!.addExpense
-      : AppLocalizations.of(context)!.addIncome;
+  String get _title {
+    if (widget.existingTransaction != null) {
+      return AppLocalizations.of(context)!.edit;
+    }
+    return _type == TransactionType.expense
+        ? AppLocalizations.of(context)!.addExpense
+        : AppLocalizations.of(context)!.addIncome;
+  }
 
   void _saveTransaction() {
-    final amount = double.tryParse(_amountController.text);
+    final amount = double.tryParse(_amountController.text.replaceAll(',', ''));
     if (amount == null || amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.enterValidAmount)),
@@ -65,17 +92,25 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       return;
     }
 
+    final existing = widget.existingTransaction;
     final transaction = TwelaTransaction(
-      id: const Uuid().v4(),
+      id: existing?.id ?? const Uuid().v4(),
       amount: amount,
       type: _type,
       walletType: _walletType,
       categoryId: _selectedCategoryId ?? '',
       note: _noteController.text,
-      date: DateTime.now(),
+      date: existing?.date ?? DateTime.now(),
+      relatedId: existing?.relatedId,
+      relatedEntryId: existing?.relatedEntryId,
     );
 
-    context.read<TwelaProvider>().addTransaction(transaction);
+    if (existing != null) {
+      context.read<TwelaProvider>().updateTransaction(transaction);
+      showInbToast(context, AppLocalizations.of(context)!.changesSaved);
+    } else {
+      context.read<TwelaProvider>().addTransaction(transaction);
+    }
 
     if (context.read<AppSettingsProvider>().hapticFeedback) {
       HapticFeedback.mediumImpact();
@@ -157,7 +192,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               _buildNoteField(isDark),
               const SizedBox(height: 32),
               TwelaPrimaryButton(
-                label: AppLocalizations.of(context)!.saveTransaction,
+                label: widget.existingTransaction != null
+                    ? AppLocalizations.of(context)!.saveChanges
+                    : AppLocalizations.of(context)!.saveTransaction,
                 color: _semanticColor,
                 icon: Icons.check_rounded,
                 onPressed: _saveTransaction,

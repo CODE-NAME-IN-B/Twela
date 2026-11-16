@@ -13,6 +13,8 @@ import '../../providers/debt_provider.dart';
 import '../../providers/savings_provider.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../design/motion.dart';
+import '../../design/theme.dart';
+import '../../design/widgets.dart';
 
 class DataExportScreen extends StatefulWidget {
   const DataExportScreen({super.key});
@@ -24,11 +26,26 @@ class DataExportScreen extends StatefulWidget {
 class _DataExportScreenState extends State<DataExportScreen> {
   bool _isExporting = false;
   bool _isImporting = false;
+  String? _error;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+
+    if (_error != null) {
+      return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        appBar: AppBar(
+          title: Text(AppLocalizations.of(context)!.data),
+        ),
+        body: InbErrorState(
+          title: AppLocalizations.of(context)!.exportFailed(_error!),
+          retryLabel: AppLocalizations.of(context)!.back,
+          onRetry: () => setState(() => _error = null),
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -42,6 +59,8 @@ class _DataExportScreenState extends State<DataExportScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            _buildMetadataCell(context),
+            const SizedBox(height: 16),
             _buildSection(
               context,
               theme: theme,
@@ -56,6 +75,7 @@ class _DataExportScreenState extends State<DataExportScreen> {
                   title: AppLocalizations.of(context)!.exportData,
                   subtitle: AppLocalizations.of(context)!.exportDataSubtitle,
                   color: theme.colorScheme.primary,
+                  rose: true,
                   isLoading: _isExporting,
                   onTap: _exportData,
                 ),
@@ -146,6 +166,46 @@ class _DataExportScreenState extends State<DataExportScreen> {
     );
   }
 
+  /// Metadata cell: what is inside the backup, in mono digits.
+  Widget _buildMetadataCell(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    return Consumer3<TwelaProvider, DebtProvider, SavingsProvider>(
+      builder: (context, twela, debts, savings, _) {
+        Widget metric(String label, int value) {
+          return Row(
+            children: [
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontFamily: InbFonts.arabic,
+                    fontSize: 13,
+                    color: context.inb.muted,
+                  ),
+                ),
+              ),
+              Text('$value', style: monoStyle(context, size: 14)),
+            ],
+          );
+        }
+
+        return CellFrame(
+          label: l.dataLabel,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              metric(l.activityLog, twela.transactions.length),
+              const SizedBox(height: S.sm),
+              metric(l.debts, debts.debts.length),
+              const SizedBox(height: S.sm),
+              metric(l.savingsGoal, savings.activeGoals.length),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildSection(
     BuildContext context, {
     required ThemeData theme,
@@ -186,9 +246,66 @@ class _DataExportScreenState extends State<DataExportScreen> {
     required String title,
     required String subtitle,
     required Color color,
+    bool rose = false,
     bool isLoading = false,
     required VoidCallback onTap,
   }) {
+    if (rose) {
+      // The one promo tile of this screen: the primary export action.
+      final c = context.inb;
+      final fg = c.onRose;
+      return BentoCard(
+        tone: BentoTone.rose,
+        onTap: isLoading ? null : onTap,
+        padding: const EdgeInsets.all(S.md),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: fg.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(R.inner),
+              ),
+              child: isLoading
+                  ? Padding(
+                      padding: const EdgeInsets.all(10),
+                      child:
+                          CircularProgressIndicator(strokeWidth: 2, color: fg),
+                    )
+                  : Icon(icon, color: fg, size: 20),
+            ),
+            const SizedBox(width: S.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontFamily: InbFonts.arabic,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: fg,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontFamily: InbFonts.arabic,
+                      fontSize: 12,
+                      color: fg.withValues(alpha: 0.7),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return PressScale(
       onTap: isLoading ? null : onTap,
       child: Container(
@@ -244,6 +361,7 @@ class _DataExportScreenState extends State<DataExportScreen> {
   }
 
   Future<void> _exportData() async {
+    setState(() => _error = null);
     setState(() => _isExporting = true);
     try {
       final storage = context.read<StorageService>();
@@ -260,10 +378,7 @@ class _DataExportScreenState extends State<DataExportScreen> {
       ));
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(AppLocalizations.of(context)!.exportFailed(e))),
-        );
+        setState(() => _error = e.toString());
       }
     } finally {
       if (mounted) setState(() => _isExporting = false);

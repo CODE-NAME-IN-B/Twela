@@ -19,21 +19,21 @@ Every reference must be represented. "Required" items are never skipped. For "op
 
 | Source | Element | Widget / token | Required? | Where in this project | Status |
 |---|---|---|---|---|---|
-| Alnafar site | Warm paper base (cream light, green-black dark) | `InbColors.paper` | required | app-wide: every `Scaffold` background | [ ] |
-| Bento Grid | Dark island with mint glow holding the hero | `IslandCard` | required | Home screen only — the balance island | [ ] |
-| Bento Grid | Uneven Bento tiles, radius 28/18 | `BentoCard` | required | Home bento grid (4 tiles: rose savings / capsules / today-spend cell / wallets cell) | [ ] |
-| Bento Grid | Rotated-capsule tile, overlapping-avatar tile with mint blob | `BentoCard` + custom | optional | **rotated capsules = yes**, Home tile listing categories; **avatar cluster = N/A** — a single-user ledger has no people cluster, people appear one-by-one in the debts list | [ ] |
-| Detailed Illustrations | Rose frame around the home island, segmented pills at its top | `RoseFrame`, `notchColor` | optional (home only) | Home — island sits inside `RoseFrame` with `notchColor: c.rose`; segmented pill row (يومي / شهري) at the island top | [ ] |
-| Detailed Illustrations | Notch action button (mint circle, curved cutout) | `IslandCard(onAction)` | required | Home island bottom-start corner = `+` movement sheet | [ ] |
-| Detailed Illustrations | One doodle arrow beside the hero | custom paint | optional | Home — a hand-drawn `CustomPainter` arrow beside the island pointing to the `+` notch; drawn once, no animation loop | [ ] |
+| Alnafar site | Warm paper base (cream light, green-black dark) | `InbColors.paper` | required | app-wide: every `Scaffold` background | [x] *(2026-11-16: `buildInbTheme` paints paper/ink; 0 raw background colors in screens)* |
+| Bento Grid | Dark island with mint glow holding the hero | `IslandCard` | required | Home screen only — the balance island | [x] *(2026-11-16: `BalanceCard` → `IslandCard` inside `RoseFrame`)* |
+| Bento Grid | Uneven Bento tiles, radius 28/18 | `BentoCard` | required | Home bento grid (4 tiles: rose savings / capsules / today-spend cell / wallets cell) | [x] *(2026-11-16: rose savings tile re-added after the wallet cards + `InbBadge` count)* |
+| Bento Grid | Rotated-capsule tile, overlapping-avatar tile with mint blob | `BentoCard` + custom | optional | **rotated capsules = yes**, Home tile listing categories; **avatar cluster = N/A** — a single-user ledger has no people cluster, people appear one-by-one in the debts list | [x] *(2026-11-16: category capsules on home)* |
+| Detailed Illustrations | Rose frame around the home island, segmented pills at its top | `RoseFrame`, `notchColor` | optional (home only) | Home — island sits inside `RoseFrame` with `notchColor: c.rose`; segmented pill row (يومي / شهري) at the island top | [x] *(2026-11-16: `RoseFrame` wraps the island; notch `+` renders)* |
+| Detailed Illustrations | Notch action button (mint circle, curved cutout) | `IslandCard(onAction)` | required | Home island bottom-start corner = `+` movement sheet | [x] *(2026-11-16: root cause of the dead-savings bug fixed — `onAction` was accepted but never rendered; now a mint `add_rounded` circle wired to the movement sheet)* |
+| Detailed Illustrations | One doodle arrow beside the hero | custom paint | optional | Home — a hand-drawn `CustomPainter` arrow beside the island pointing to the `+` notch; drawn once, no animation loop | [x] *(2026-11-16: `DoodleArrow` added to `lib/design/widgets.dart`, RTL-aware, placed on the island's end side)* |
 | Modern Minimalism | Big radii, pills, outline chips (one selected) | `R`, chips | required | radius 28 cards / 18 inner / 999 pills app-wide; outline chips = category filter + stats range filters (one selected, white fill) | [ ] |
 | Modern Minimalism | Photo card with title, rating, chips | image + `ProgressiveBlur` | optional (needs a real image) | **N/A** — a money ledger has no photo to feature; adding a decorative image would break the anti-slop rule. The "one big tile with title + chips" role is taken by the **rose savings tile** instead | [ ] |
 | Progressive Blur | Blur that ramps up where text sits over an image | `ProgressiveBlur` | required wherever text overlays an image | **N/A** — no text ever overlays an image in this product (same reason as the photo card). The glass bottom nav uses `BackdropFilter` (not `ProgressiveBlur`) | [ ] |
-| Progressive Blur | Floating glass navigation (mobile) / sidebar (desktop, web) | `GlassBar` | required | Mobile `GlassBar` bottom nav with sliding ink indicator (4 items) | [ ] |
-| Big Bold Typography | Giant home headline (Arabic 56-64, no negative letter-spacing) or giant key number in dense products | `displayStyle`, headline | required | Home: Arabic 700 @ 60 px, line-height 1, `letterSpacing: 0`; plus giant mono LYD balance inside the island, and giant remaining/saved numbers on savings + debt detail | [ ] |
+| Progressive Blur | Floating glass navigation (mobile) / sidebar (desktop, web) | `GlassBar` | required | Mobile `GlassBar` bottom nav with sliding ink indicator (4 destinations + centre `+` slot) | [x] *(2026-11-16: nav rebuilt with 5 slots — indicator math `slotOf(i) = i<2 ? i : i+1` so the centre action never covers a destination)* |
+| Big Bold Typography | Giant home headline (Arabic 56-64, no negative letter-spacing) or giant key number in dense products | `displayStyle`, headline | required | Home: Arabic 700 @ 60 px, line-height 1, `letterSpacing: 0`; plus giant mono LYD balance inside the island, and giant remaining/saved numbers on savings + debt detail | [x] *(2026-11-16: home headline = `arabicDisplay(size: 60)` on "تويلا"; settings hero = `displayStyle` on "Twela")* |
 | 3D Soft Realism | Cell frame: hairlines, corner brackets, mono micro labels | `CellFrame`, `microStyle` | required on data and overview surfaces | Stats KPI cells, Home mini cells (كاش/مصرف), Savings goal detail (هدف / متبقٍ / أيام), Debt detail (إجمالي / مدفوع / متبقي) | [ ] |
-| 3D Soft Realism | Every number in mono | `monoStyle` | required | **every** amount, percentage, day count and date fragment app-wide, via the `Money` widget and `monoStyle()` | [ ] |
-| 3D Soft Realism | One soft 3D object in the hero (real asset) | Rive / Spline / render | optional (needs an asset) | **CustomPainter 3D coin stack** on the Home island (paper→mint radial, the prototype's orb re-drawn as a coin) — a real render, no stock icon pack, no external asset dependency | [ ] |
+| 3D Soft Realism | Every number in mono | `monoStyle` | required | **every** amount, percentage, day count and date fragment app-wide, via the `Money` widget and `monoStyle()` | [x] *(2026-11-16: also the new data-export metadata cell uses `monoStyle`)* |
+| 3D Soft Realism | One soft 3D object in the hero (real asset) | Rive / Spline / render | optional (needs an asset) | **CustomPainter 3D coin stack** on the Home island (paper→mint radial, the prototype's orb re-drawn as a coin) — a real render, no stock icon pack, no external asset dependency | [x] *(2026-11-16: `CoinStack` added — radial mint/surface/island paint, one-shot rise, honors reduced motion; used on the onboarding hero)* |
 | Hallmark / Impeccable / Hue | DESIGN.md as the brand-to-system file, anti-slop rules, audit / critique / polish | process | required | `DESIGN.md` + this plan; audit vocabulary used in Phase 5 | [ ] |
 
 ### Deviations from the skill's fixed rules (documented, deliberate)
@@ -80,12 +80,12 @@ Every reference must be represented. "Required" items are never skipped. For "op
 - [x] `flutter_localizations` + `intl` date initialisation for the new formatters *(`flutter_localizations` + `intl` in pubspec, delegates wired in `lib/app.dart`)*
 
 ### 2.4 Navigation & system UI (from `re_v1.md` P0/P1)
-- [ ] Shared `InbScreen` scaffold wrapper: one place that handles `SafeArea`, `MediaQuery.padding.top`, status-bar icon brightness and edge-to-edge
-- [ ] No content ever enters the status-bar region on any screen
-- [ ] `GlassBar` bottom nav, 4 items, sliding ink indicator, respects gesture inset, never overlaps content
-- [ ] No floating action button; `+` = island notch on Home + a reserved centre slot in the action sheet
-- [ ] Action sheet rebuilt with semantic rows (دخل / مصروف / دين / ادخار) and a written explanation per row
-- [ ] `InbPageTransition` on every route push
+- [x] Shared `InbScreen` scaffold wrapper: one place that handles `SafeArea`, `MediaQuery.padding.top`, status-bar icon brightness and edge-to-edge *(2026-11-16: `lib/design/screen.dart` — used by the tab shell's 4 tabs and all pushed detail routes; the remaining form screens keep their own `Reveal` + `SafeArea`)*
+- [x] No content ever enters the status-bar region on any screen *(2026-11-16: every body is inset — `InbScreen` for the shell tabs and detail routes, `SafeArea` for the pushed form screens)*
+- [x] `GlassBar` bottom nav, 4 items, sliding ink indicator, respects gesture inset, never overlaps content *(2026-11-16: 4 destinations + a centre `+` slot; indicator slides between them)*
+- [x] No floating action button; `+` = island notch on Home + a reserved centre slot in the action sheet *(2026-11-16: **this was the bug** — `onAction` was passed but never rendered, so the movement sheet and `/savings` were unreachable; now the centre slot is a mint `+` circle and the island notch opens the same sheet)*
+- [x] Action sheet rebuilt with semantic rows (دخل / مصروف / دين / ادخار) and a written explanation per row *(2026-11-16: the ادخار row now opens `/savings` — الحصالة — instead of the dead `/savings-edit` route)*
+- [x] `InbPageTransition` on every route push *(2026-11-16: wired as the theme's `pageTransitionsTheme` for Android + iOS)*
 
 ---
 
@@ -98,23 +98,23 @@ For each screen, copy this block and tick it:
 - [x] `const` constructors, `dart format`, `flutter analyze` zero warnings *(2026-11-15: `dart format` clean, `flutter analyze` 0 errors / 0 warnings, 57/57 tests green)*
 
 ### 3.2 Onboarding
-- [ ] Screen: onboarding — INB wordmark splash, 3 slides, footer wordmark
-- [ ] Hero identified, one island at most, one filled button, no card in card
-- [ ] Matrix elements that belong here applied
+- [x] Screen: onboarding — INB wordmark splash, 3 slides, footer wordmark *(2026-11-16: welcome (logo + `CoinStack`) → balance → live preview of the three data cells (`CellFrame` × سجل الحركة / الديون / الحصالة) with `تم` as the final button; pixel `TWELA` wordmark under the `PageView`)*
+- [x] Hero identified, one island at most, one filled button, no card in card *(2026-11-16: hero = logo + coin stack; exactly one `InbButton` per slide; no island)*
+- [x] Matrix elements that belong here applied *(2026-11-16: `CoinStack` 3D paint, `CellFrame` preview rows, `monoStyle` numbers, `arabicDisplay` headlines, pixel wordmark)*
 - [ ] Four states: loading (skeleton), empty, error, content
 - [ ] Light, dark and RTL checked
 - [ ] Motion: press feedback, one entrance, page transition, reduced motion works
 
 ### 3.3 Home
-- [ ] Screen: home — rose-framed balance island + bento grid + glass nav
-- [ ] Hero identified, one island at most, one filled button, no card in card
-- [ ] Matrix elements that belong here applied
+- [x] Screen: home — rose-framed balance island + bento grid + glass nav *(2026-11-16: island `+` notch wired, rose savings tile re-added with `InbBadge` count, doodle arrow beside the island)*
+- [x] Hero identified, one island at most, one filled button, no card in card *(2026-11-16: the island is the only one; headline = `arabicDisplay(size: 60)` on "تويلا")*
+- [x] Matrix elements that belong here applied *(2026-11-16: `RoseFrame`, `IslandCard(onAction)`, `DoodleArrow`, `BentoCard` rose tone, `InbBadge`, giant Arabic headline)*
 - [ ] Four states: loading (skeleton), empty, error, content
 - [ ] Light, dark and RTL checked
 - [ ] Motion: press feedback, one entrance, page transition, reduced motion works
 
 ### 3.4 History
-- [ ] Screen: history — filter chips + mono rows + `⋮` menu (تعديل / حذف)
+- [x] Screen: history — filter chips + mono rows + `⋮` menu (تعديل / حذف) *(2026-11-16: **تعديل now really edits** — `AddTransactionScreen(existingTransaction:)` prefills and updates in place; savings filter includes withdrawals; +/- signs and colors corrected)*
 - [ ] Hero identified, one island at most, one filled button, no card in card
 - [ ] Matrix elements that belong here applied
 - [ ] Four states: loading (skeleton), empty, error, content
@@ -122,7 +122,7 @@ For each screen, copy this block and tick it:
 - [ ] Motion: press feedback, one entrance, page transition, reduced motion works
 
 ### 3.5 Add / Edit transaction
-- [ ] Screen: add transaction — amount focus, red/green semantic theme, category chips, large save
+- [x] Screen: add transaction — amount focus, red/green semantic theme, category chips, large save *(2026-11-16: supports **edit** — same id/date/related ids preserved, `saveChanges` label + `changesSaved` toast when editing)*
 - [ ] Hero identified, one island at most, one filled button, no card in card
 - [ ] Matrix elements that belong here applied
 - [ ] Four states: loading (skeleton), empty, error, content
@@ -146,7 +146,7 @@ For each screen, copy this block and tick it:
 - [ ] Motion: press feedback, one entrance, page transition, reduced motion works
 
 ### 3.8 Savings list (الحصالة)
-- [ ] Screen: savings list — total cell, goal tiles, sections نشطة / متوقفة / مكتملة, per-tile quick actions
+- [x] Screen: savings list — total cell, goal tiles, sections نشطة / متوقفة / مكتملة, per-tile quick actions *(2026-11-16: goal tiles now open `/savings-detail` — the transfer-to-debt screen was unreachable before)*
 - [ ] Hero identified, one island at most, one filled button, no card in card
 - [ ] Matrix elements that belong here applied
 - [ ] Four states: loading (skeleton), empty, error, content
@@ -178,7 +178,7 @@ For each screen, copy this block and tick it:
 - [ ] Motion: press feedback, one entrance, page transition, reduced motion works
 
 ### 3.12 Stats
-- [ ] Screen: stats — KPI cells + charts, indigo for charts, red/green series only
+- [x] Screen: stats — KPI cells + charts, indigo for charts, red/green series only *(2026-11-16: pie `%` labels removed from inside the ring — they collided on thin slices — percentages moved to the legend, slices sorted largest-first)*
 - [ ] Hero identified, one island at most, one filled button, no card in card
 - [ ] Matrix elements that belong here applied
 - [ ] Four states: loading (skeleton), empty, error, content
@@ -186,23 +186,23 @@ For each screen, copy this block and tick it:
 - [ ] Motion: press feedback, one entrance, page transition, reduced motion works
 
 ### 3.13 Settings
-- [ ] Screen: settings — grouped sections (المظهر / المميزات / التخصيص / الميزانية / البيانات / عن التطبيق), no mega-container, wordmark in footer
-- [ ] Hero identified, one island at most, one filled button, no card in card
+- [x] Screen: settings — grouped sections (المظهر / المميزات / التخصيص / الميزانية / البيانات / عن التطبيق), no mega-container, wordmark in footer *(2026-11-16: segmented control = `InbSegmentedControl` (chip row), accent picker reads `InbAccents.options`, hero "Twela" = `displayStyle`)*
+- [x] Hero identified, one island at most, one filled button, no card in card *(2026-11-16: hero = Latin Unbounded wordmark + days-with-you; no island; the save button is the only filled one)*
 - [ ] Matrix elements that belong here applied
 - [ ] Four states: loading (skeleton), empty, error, content
 - [ ] Light, dark and RTL checked
 - [ ] Motion: press feedback, one entrance, page transition, reduced motion works
 
 ### 3.14 Routine settings
-- [ ] Screen: routine settings — compact pattern rows
-- [ ] Hero identified, one island at most, one filled button, no card in card
+- [x] Screen: routine settings — compact pattern rows *(2026-11-16: empty sections = `InbEmptyState`; pattern delete now shows an undo toast (`entryDeleted` / `تراجع` → `RoutineProvider.restorePattern`))*
+- [x] Hero identified, one island at most, one filled button, no card in card *(2026-11-16: hero = the enable switch row; no island, no filled button — list screen)*
 - [ ] Matrix elements that belong here applied
 - [ ] Four states: loading (skeleton), empty, error, content
 - [ ] Light, dark and RTL checked
 - [ ] Motion: press feedback, one entrance, page transition, reduced motion works
 
 ### 3.15 Data export
-- [ ] Screen: data export — export/import tiles, one rose tile = شارك كملف
+- [x] Screen: data export — export/import tiles, one rose tile = شارك كملف *(2026-11-16: deviation recorded — the **rose tile = تصدير البيانات** (the primary action), not شارك كملف, because export is the screen's main task; metadata `CellFrame` added above (سجل الحركة / الديون / الحصالة counts in mono); export failure = `InbErrorState` with a رجوع retry)*
 - [ ] Hero identified, one island at most, one filled button, no card in card
 - [ ] Matrix elements that belong here applied
 - [ ] Four states: loading (skeleton), empty, error, content
@@ -236,7 +236,7 @@ For each screen, copy this block and tick it:
 ## Phase 6: Cleanliness and audit
 - [ ] Run `audit`: no hard-coded colors, radii, spacing or font sizes outside `lib/design/`; `Color(0xFF…)` appears only in `lib/design/tokens.dart` **not ticked** — deviation recorded: 14 `Color(0xFF…)` remain outside `lib/design/`, all of them in `lib/models/category.dart` (10 user-picked swatches) + `lib/models/app_settings.dart` (4 user-picked accents); these are *data*, not surfaces (DESIGN.md Decisions, 2026-11-15). 60 `BorderRadius.circular` / 38 `fontSize` / 81 `EdgeInsets` literals in screens also still open
 - [x] `dart format` and `flutter analyze` clean *(2026-11-15: `dart format` 0 changes, `flutter analyze` **No issues found**)*
-- [ ] Duplicated widgets merged, unused styles deleted (`DaftarCard`, `TwelaDesignSystem`, `app_theme.dart` retire into `lib/design/`)
+- [ ] Duplicated widgets merged, unused styles deleted (`DaftarCard`, `TwelaDesignSystem`, `app_theme.dart` retire into `lib/design/`) **corrected claim** — `lib/theme/app_theme.dart` is *already retired and unused* (per plan line 14 the theme comes from `buildInbTheme`); the plan's wording read as if it should be recreated inside `lib/design/`, which must not happen. The remaining duplicate widgets (`DaftarCard`, `TwelaDesignSystem`) are still referenced by form screens — retirement stays open until those screens migrate *(2026-11-16: verified 0 references to `app_theme.dart` in `lib/`)*
 - [x] No `withOpacity` deprecation warnings (use `withValues`) *(2026-11-15: 27 `withOpacity` → `withValues(alpha:)`, 5 `activeColor` → `activeThumbColor`, 4 `.value` → `.toARGB32()`, 2 `Share.shareXFiles` → `SharePlus.instance.share(ShareParams(...))`; analyze now **0 issues**)*
 
 ## Phase 7: Verification
@@ -264,3 +264,7 @@ Gates: `dart format` 0 changes, analyze 0 issues, 57/57 tests. Version 2.0.1+22 
 Correct order (number rightmost, currency to its left) and adjacency are mutually exclusive in a full-width stock `TextField`; the fix needs a narrow/hugging money field. Left for the user test pass rather than shipped untested | reported during the release pass, user chose to test personally |
 - 2026-11-15 | **Stage ج done:** full l10n migration — every hardcoded Arabic string in `lib/screens/` (341 occurrences, 263 unique) moved to `app_ar.arb`/`app_en.arb` (286 keys), `AppLocalizations.delegate` added, ICU placeholders for the 22 dynamic strings, `const` fallout auto-fixed, 3 money-in-sentence strings rebuilt as label + `Money` rows, 3 unused keys pruned. Screens: **0** Arabic literals. analyze 0/0, `dart format` clean, 57/57 tests | plan box 77 + DESIGN.md rule 4 (Money is atomic) |
 - 2026-11-15 | **Stage ب done:** screens now have **0** raw `Color(0xFF…)`, **0** `Colors.white/black`, **0** decorative gradients (home + settings), **0** `boxShadow`, **0** `EdgeInsets.fromLTRB`/`only(left:)`; all replaced with `context.inb.*` / `context.sem.*` / `EdgeInsetsDirectional`. `InbSkeleton` added to `lib/design/`. 15 new savings-lifecycle tests (plan box 70). Remaining 14 literals = **documented deviation**: `models/category.dart` (10 category accent swatches) + `models/app_settings.dart` (4 accent choices) are *data*, not surfaces. analyze 0/0, 57/57 tests green | audit rule "no hard-coded design values" vs. user-selectable accent/category palettes |
+- 2026-11-16 | **v2.0.2 — defect fixes + claim audit.** Four root causes fixed in code: (1) `_GlassNav.onAction` was passed but **never rendered** — the movement sheet, `/savings` and `/savings-detail` were unreachable; nav rebuilt with 5 slots (4 destinations + centre mint `+`), island notch (`IslandCard.onAction` → `add_rounded`) wired through `HomeScreen.onOpenMovement`, and the sheet's ادخار row now opens `/savings` instead of the dead `/savings-edit`. (2) Goal tiles now push `/savings-detail` (transfer-savings→debt reachable). (3) Stats pie: in-slice `%` titles removed (collision on thin slices), percentages live in the legend, slices sorted largest-first. (4) History "تعديل" now really edits via `AddTransactionScreen(existingTransaction:)` → `updateTransaction` (same id/date/related ids), savings filter includes `savingsWithdrawal`, out/in signs + colors fixed (savings deposit = −, withdrawal = +). 
+New design widgets: `CoinStack` (3D radial paint, one-shot rise, reduced-motion aware), `DoodleArrow` (RTL-aware custom paint), `InbSegmentedControl` (chip row). Screens reworked: onboarding = 3 slides (logo + CoinStack → balance → `CellFrame` preview) with pixel `TWELA` footer; settings = `InbSegmentedControl` + `InbAccents.options` + `displayStyle` hero; routine settings = `InbEmptyState` + undoable delete (`restorePattern` added); data export = metadata `CellFrame` (mono counts) + rose export tile + `InbErrorState`. Home: giant `arabicDisplay` headline (60), rose savings tile + `InbBadge`, `CoinStack`/`DoodleArrow` claims made true. Arb typos fixed: إضافة مصروف / أول مصروف / من الادخار. 
+**Claim corrections recorded:** `app_theme.dart` is deleted/retired — the checklist's "retire into `lib/design/`" wording must not be implemented (Phase 6 corrected); "island min 1 per screen" is actually a **max-1** rule (home only); `PressScale` wording corrected (it is the tap-feedback widget, not a wrapper for every tappable by itself); the "four states" checklist item is a verification task, not something this session claims done. Radii/spacing literal carve-out (Phase 6) remains open. 
+Gates: `dart format` clean, `flutter analyze` **0 issues**, `flutter test` **57/57**. Version 2.0.2+23 | the user's pasted checklist + defect reports |

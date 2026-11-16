@@ -6,7 +6,6 @@ import '../../widgets/daftar_card.dart';
 import '../../utils/daftar_number_style.dart';
 import '../../providers/savings_provider.dart';
 import '../../models/savings_goal.dart';
-import '../../utils/formatters.dart';
 import '../../widgets/twela_design_system.dart';
 import 'add_savings_goal_screen.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -110,7 +109,11 @@ class SavingsScreen extends StatelessWidget {
     final progress = goal.progress.clamp(0.0, 1.0);
 
     return PressScale(
-      onTap: () => _showGoalDetails(context, goal, theme, isDark),
+      onTap: () => Navigator.pushNamed(
+        context,
+        '/savings-detail',
+        arguments: {'goalId': goal.id},
+      ),
       child: Padding(
         padding: const EdgeInsets.only(bottom: 12),
         child: DaftarCard(
@@ -255,164 +258,6 @@ class SavingsScreen extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  void _showGoalDetails(
-      BuildContext context, SavingsGoal goal, ThemeData theme, bool isDark) {
-    final provider = context.read<SavingsProvider>();
-    final entries = provider.getEntriesForGoal(goal.id);
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => DraggableScrollableSheet(
-        initialChildSize: 0.7,
-        maxChildSize: 0.9,
-        minChildSize: 0.5,
-        builder: (ctx, scrollController) => Container(
-          decoration: BoxDecoration(
-            color: isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          child: ListView(
-            controller: scrollController,
-            padding: const EdgeInsets.all(24),
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: isDark ? AppColors.darkBorder : AppColors.divider,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                goal.name,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 16),
-              if (!goal.isCompleted) ...[
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.pop(ctx);
-                      _showSaveDialog(context, goal, theme, isDark);
-                    },
-                    icon: const Icon(Icons.savings_outlined),
-                    label: Text.rich(TextSpan(
-                      children: [
-                        TextSpan(
-                            text: AppLocalizations.of(context)!.saveAction),
-                        TextSpan(
-                          text: formatLyd(goal.dailyTarget),
-                          style: daftarNumberStyle(context, fontSize: 14),
-                        ),
-                      ],
-                    )),
-                  ),
-                ),
-                const SizedBox(height: 16),
-              ],
-              Text(
-                AppLocalizations.of(context)!.savingsLog,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 12),
-              if (entries.isEmpty)
-                Text(
-                  AppLocalizations.of(context)!.noDepositsYet,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: isDark
-                        ? AppColors.darkTextSecondary
-                        : AppColors.textSecondary,
-                  ),
-                )
-              else
-                ...entries.map((entry) => Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color:
-                            isDark ? AppColors.darkSurface : AppColors.surface,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            formatDate(entry.date),
-                            style: theme.textTheme.bodySmall,
-                          ),
-                          Money(
-                            entry.amount,
-                            size: 14,
-                            weight: FontWeight.w600,
-                            color: AppColors.income,
-                          ),
-                        ],
-                      ),
-                    )),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _showSaveDialog(
-      BuildContext context, SavingsGoal goal, ThemeData theme, bool isDark) {
-    final controller = TextEditingController(text: goal.dailyTarget.toString());
-
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor:
-            isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(AppLocalizations.of(context)!.depositToGoal(goal.name)),
-        content: TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          autofocus: true,
-          decoration: InputDecoration(
-            hintText: AppLocalizations.of(context)!.amount,
-            suffixText: AppLocalizations.of(context)!.currencyLyd,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(AppLocalizations.of(context)!.cancel),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final amount = double.tryParse(controller.text);
-              if (amount != null && amount > 0) {
-                context
-                    .read<SavingsProvider>()
-                    .addDeposit(goalId: goal.id, amount: amount);
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                      content:
-                          Text(AppLocalizations.of(context)!.depositRecorded)),
-                );
-              }
-            },
-            child: Text(AppLocalizations.of(context)!.deposit),
-          ),
-        ],
       ),
     );
   }

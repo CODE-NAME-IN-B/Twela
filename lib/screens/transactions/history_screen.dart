@@ -64,8 +64,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
             .toList();
         break;
       case TransactionFilter.savings:
-        filtered =
-            filtered.where((t) => t.type == TransactionType.savings).toList();
+        filtered = filtered
+            .where((t) =>
+                t.type == TransactionType.savings ||
+                t.type == TransactionType.savingsWithdrawal)
+            .toList();
         break;
     }
 
@@ -83,9 +86,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
     return filtered;
   }
 
+  bool _isOutflow(TwelaTransaction t) =>
+      t.isExpense || t.type == TransactionType.savings;
+
+  bool _isInflow(TwelaTransaction t) =>
+      t.isIncome || t.type == TransactionType.savingsWithdrawal;
+
   Color _amountColor(TwelaTransaction t) {
-    if (t.isExpense) return AppColors.expense;
-    if (t.isIncome) return AppColors.income;
+    if (_isOutflow(t)) return AppColors.expense;
+    if (_isInflow(t)) return AppColors.income;
     return AppColors.textSecondary;
   }
 
@@ -110,6 +119,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   void _showEditMenu(TwelaTransaction transaction) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    // AddTransactionScreen handles income and expense only.
+    final editable = transaction.isExpense || transaction.isIncome;
 
     showModalBottomSheet(
       context: context,
@@ -132,26 +143,27 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              ListTile(
-                leading: Icon(
-                  Icons.edit_outlined,
-                  color: isDark
-                      ? AppColors.darkTextSecondary
-                      : AppColors.textSecondary,
-                ),
-                title: Text(
-                  AppLocalizations.of(context)!.edit,
-                  style: TextStyle(
+              if (editable)
+                ListTile(
+                  leading: Icon(
+                    Icons.edit_outlined,
                     color: isDark
-                        ? AppColors.darkTextPrimary
-                        : AppColors.textPrimary,
+                        ? AppColors.darkTextSecondary
+                        : AppColors.textSecondary,
                   ),
+                  title: Text(
+                    AppLocalizations.of(context)!.edit,
+                    style: TextStyle(
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.textPrimary,
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _editTransaction(transaction);
+                  },
                 ),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  _editTransaction(transaction);
-                },
-              ),
               ListTile(
                 leading: Icon(Icons.delete_outline, color: AppColors.danger),
                 title: Text(
@@ -172,13 +184,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   void _editTransaction(TwelaTransaction transaction) {
-    // AddTransactionScreen does not support existingTransaction.
-    // Delete the old one and navigate to add screen with type pre-selected.
-    // The user will re-enter amount/note for the new transaction.
+    // Real editing: the screen prefills the fields and updates in place.
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => AddTransactionScreen(initialType: transaction.type),
+        builder: (_) => AddTransactionScreen(existingTransaction: transaction),
       ),
     );
   }
@@ -340,9 +350,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   final category =
                       provider.getCategoryById(transaction.categoryId);
                   final color = _amountColor(transaction);
-                  final prefix = transaction.isExpense
+                  final prefix = _isOutflow(transaction)
                       ? '-'
-                      : (transaction.isIncome ? '+' : '');
+                      : (_isInflow(transaction) ? '+' : '');
+                  final value =
+                      prefix == '-' ? -transaction.amount : transaction.amount;
 
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 14),
@@ -382,9 +394,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         ),
                         const SizedBox(width: 12),
                         Money(
-                          transaction.isExpense
-                              ? -transaction.amount
-                              : transaction.amount,
+                          value,
                           signed: prefix.isNotEmpty,
                           size: 15,
                           weight: FontWeight.w600,
