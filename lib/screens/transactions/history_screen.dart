@@ -12,6 +12,7 @@ import '../transactions/add_transaction_screen.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../design/format.dart';
 import '../../design/motion.dart';
+import '../../design/widgets.dart' show showInbToast;
 
 enum TransactionFilter { all, income, expense, debt, savings }
 
@@ -202,7 +203,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
         confirmLabel: AppLocalizations.of(context)!.delete,
         cancelLabel: AppLocalizations.of(context)!.cancel,
         onConfirm: () async {
-          await context.read<TwelaProvider>().removeTransaction(transaction.id);
+          final provider = context.read<TwelaProvider>();
+          // Captured before removal so undo can put it back in place.
+          final index = provider.transactions.indexOf(transaction);
+          await provider.removeTransaction(transaction.id);
+          if (!context.mounted) return;
+          showInbToast(
+            context,
+            AppLocalizations.of(context)!.entryDeleted,
+            undoLabel: AppLocalizations.of(context)!.undo,
+            onUndo: () =>
+                provider.restoreTransaction(transaction, index: index),
+          );
           if (mounted) setState(() {});
         },
       ),

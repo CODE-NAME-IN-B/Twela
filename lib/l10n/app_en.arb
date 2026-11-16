@@ -82,6 +82,7 @@
   "debtRepaymentNote": "Debt repayment: {name}",
   "debts": "Debts",
   "debtsShort": "Debts",
+  "debtDeleted": "Debt deleted",
   "delete": "Delete",
   "deleteDebt": "Delete debt",
   "deleteDebtBody": "Are you sure you want to delete this debt? All related transactions will be deleted too.",

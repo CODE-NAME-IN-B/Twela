@@ -14,6 +14,7 @@ import '../../widgets/daftar_card.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../design/format.dart';
 import '../../design/motion.dart';
+import '../../design/widgets.dart' show showInbToast;
 
 class DebtDetailScreen extends StatefulWidget {
   final Debt debt;
@@ -70,8 +71,26 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
         title: AppLocalizations.of(context)!.deleteDebt,
         message: AppLocalizations.of(context)!.deleteDebtBody,
         confirmLabel: AppLocalizations.of(context)!.delete,
-        onConfirm: () {
-          context.read<DebtProvider>().removeDebt(widget.debt.id);
+        onConfirm: () async {
+          final provider = context.read<DebtProvider>();
+          // Captured before removal so undo can rebuild both the debt and
+          // its ledger transactions, in place. The current instance comes
+          // from the provider — applyPayment replaces the debt via copyWith,
+          // so widget.debt can be stale.
+          final current = provider.getDebtById(widget.debt.id);
+          if (current == null) return;
+          final index = provider.debts.indexOf(current);
+          final txs = provider.ledger.transactions
+              .where((t) => t.relatedId == current.id)
+              .toList();
+          await provider.removeDebt(current.id);
+          if (!context.mounted) return;
+          showInbToast(
+            context,
+            AppLocalizations.of(context)!.debtDeleted,
+            undoLabel: AppLocalizations.of(context)!.undo,
+            onUndo: () => provider.restoreDebt(current, txs, index: index),
+          );
           Navigator.pop(context);
         },
       ),

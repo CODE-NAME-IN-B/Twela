@@ -143,6 +143,24 @@ class DebtProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Undo for [removeDebt]: rebuilds the debt where it was and puts its
+  /// ledger transactions back. Pass the [index] the screen captured before
+  /// deleting. Guarded against duplicate ids.
+  Future<void> restoreDebt(Debt debt, List<TwelaTransaction> txs,
+      {int? index}) async {
+    if (_debts.any((d) => d.id == debt.id)) return;
+    if (index == null || index > _debts.length) {
+      _debts.insert(0, debt);
+    } else {
+      _debts.insert(index.clamp(0, _debts.length), debt);
+    }
+    await _storage.saveDebts(_debts);
+    for (final tx in txs) {
+      await ledger.restoreTransaction(tx);
+    }
+    notifyListeners();
+  }
+
   Debt? getDebtById(String id) {
     try {
       return _debts.firstWhere((d) => d.id == id);

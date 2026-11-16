@@ -401,9 +401,7 @@ class _DataExportScreenState extends State<DataExportScreen> {
 
       if (data == null) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(AppLocalizations.of(context)!.invalidFile)),
-          );
+          setState(() => _error = AppLocalizations.of(context)!.invalidFile);
         }
         return;
       }
@@ -449,10 +447,7 @@ class _DataExportScreenState extends State<DataExportScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(AppLocalizations.of(context)!.importFailed(e))),
-        );
+        setState(() => _error = AppLocalizations.of(context)!.importFailed(e));
       }
     } finally {
       if (mounted) setState(() => _isImporting = false);
@@ -470,9 +465,7 @@ class _DataExportScreenState extends State<DataExportScreen> {
       ));
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.shareFailed(e))),
-        );
+        setState(() => _error = AppLocalizations.of(context)!.shareFailed(e));
       }
     }
   }
@@ -483,15 +476,11 @@ class _DataExportScreenState extends State<DataExportScreen> {
       final jsonStr = await DataExportService.exportToJson(storage);
       await Clipboard.setData(ClipboardData(text: jsonStr));
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.dataCopied)),
-        );
+        showInbToast(context, AppLocalizations.of(context)!.dataCopied);
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.copyFailed(e))),
-        );
+        setState(() => _error = AppLocalizations.of(context)!.copyFailed(e));
       }
     }
   }

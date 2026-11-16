@@ -82,6 +82,7 @@
   "debtRepaymentNote": "سداد دين {name}",
   "debts": "الديون",
   "debtsShort": "ديون",
+  "debtDeleted": "حُذف الدين",
   "delete": "حذف",
   "deleteDebt": "حذف الدين",
   "deleteDebtBody": "هل أنت متأكد من حذف هذا الدين؟ سيتم حذف جميع المعاملات المرتبطة به.",

@@ -268,6 +268,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get debtsShort => 'Debts';
 
   @override
+  String get debtDeleted => 'Debt deleted';
+
+  @override
   String get delete => 'Delete';
 
   @override

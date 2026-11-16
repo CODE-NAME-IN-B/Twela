@@ -268,6 +268,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get debtsShort => 'ديون';
 
   @override
+  String get debtDeleted => 'حُذف الدين';
+
+  @override
   String get delete => 'حذف';
 
   @override

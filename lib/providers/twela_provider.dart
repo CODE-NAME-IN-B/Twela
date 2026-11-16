@@ -234,6 +234,21 @@ class TwelaProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Undo for [removeTransaction]: puts the transaction back where it was
+  /// (the list is add-ordered, newest first). Pass the [index] the screen
+  /// captured before deleting; falls back to the top when unknown. Guarded
+  /// against duplicate ids.
+  Future<void> restoreTransaction(TwelaTransaction t, {int? index}) async {
+    if (_transactions.any((x) => x.id == t.id)) return;
+    if (index == null || index > _transactions.length) {
+      _transactions.insert(0, t);
+    } else {
+      _transactions.insert(index.clamp(0, _transactions.length), t);
+    }
+    await _storage.saveTransactions(_transactions);
+    notifyListeners();
+  }
+
   // Wallet Settings
   Future<void> updateWalletSettings(WalletSettings settings) async {
     _walletSettings = settings;

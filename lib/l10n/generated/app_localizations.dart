@@ -590,6 +590,12 @@ abstract class AppLocalizations {
   /// **'ديون'**
   String get debtsShort;
 
+  /// No description provided for @debtDeleted.
+  ///
+  /// In ar, this message translates to:
+  /// **'حُذف الدين'**
+  String get debtDeleted;
+
   /// No description provided for @delete.
   ///
   /// In ar, this message translates to:
