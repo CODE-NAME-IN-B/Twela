@@ -2,17 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../design/screen.dart';
+import '../../design/theme.dart';
+import '../../design/tokens.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/daftar_theme.dart';
 import '../../widgets/daftar_card.dart';
 import '../../utils/daftar_number_style.dart';
 import '../../providers/twela_provider.dart';
 import '../../models/transaction.dart';
-import '../../utils/formatters.dart';
 import '../../widgets/twela_design_system.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../design/format.dart' show Money;
 import '../../design/motion.dart';
+import 'package:intl/intl.dart';
 
 class StatsScreen extends StatelessWidget {
   const StatsScreen({
@@ -82,10 +84,14 @@ class StatsScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            AppLocalizations.of(context)!
-                .monthSummary(formatMonthYear(DateTime.now())),
-            style: theme.textTheme.headlineSmall,
+          // Latin brand display for the month word, English month name.
+          SizedBox(
+            width: double.infinity,
+            child: Text(
+              DateFormat('MMMM yyyy', 'en').format(DateTime.now()),
+              textAlign: TextAlign.center,
+              style: displayStyle(context, size: 22),
+            ),
           ),
           const SizedBox(height: 20),
           Row(
@@ -196,20 +202,46 @@ class StatsScreen extends StatelessWidget {
             style: theme.textTheme.headlineSmall,
           ),
           const SizedBox(height: 20),
-          // No labels inside the ring: on thin slices they collide with the
-          // centre and with each other. Percentages live in the legend below.
+          // No labels inside the ring on thin slices — they collide. Big
+          // slices carry the Arabic name + percentage, mid slices the
+          // percentage alone; everything stays in the legend below.
           SizedBox(
             height: 220,
             child: PieChart(
               PieChartData(
                 sections: sorted.map((entry) {
                   final category = provider.getCategoryById(entry.key);
+                  final percentage =
+                      totalSpent > 0 ? entry.value / totalSpent : 0.0;
+                  final pctText = '${(percentage * 100).toStringAsFixed(0)}%';
+                  final name =
+                      category?.name ?? AppLocalizations.of(context)!.unknown;
+
+                  final String title;
+                  if (percentage >= 0.15) {
+                    title = '$name $pctText';
+                  } else if (percentage >= 0.08) {
+                    title = pctText;
+                  } else {
+                    title = '';
+                  }
 
                   return PieChartSectionData(
                     value: entry.value,
                     color: category?.color ?? AppColors.expense,
                     radius: 88,
-                    showTitle: false,
+                    showTitle: title.isNotEmpty,
+                    title: title,
+                    titleStyle: percentage >= 0.15
+                        ? TextStyle(
+                            fontFamily: InbFonts.arabic,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            height: 1.2,
+                            color: context.inb.paper,
+                          )
+                        : monoStyle(context,
+                            size: 12, color: context.inb.paper),
                   );
                 }).toList(),
                 sectionsSpace: 2,
@@ -218,8 +250,9 @@ class StatsScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
+          // Spans the full card width: items spread evenly on every line.
           Wrap(
-            spacing: 16,
+            alignment: WrapAlignment.spaceBetween,
             runSpacing: 8,
             children: sorted.map((entry) {
               final category = provider.getCategoryById(entry.key);

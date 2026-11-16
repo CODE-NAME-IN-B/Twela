@@ -152,8 +152,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  AppLocalizations.of(context)!.appTitle,
-                  style: arabicDisplay(context, size: 60),
+                  'Twela',
+                  style: displayStyle(context, size: 34),
                 ),
               ],
             ),
