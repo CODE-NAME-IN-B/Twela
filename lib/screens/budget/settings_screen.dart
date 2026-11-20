@@ -847,10 +847,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Center(
       child: Text(
         'Twela v${_currentVersion.isNotEmpty ? _currentVersion : '1.1.9'}',
-        style: TextStyle(
-          fontFamily: InbFonts.pixel,
-          fontSize: 12,
-          fontWeight: FontWeight.w400,
+        style: monoStyle(
+          context,
+          size: 12,
+          weight: FontWeight.w400,
           color: context.inb.muted,
         ),
       ),

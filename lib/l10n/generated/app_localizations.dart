@@ -1813,6 +1813,78 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'هدفك'**
   String get yourGoal;
+
+  /// No description provided for @allAccounts.
+  ///
+  /// In ar, this message translates to:
+  /// **'كل الحسابات'**
+  String get allAccounts;
+
+  /// No description provided for @myDebts.
+  ///
+  /// In ar, this message translates to:
+  /// **'ديون لي'**
+  String get myDebts;
+
+  /// No description provided for @totalBalanceLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الرصيد الكلي'**
+  String get totalBalanceLabel;
+
+  /// No description provided for @cashBalanceLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'رصيد الكاش'**
+  String get cashBalanceLabel;
+
+  /// No description provided for @bankBalanceLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'رصيد المصرف'**
+  String get bankBalanceLabel;
+
+  /// No description provided for @todayIncome.
+  ///
+  /// In ar, this message translates to:
+  /// **'دخل اليوم'**
+  String get todayIncome;
+
+  /// No description provided for @quickIncome.
+  ///
+  /// In ar, this message translates to:
+  /// **'دخل'**
+  String get quickIncome;
+
+  /// No description provided for @quickExpense.
+  ///
+  /// In ar, this message translates to:
+  /// **'مصروف'**
+  String get quickExpense;
+
+  /// No description provided for @quickSavings.
+  ///
+  /// In ar, this message translates to:
+  /// **'ادخار'**
+  String get quickSavings;
+
+  /// No description provided for @quickDebt.
+  ///
+  /// In ar, this message translates to:
+  /// **'دين'**
+  String get quickDebt;
+
+  /// No description provided for @settled.
+  ///
+  /// In ar, this message translates to:
+  /// **'مسدّدة'**
+  String get settled;
+
+  /// No description provided for @paidOff.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم السداد'**
+  String get paidOff;
 }
 
 class _AppLocalizationsDelegate

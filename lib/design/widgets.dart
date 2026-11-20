@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import 'motion.dart';
 import 'theme.dart';
@@ -16,10 +17,12 @@ class BentoCard extends StatelessWidget {
       required this.child,
       this.onTap,
       this.tone = BentoTone.surface,
+      this.radius = R.card,
       this.padding = const EdgeInsets.all(S.md)});
   final Widget child;
   final VoidCallback? onTap;
   final BentoTone tone;
+  final double radius;
   final EdgeInsetsGeometry padding;
 
   @override
@@ -30,7 +33,7 @@ class BentoCard extends StatelessWidget {
       padding: padding,
       decoration: BoxDecoration(
         color: rose ? c.rose : c.surface,
-        borderRadius: BorderRadius.circular(R.card),
+        borderRadius: BorderRadius.circular(radius),
         border: Border.all(color: rose ? Colors.transparent : c.line),
       ),
       child: DefaultTextStyle.merge(
@@ -113,7 +116,10 @@ class IslandCard extends StatelessWidget {
                       height: 46,
                       decoration:
                           BoxDecoration(color: c.mint, shape: BoxShape.circle),
-                      child: Icon(Icons.add_rounded, color: c.island, size: 24),
+                      // ↗, never `+`: the notch says "go see everything",
+                      // it does not say "add".
+                      child: Icon(LucideIcons.arrowUpRight,
+                          color: c.island, size: 24),
                     ),
                   ),
                 ),
@@ -155,7 +161,8 @@ class CellFrame extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (label != null) ...[
-              Text(label!.toUpperCase(), style: microStyle(context)),
+              // Labels are Arabic only: no uppercasing, no mono face.
+              Text(label!, style: microStyle(context)),
               const SizedBox(height: S.sm),
             ],
             child,
@@ -375,6 +382,9 @@ class GlassBar extends StatelessWidget {
 
 /// Soft rose frame around the hero island (Detailed Illustrations).
 /// Pass `notchColor: c.rose` to the island inside.
+///
+/// Two small mint squares mark opposite corners — the same marker language
+/// as [CellFrame], so the frame reads as part of the system.
 class RoseFrame extends StatelessWidget {
   const RoseFrame({super.key, required this.child});
   final Widget child;
@@ -382,11 +392,26 @@ class RoseFrame extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.inb;
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration:
-          BoxDecoration(color: c.rose, borderRadius: BorderRadius.circular(36)),
-      child: child,
+    const marker = SizedBox(width: 6, height: 6);
+    return Stack(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+              color: c.rose, borderRadius: BorderRadius.circular(36)),
+          child: child,
+        ),
+        PositionedDirectional(
+          top: 1,
+          start: 1,
+          child: Container(color: c.mint, child: marker),
+        ),
+        PositionedDirectional(
+          bottom: 1,
+          end: 1,
+          child: Container(color: c.mint, child: marker),
+        ),
+      ],
     );
   }
 }
@@ -730,14 +755,36 @@ class InbProgress extends StatelessWidget {
 /// Selectable chip — the only allowed segmented control surface.
 class InbChip extends StatelessWidget {
   const InbChip(
-      {super.key, required this.label, this.selected = false, this.onTap});
+      {super.key,
+      required this.label,
+      this.selected = false,
+      this.icon,
+      this.onIsland = false,
+      this.onTap});
   final String label;
   final bool selected;
+  final IconData? icon;
+
+  /// The chip sits on a dark island instead of paper: fill with mint, muted
+  /// text on island for the rest, so nothing paints a dark tone on the island.
+  final bool onIsland;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final c = context.inb;
+    final background = onIsland
+        ? (selected ? c.mint : c.onIsland.withValues(alpha: 0.08))
+        : (selected ? c.island : c.surface);
+    final border = onIsland
+        ? (selected ? Colors.transparent : c.onIsland.withValues(alpha: 0.28))
+        : (selected ? Colors.transparent : c.line);
+    final labelColor = onIsland
+        ? (selected ? c.island : c.onIslandMuted)
+        : (selected ? c.onIsland : c.muted);
+    final iconColor = onIsland
+        ? (selected ? c.island : c.onIslandMuted)
+        : (selected ? c.mint : c.muted);
     return PressScale(
       onTap: onTap,
       child: AnimatedContainer(
@@ -746,18 +793,28 @@ class InbChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: S.md, vertical: S.sm),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: selected ? c.island : c.surface,
+          color: background,
           borderRadius: BorderRadius.circular(R.pill),
-          border: Border.all(color: selected ? Colors.transparent : c.line),
+          border: Border.all(color: border),
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontFamily: InbFonts.arabic,
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-            color: selected ? c.onIsland : c.muted,
-          ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (icon != null) ...[
+              Icon(icon, size: 16, color: iconColor),
+              const SizedBox(width: S.xs),
+            ],
+            Text(
+              label,
+              style: TextStyle(
+                fontFamily: InbFonts.arabic,
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: labelColor,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -771,11 +828,13 @@ class InbSegmentedControl<T> extends StatelessWidget {
     required this.segments,
     required this.selected,
     required this.onSelected,
+    this.onIsland = false,
   });
 
   final Map<T, String> segments;
   final T selected;
   final ValueChanged<T> onSelected;
+  final bool onIsland;
 
   @override
   Widget build(BuildContext context) {
@@ -787,6 +846,7 @@ class InbSegmentedControl<T> extends StatelessWidget {
             child: InbChip(
               label: entry.value,
               selected: entry.key == selected,
+              onIsland: onIsland,
               onTap: () => onSelected(entry.key),
             ),
           ),
@@ -798,25 +858,75 @@ class InbSegmentedControl<T> extends StatelessWidget {
 
 /// Soft 3D coin stack (3D Soft Realism). The coins rise once on first build —
 /// one shot, no loop — and hold still under reduced motion.
-class CoinStack extends StatelessWidget {
+///
+/// With `tiltable` the stack leans with the finger and springs back to rest:
+/// a soft object feels held, not printed. Reduced motion gets a static stack.
+class CoinStack extends StatefulWidget {
   const CoinStack({
     super.key,
     this.coins = 3,
     this.size = 88,
     this.animate = true,
+    this.tiltable = false,
   });
 
   final int coins;
   final double size;
   final bool animate;
+  final bool tiltable;
+
+  @override
+  State<CoinStack> createState() => _CoinStackState();
+}
+
+class _CoinStackState extends State<CoinStack>
+    with SingleTickerProviderStateMixin {
+  static const _maxTilt = 0.18; // radians, ~10°
+
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: Motion.base,
+  );
+
+  /// Where the stack is leaning while the finger is down.
+  Offset _tilt = Offset.zero;
+
+  /// The release animation runs from where the finger left it to rest.
+  Offset _from = Offset.zero;
+
+  void _setTilt(Offset next) {
+    if (_controller.isAnimating) _controller.stop();
+    setState(() => _tilt = Offset(
+          next.dx.clamp(-_maxTilt, _maxTilt),
+          next.dy.clamp(-_maxTilt, _maxTilt),
+        ));
+  }
+
+  void _release() {
+    _from = _tilt;
+    if (_tilt == Offset.zero) return;
+    setState(() => _tilt = Offset.zero);
+    _controller.forward(from: 0);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Matrix4 _matrix(Offset t) => Matrix4.identity()
+    ..setEntry(3, 2, 0.0012) // perspective, so the lean reads as depth
+    ..rotateX(t.dy)
+    ..rotateY(t.dx);
 
   @override
   Widget build(BuildContext context) {
     final c = context.inb;
     Widget paint(double progress) => CustomPaint(
-          size: Size(size, size),
+          size: Size(widget.size, widget.size),
           painter: _CoinStackPainter(
-            coins: coins.clamp(1, 5),
+            coins: widget.coins.clamp(1, 5),
             body: c.mint,
             highlight: c.surface,
             rim: c.island,
@@ -824,12 +934,38 @@ class CoinStack extends StatelessWidget {
           ),
         );
 
-    if (!animate || reduceMotion(context)) return paint(1);
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0, end: 1),
-      duration: Motion.slow,
-      curve: Motion.emphasized,
-      builder: (_, v, __) => paint(v),
+    final stack = !widget.animate || reduceMotion(context)
+        ? paint(1)
+        : TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: 1),
+            duration: Motion.slow,
+            curve: Motion.emphasized,
+            builder: (_, v, __) => paint(v),
+          );
+
+    if (!widget.tiltable || reduceMotion(context)) return stack;
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onPanUpdate: (d) => _setTilt(
+          Offset(_tilt.dx + d.delta.dx * 0.012, _tilt.dy + d.delta.dy * 0.012)),
+      onPanEnd: (_) => _release(),
+      onPanCancel: _release,
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (_, child) {
+          final t = _controller.isAnimating
+              ? Offset.lerp(_from, Offset.zero,
+                  Motion.emphasized.transform(_controller.value))!
+              : _tilt;
+          return Transform(
+            alignment: Alignment.center,
+            transform: _matrix(t),
+            child: child,
+          );
+        },
+        child: stack,
+      ),
     );
   }
 }
@@ -939,10 +1075,12 @@ class _DoodleArrowPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final w = size.width, h = size.height;
-    // Tail near the end edge (bottom), head near the start edge (top).
-    final tail = Offset(rtl ? w - 4 : 4, h - 4);
-    final head = Offset(rtl ? 6 : w - 6, 8);
-    final control = Offset(w * 0.55, h - 2);
+    // Tail near the end edge (bottom), head near the start edge (top): in RTL
+    // that means the arrow rises toward the right, where the island's notch
+    // sits. The previous mapping pointed it away from the notch.
+    final tail = Offset(rtl ? 4 : w - 4, h - 4);
+    final head = Offset(rtl ? w - 6 : 6, 8);
+    final control = Offset(w * (rtl ? 0.45 : 0.55), h - 2);
 
     final stroke = Paint()
       ..color = color

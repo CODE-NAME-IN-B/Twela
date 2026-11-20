@@ -1,22 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
+
+import '../../design/format.dart';
+import '../../design/motion.dart';
 import '../../design/screen.dart';
 import '../../design/theme.dart';
 import '../../design/tokens.dart';
 import '../../design/widgets.dart';
-import '../../providers/twela_provider.dart';
-import '../../providers/savings_provider.dart';
-import '../../providers/app_settings_provider.dart';
-import '../../theme/app_colors.dart';
-import '../../theme/daftar_theme.dart';
-import '../../widgets/balance_card.dart';
-import '../../widgets/daftar_card.dart';
-import '../../widgets/wallet_mini_card.dart';
-import '../../widgets/limit_progress_bar.dart';
-import '../../utils/motivational_messages.dart';
 import '../../l10n/generated/app_localizations.dart';
-import '../../design/format.dart';
-import '../../design/motion.dart';
+import '../../providers/app_settings_provider.dart';
+import '../../providers/debt_provider.dart';
+import '../../providers/savings_provider.dart';
+import '../../providers/twela_provider.dart';
+import '../../widgets/balance_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -40,51 +37,40 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late final String _motivationalMessage;
-
-  @override
-  void initState() {
-    super.initState();
-    _motivationalMessage = getRandomMotivationalMessage();
-  }
-
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final c = context.inb;
     final appSettings = context.watch<AppSettingsProvider>();
 
-    final content = Container(
-      decoration: BoxDecoration(color: context.inb.paper),
-      child: RefreshIndicator(
-        onRefresh: () async {},
-        color: AppColors.primary,
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsetsDirectional.only(
-              start: 20, top: 16, end: 20, bottom: 100),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(context, theme, isDark),
-              const SizedBox(height: 6),
-              _buildMotivationalMessage(context, theme, isDark),
-              if (appSettings.showGlyphBar) ...[
-                const SizedBox(height: 12),
-                _buildGlyphBar(context, theme, isDark),
-              ],
-              const SizedBox(height: 24),
-              BalanceCard(onAction: widget.onOpenMovement),
-              const SizedBox(height: 20),
-              _buildWalletCards(context),
-              const SizedBox(height: 20),
-              _buildSavingsTile(context),
-              const SizedBox(height: 24),
-              _buildTodaySpending(context, theme, isDark),
-              const SizedBox(height: 24),
-              _buildQuickActions(context, theme, isDark),
+    // The list must stop exactly where the glass bar starts, so the last tile
+    // is never hidden behind it.
+    final bottomPadding = widget.embedded
+        ? widget.bottomBarHeight + S.md
+        : MediaQuery.of(context).padding.bottom + S.lg;
+
+    final content = ColoredBox(
+      color: c.paper,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsetsDirectional.only(
+            start: 20, top: 16, end: 20, bottom: bottomPadding),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(context),
+            const SizedBox(height: S.xs),
+            _buildTagline(context),
+            if (appSettings.showGlyphBar) ...[
+              const SizedBox(height: S.md),
+              _buildGlyphBar(context),
             ],
-          ),
+            const SizedBox(height: S.lg),
+            BalanceCard(onAction: widget.onOpenMovement),
+            const SizedBox(height: S.lg),
+            _buildBento(context),
+            const SizedBox(height: S.lg),
+            _buildQuickActions(context),
+          ],
         ),
       ),
     );
@@ -93,157 +79,96 @@ class _HomeScreenState extends State<HomeScreen> {
       return InbScreen(embedded: true, child: Reveal(child: content));
     }
 
-    return Scaffold(
-      backgroundColor:
-          isDark ? DaftarTheme.darkSurface : DaftarTheme.lightSurface,
-      body: SafeArea(child: content),
-    );
+    return Scaffold(backgroundColor: c.paper, body: SafeArea(child: content));
   }
 
-  Widget _buildHeader(BuildContext context, ThemeData theme, bool isDark) {
-    final logoAsset = isDark
-        ? 'assets/logo/twela_logo_mono.png'
-        : 'assets/logo/twela_logo.png';
-
+  /// Greeting + the wordmark on the start side (right in RTL), settings on
+  /// the end side — one 48 px target, no top navigation bar.
+  Widget _buildHeader(BuildContext context) {
+    final c = context.inb;
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Row(
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: isDark
-                    ? AppColors.primary.withAlpha(25)
-                    : AppColors.primarySurface,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: AppColors.primary.withAlpha(38),
-                  width: 1,
-                ),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                _getGreeting(),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: c.muted,
+                    ),
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Image.asset(
-                  logoAsset,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Icon(
-                      Icons.account_balance_wallet_outlined,
-                      color: AppColors.primary,
-                      size: 22,
-                    );
-                  },
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _getGreeting(),
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: isDark
-                        ? AppColors.darkTextSecondary
-                        : AppColors.textSecondary,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  'Twela',
-                  style: displayStyle(context, size: 34),
-                ),
-              ],
-            ),
-          ],
+              const SizedBox(height: 2),
+              // The wordmark: Unbounded displayStyle, 700, tight tracking.
+              Text('Twela', style: displayStyle(context, size: 58)),
+            ],
+          ),
         ),
-        _buildNotificationButton(context, theme, isDark),
+        const SizedBox(width: S.sm),
+        PressScale(
+          onTap: () {
+            if (widget.onOpenSettings != null) {
+              widget.onOpenSettings!();
+            } else {
+              Navigator.pushNamed(context, '/settings');
+            }
+          },
+          child: Semantics(
+            button: true,
+            label: 'الإعدادات',
+            child: Container(
+              width: 48,
+              height: 48,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: c.surface,
+                borderRadius: BorderRadius.circular(R.inner),
+                border: Border.all(color: c.line),
+              ),
+              child: const Icon(LucideIcons.settings, size: 22),
+            ),
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildMotivationalMessage(
-      BuildContext context, ThemeData theme, bool isDark) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.primary.withAlpha(15)
-            : AppColors.primary.withAlpha(10),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: AppColors.primary.withAlpha(30),
-          width: 1,
-        ),
-      ),
-      child: Text(
-        _motivationalMessage,
-        style: theme.textTheme.bodySmall?.copyWith(
-          color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
-          fontStyle: FontStyle.italic,
-          height: 1.4,
-        ),
-        textAlign: TextAlign.center,
-      ),
+  Widget _buildTagline(BuildContext context) {
+    return Text(
+      AppLocalizations.of(context)!.tagline,
+      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: context.inb.muted,
+          ),
     );
   }
 
+  /// The owner's fixed line for the dawn slot; the rest of the day keeps its
+  /// own greeting so the screen never lies about the hour.
   String _getGreeting() {
     final hour = DateTime.now().hour;
+    final l10n = AppLocalizations.of(context)!;
 
     if (hour >= 5 && hour < 7) {
-      return AppLocalizations.of(context)!.moodDawn;
+      return l10n.moodDawn;
     } else if (hour >= 7 && hour < 12) {
-      return AppLocalizations.of(context)!.moodMorning;
+      return l10n.moodMorning;
     } else if (hour >= 12 && hour < 14) {
-      return AppLocalizations.of(context)!.moodNoon;
+      return l10n.moodNoon;
     } else if (hour >= 14 && hour < 17) {
-      return AppLocalizations.of(context)!.moodEvening;
+      return l10n.moodEvening;
     } else if (hour >= 17 && hour < 19) {
-      return AppLocalizations.of(context)!.moodRest;
+      return l10n.moodRest;
     } else if (hour >= 19 && hour < 22) {
-      return AppLocalizations.of(context)!.moodNiceEvening;
+      return l10n.moodNiceEvening;
     } else {
-      return AppLocalizations.of(context)!.moodGoodEvening;
+      return l10n.moodGoodEvening;
     }
   }
 
-  Widget _buildNotificationButton(
-      BuildContext context, ThemeData theme, bool isDark) {
-    return PressScale(
-      onTap: () {
-        if (widget.onOpenSettings != null) {
-          widget.onOpenSettings!();
-        } else {
-          Navigator.pushNamed(context, '/settings');
-        }
-      },
-      child: Container(
-        width: 44,
-        height: 44,
-        decoration: BoxDecoration(
-          color: isDark
-              ? AppColors.primary.withAlpha(25)
-              : AppColors.primarySurface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: AppColors.primary.withAlpha(30),
-            width: 1,
-          ),
-        ),
-        child: Icon(
-          Icons.settings_outlined,
-          color: AppColors.primary,
-          size: 22,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGlyphBar(BuildContext context, ThemeData theme, bool isDark) {
+  /// Budget / days-left line: a slim surface row, not a card of its own.
+  Widget _buildGlyphBar(BuildContext context) {
+    final c = context.inb;
     return Consumer<TwelaProvider>(
       builder: (context, provider, _) {
         final now = DateTime.now();
@@ -251,59 +176,52 @@ class _HomeScreenState extends State<HomeScreen> {
         final daysLeft = daysInMonth - now.day;
         final monthlyBudget = provider.budgetSettings.monthlyBudgetTotal;
         final monthSpent = provider.monthSpent;
+        final l10n = AppLocalizations.of(context)!;
 
         String message;
         IconData icon;
+        Color tone;
 
         if (monthlyBudget != null && monthlyBudget > 0) {
           final percent = ((monthSpent / monthlyBudget) * 100).round();
           if (percent >= 100) {
-            message = AppLocalizations.of(context)!.budgetExceeded;
-            icon = Icons.warning_amber_outlined;
+            message = l10n.budgetExceeded;
+            icon = LucideIcons.triangleAlert;
+            tone = context.sem.warning;
           } else if (percent >= 80) {
-            message =
-                AppLocalizations.of(context)!.reachedPercentOfBudget(percent);
-            icon = Icons.info_outline;
+            message = l10n.reachedPercentOfBudget(percent);
+            icon = LucideIcons.info;
+            tone = c.indigo;
           } else {
-            message =
-                AppLocalizations.of(context)!.spentPercentOfBudget(percent);
-            icon = Icons.check_circle_outline;
+            message = l10n.spentPercentOfBudget(percent);
+            icon = LucideIcons.circleCheck;
+            tone = context.sem.income;
           }
         } else {
-          message = AppLocalizations.of(context)!.daysLeftInMonth(daysLeft);
-          icon = Icons.calendar_today_outlined;
+          message = l10n.daysLeftInMonth(daysLeft);
+          icon = LucideIcons.calendarDays;
+          tone = c.muted;
         }
 
         return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: S.md, vertical: 12),
           decoration: BoxDecoration(
-            color: isDark
-                ? AppColors.darkSurface.withAlpha(128)
-                : context.inb.surface,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: isDark
-                  ? AppColors.darkBorder.withAlpha(128)
-                  : AppColors.border.withAlpha(180),
-              width: 1,
-            ),
+            color: c.surface,
+            borderRadius: BorderRadius.circular(R.inner),
+            border: Border.all(color: c.line),
           ),
           child: Row(
             children: [
-              Icon(
-                icon,
-                size: 16,
-                color: AppColors.primary,
-              ),
-              const SizedBox(width: 8),
+              Icon(icon, size: 16, color: tone),
+              const SizedBox(width: S.sm),
               Expanded(
                 child: Text(
                   message,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: isDark
-                        ? AppColors.darkTextSecondary
-                        : AppColors.textSecondary,
-                    fontWeight: FontWeight.w500,
+                  style: TextStyle(
+                    fontFamily: InbFonts.arabic,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: c.muted,
                   ),
                 ),
               ),
@@ -314,312 +232,300 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildWalletCards(BuildContext context) {
-    return Consumer<TwelaProvider>(
-      builder: (context, provider, _) {
+  /// The bento: one long tile at ~55% (الحصالة) and two small radius-18
+  /// tiles stacked in the rest — all `surface`, no card inside a card, and
+  /// the rose stays on the frame alone.
+  Widget _buildBento(BuildContext context) {
+    final c = context.inb;
+    final sem = context.sem;
+
+    return Consumer3<TwelaProvider, SavingsProvider, DebtProvider>(
+      builder: (context, twela, savings, debts, _) {
+        final l10n = AppLocalizations.of(context)!;
+        final owedToMe = debts.collectibleDebts.fold(
+          0.0,
+          (sum, d) => sum + d.remaining,
+        );
+        final ratio = savings.totalTarget > 0
+            ? (savings.totalSaved / savings.totalTarget).clamp(0.0, 1.0)
+            : 0.0;
+
         return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: WalletMiniCard(
-                title: AppLocalizations.of(context)!.cash,
-                amount: provider.cashBalance,
-                icon: Icons.money_outlined,
-                color: AppColors.primary,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: WalletMiniCard(
-                title: AppLocalizations.of(context)!.bank,
-                amount: provider.bankBalance,
-                icon: Icons.account_balance_outlined,
-                color: AppColors.success,
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  /// The rose savings tile: the single promo tile per screen rule, and the
-  /// only entry point to the savings feature from home.
-  Widget _buildSavingsTile(BuildContext context) {
-    return Consumer<SavingsProvider>(
-      builder: (context, savings, _) {
-        final c = context.inb;
-        return BentoCard(
-          tone: BentoTone.rose,
-          onTap: () => Navigator.pushNamed(context, '/savings'),
-          padding: const EdgeInsets.all(S.md),
-          child: Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: c.onRose.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(R.inner),
-                ),
-                child: Icon(Icons.savings_outlined, color: c.onRose, size: 20),
-              ),
-              const SizedBox(width: S.md),
-              Expanded(
+              flex: 11,
+              child: BentoCard(
+                onTap: () => Navigator.pushNamed(context, '/savings'),
+                padding: const EdgeInsets.all(S.md),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
+                        _TileIcon(
+                            icon: LucideIcons.piggyBank, tone: sem.savings),
+                        const SizedBox(width: S.sm),
                         Expanded(
                           child: Text(
-                            AppLocalizations.of(context)!.savingsGoal,
+                            l10n.savingsGoal,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontFamily: InbFonts.arabic,
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
-                              color: c.onRose,
+                              color: c.fg,
                             ),
                           ),
                         ),
-                        InbBadge('${savings.activeGoals.length}'),
+                        if (savings.activeGoals.isNotEmpty)
+                          InbBadge('${savings.activeGoals.length}'),
                       ],
                     ),
-                    const SizedBox(height: 2),
-                    Row(
-                      children: [
-                        Text(
-                          AppLocalizations.of(context)!.savedSoFar,
-                          style: TextStyle(
-                            fontFamily: InbFonts.arabic,
-                            fontSize: 12,
-                            color: c.onRose.withValues(alpha: 0.7),
-                          ),
-                        ),
-                        const SizedBox(width: S.sm),
-                        Money(
-                          savings.totalSaved,
-                          size: 14,
-                          color: c.onRose,
-                        ),
-                      ],
+                    const SizedBox(height: S.md),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Money(savings.totalSaved, size: 24),
+                    ),
+                    const SizedBox(height: S.sm),
+                    InbProgress(value: ratio, color: sem.savings),
+                    const SizedBox(height: S.xs),
+                    Text(
+                      '${l10n.savedSoFar} · ${formatPercent(ratio)}',
+                      style: microStyle(context),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: S.sm),
-              Icon(Icons.chevron_right, size: 18, color: c.onRose),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildTodaySpending(
-      BuildContext context, ThemeData theme, bool isDark) {
-    return Consumer<TwelaProvider>(
-      builder: (context, provider, _) {
-        final dailyLimit = provider.budgetSettings.dailySpendingLimit;
-        final todaySpent = provider.todaySpent;
-
-        return DaftarCard(
-          showDiagonalCut: false,
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            ),
+            const SizedBox(width: S.sm),
+            Expanded(
+              flex: 9,
+              child: Column(
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? AppColors.primary.withAlpha(38)
-                              : AppColors.primarySurface,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: AppColors.primary.withAlpha(30),
-                            width: 1,
-                          ),
-                        ),
-                        child: Icon(
-                          Icons.receipt_long_outlined,
-                          color: AppColors.primary,
-                          size: 18,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        AppLocalizations.of(context)!.spentToday,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: isDark
-                              ? AppColors.darkTextPrimary
-                              : AppColors.textPrimary,
-                        ),
-                      ),
-                    ],
+                  _SmallTile(
+                    title: l10n.spentToday,
+                    icon: LucideIcons.arrowDownLeft,
+                    amount: twela.todaySpent,
+                    tone: c.fg,
+                    trailing: twela.budgetSettings.dailySpendingLimit != null
+                        ? formatPercent(
+                            twela.budgetSettings.dailySpendingLimit! > 0
+                                ? twela.todaySpent /
+                                    twela.budgetSettings.dailySpendingLimit!
+                                : 0,
+                          )
+                        : null,
+                    trailingTone: c.muted,
                   ),
-                  Money(
-                    todaySpent,
-                    size: 18,
-                    weight: FontWeight.w700,
-                    color: AppColors.primary,
+                  const SizedBox(height: S.sm),
+                  _SmallTile(
+                    title: l10n.myDebts,
+                    icon: LucideIcons.handCoins,
+                    amount: owedToMe,
+                    tone: sem.debt,
+                    onTap: () => Navigator.pushNamed(context, '/debts'),
                   ),
                 ],
               ),
-              if (dailyLimit != null) ...[
-                const SizedBox(height: 16),
-                LimitProgressBar(
-                  current: todaySpent,
-                  limit: dailyLimit,
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          '${AppLocalizations.of(context)!.limit}: ',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: isDark
-                                ? AppColors.darkTextSecondary
-                                : AppColors.textSecondary,
-                          ),
-                        ),
-                        Money(
-                          dailyLimit,
-                          size: 13,
-                          weight: FontWeight.w400,
-                          color: isDark
-                              ? AppColors.darkTextSecondary
-                              : AppColors.textSecondary,
-                        ),
-                      ],
-                    ),
-                    Text(
-                      dailyLimit > 0
-                          ? '${((todaySpent / dailyLimit) * 100).toStringAsFixed(0)}%'
-                          : '0%',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: isDark
-                            ? AppColors.darkTextSecondary
-                            : AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ],
-          ),
+            ),
+          ],
         );
       },
     );
   }
 
-  Widget _buildQuickActions(
-      BuildContext context, ThemeData theme, bool isDark) {
+  /// One outline capsule per action, four across: دخل / مصروف / ادخار / دين.
+  Widget _buildQuickActions(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    final actions = <_QuickAction>[
+      _QuickAction(
+        icon: LucideIcons.arrowUpRight,
+        label: l10n.quickIncome,
+        tone: context.sem.income,
+        onTap: () => Navigator.pushNamed(
+          context,
+          '/add-transaction',
+          arguments: {'type': 'income'},
+        ),
+      ),
+      _QuickAction(
+        icon: LucideIcons.arrowDownLeft,
+        label: l10n.quickExpense,
+        tone: context.inb.fg,
+        onTap: () => Navigator.pushNamed(context, '/add-transaction'),
+      ),
+      _QuickAction(
+        icon: LucideIcons.piggyBank,
+        label: l10n.quickSavings,
+        tone: context.sem.savings,
+        onTap: () => Navigator.pushNamed(context, '/savings'),
+      ),
+      _QuickAction(
+        icon: LucideIcons.handCoins,
+        label: l10n.quickDebt,
+        tone: context.sem.debt,
+        onTap: () => Navigator.pushNamed(context, '/add-debt'),
+      ),
+    ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          AppLocalizations.of(context)!.quickActions,
-          style: theme.textTheme.headlineSmall?.copyWith(
-            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 12),
+        Text(l10n.quickActions, style: arabicDisplay(context, size: 24)),
+        const SizedBox(height: S.md),
         Row(
           children: [
-            Expanded(
-              child: _buildQuickAction(
-                context,
-                theme: theme,
-                isDark: isDark,
-                icon: Icons.arrow_upward_rounded,
-                label: AppLocalizations.of(context)!.addExpense,
-                color: AppColors.expense,
-                onTap: () => Navigator.pushNamed(context, '/add-transaction'),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildQuickAction(
-                context,
-                theme: theme,
-                isDark: isDark,
-                icon: Icons.arrow_downward_rounded,
-                label: AppLocalizations.of(context)!.addIncome,
-                color: AppColors.income,
-                onTap: () => Navigator.pushNamed(
-                  context,
-                  '/add-transaction',
-                  arguments: {'type': 'income'},
-                ),
-              ),
-            ),
+            for (final action in actions) ...[
+              if (action != actions.first) const SizedBox(width: S.sm),
+              Expanded(child: action.build(context)),
+            ],
           ],
         ),
       ],
     );
   }
+}
 
-  Widget _buildQuickAction(
-    BuildContext context, {
-    required ThemeData theme,
-    required bool isDark,
-    required IconData icon,
-    required String label,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
+class _QuickAction {
+  const _QuickAction({
+    required this.icon,
+    required this.label,
+    required this.tone,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color tone;
+  final VoidCallback onTap;
+
+  Widget build(BuildContext context) {
+    final c = context.inb;
     return PressScale(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-        decoration: BoxDecoration(
-          color: context.inb.surface,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: isDark ? AppColors.darkBorder : AppColors.border,
-            width: 1,
+      child: Semantics(
+        button: true,
+        label: label,
+        child: Container(
+          height: 60,
+          padding: const EdgeInsets.symmetric(horizontal: S.xs),
+          decoration: BoxDecoration(
+            color: c.surface,
+            borderRadius: BorderRadius.circular(R.pill),
+            border: Border.all(color: c.line),
           ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 28,
-              height: 28,
-              decoration: BoxDecoration(
-                color: color.withAlpha(25),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: color.withAlpha(38),
-                  width: 1,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 17, color: tone),
+              const SizedBox(height: S.xs),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontFamily: InbFonts.arabic,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: c.fg,
                 ),
               ),
-              child: Icon(icon, color: color, size: 16),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: theme.textTheme.titleSmall?.copyWith(
-                color:
-                    isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TileIcon extends StatelessWidget {
+  const _TileIcon({required this.icon, required this.tone});
+  final IconData icon;
+  final Color tone;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.inb;
+    return Container(
+      width: 34,
+      height: 34,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: c.paper,
+        borderRadius: BorderRadius.circular(R.inner),
+        border: Border.all(color: c.line),
+      ),
+      child: Icon(icon, size: 17, color: tone),
+    );
+  }
+}
+
+class _SmallTile extends StatelessWidget {
+  const _SmallTile({
+    required this.title,
+    required this.icon,
+    required this.amount,
+    required this.tone,
+    this.trailing,
+    this.trailingTone,
+    this.onTap,
+  });
+
+  final String title;
+  final IconData icon;
+  final double amount;
+  final Color tone;
+  final String? trailing;
+  final Color? trailingTone;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.inb;
+    return BentoCard(
+      onTap: onTap,
+      radius: R.inner,
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 15, color: tone),
+              const SizedBox(width: S.xs),
+              Expanded(
+                child: Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: InbFonts.arabic,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: c.muted,
+                  ),
+                ),
               ),
+            ],
+          ),
+          const SizedBox(height: S.sm),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: AlignmentDirectional.centerStart,
+            child: Money(amount, size: 17, color: tone),
+          ),
+          if (trailing != null) ...[
+            const SizedBox(height: 2),
+            Text(
+              trailing!,
+              style: microStyle(context, color: trailingTone),
             ),
           ],
-        ),
+        ],
       ),
     );
   }

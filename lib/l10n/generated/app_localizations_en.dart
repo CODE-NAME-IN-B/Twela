@@ -913,4 +913,40 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get yourGoal => 'Your goal';
+
+  @override
+  String get allAccounts => 'All accounts';
+
+  @override
+  String get myDebts => 'My debts';
+
+  @override
+  String get totalBalanceLabel => 'Total balance';
+
+  @override
+  String get cashBalanceLabel => 'Cash balance';
+
+  @override
+  String get bankBalanceLabel => 'Bank balance';
+
+  @override
+  String get todayIncome => 'Income today';
+
+  @override
+  String get quickIncome => 'Income';
+
+  @override
+  String get quickExpense => 'Expense';
+
+  @override
+  String get quickSavings => 'Savings';
+
+  @override
+  String get quickDebt => 'Debt';
+
+  @override
+  String get settled => 'Settled';
+
+  @override
+  String get paidOff => 'Paid';
 }

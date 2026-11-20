@@ -70,9 +70,3 @@ flutter:
           weight: 400
         - asset: assets/fonts/Unbounded-Bold.ttf
           weight: 700
-    - family: Silkscreen
-      fonts:
-        - asset: assets/fonts/Silkscreen-Regular.ttf
-          weight: 400
-        - asset: assets/fonts/Silkscreen-Bold.ttf
-          weight: 700

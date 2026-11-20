@@ -99,12 +99,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ],
                 ),
               ),
-              // Pixel wordmark footer.
+              // Wordmark footer: the brand name only, no pixel face.
               Padding(
                 padding: const EdgeInsets.only(bottom: S.md),
                 child: Text(
-                  'TWELA',
-                  style: pixelStyle(context, color: context.inb.muted),
+                  'Twela',
+                  style: displayStyle(context, size: 18),
                 ),
               ),
             ],

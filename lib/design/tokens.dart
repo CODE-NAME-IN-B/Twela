@@ -198,7 +198,6 @@ class InbFonts {
   static const arabic = 'IBM Plex Sans Arabic';
   static const mono = 'Space Mono';
   static const display = 'Unbounded';
-  static const pixel = 'Silkscreen';
 }
 
 /// The only thing the user may re-colour: the tint of the dark island.

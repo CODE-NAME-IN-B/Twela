@@ -285,5 +285,17 @@
   "withdrawal": "سحب",
   "withinDays": "خلال {duration} يوم",
   "youAreUpToDate": "أنت تستخدم أحدث إصدار",
-  "yourGoal": "هدفك"
+  "yourGoal": "هدفك",
+  "allAccounts": "كل الحسابات",
+  "myDebts": "ديون لي",
+  "totalBalanceLabel": "الرصيد الكلي",
+  "cashBalanceLabel": "رصيد الكاش",
+  "bankBalanceLabel": "رصيد المصرف",
+  "todayIncome": "دخل اليوم",
+  "quickIncome": "دخل",
+  "quickExpense": "مصروف",
+  "quickSavings": "ادخار",
+  "quickDebt": "دين",
+  "settled": "مسدّدة",
+  "paidOff": "تم السداد"
 }

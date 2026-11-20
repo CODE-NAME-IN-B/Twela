@@ -906,4 +906,40 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get yourGoal => 'هدفك';
+
+  @override
+  String get allAccounts => 'كل الحسابات';
+
+  @override
+  String get myDebts => 'ديون لي';
+
+  @override
+  String get totalBalanceLabel => 'الرصيد الكلي';
+
+  @override
+  String get cashBalanceLabel => 'رصيد الكاش';
+
+  @override
+  String get bankBalanceLabel => 'رصيد المصرف';
+
+  @override
+  String get todayIncome => 'دخل اليوم';
+
+  @override
+  String get quickIncome => 'دخل';
+
+  @override
+  String get quickExpense => 'مصروف';
+
+  @override
+  String get quickSavings => 'ادخار';
+
+  @override
+  String get quickDebt => 'دين';
+
+  @override
+  String get settled => 'مسدّدة';
+
+  @override
+  String get paidOff => 'تم السداد';
 }

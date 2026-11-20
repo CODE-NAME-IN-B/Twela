@@ -202,15 +202,18 @@ TextStyle monoStyle(
       color: color ?? context.inb.fg,
     );
 
-/// Giant Latin display type for brand words and numbers-as-art (tight tracking).
-/// Never use it for Arabic — Arabic display is [arabicDisplay].
+/// Giant Latin display type for brand words and numbers-as-art.
+///
+/// Frozen by the owner for the `Twela` wordmark: Unbounded, weight 700,
+/// letter-spacing ≈ −0.05em, line-height 1.0 — name only. Never used for
+/// Arabic: Arabic display is [arabicDisplay].
 TextStyle displayStyle(BuildContext context,
         {double size = 44, Color? color}) =>
     TextStyle(
       fontFamily: InbFonts.display,
       fontSize: size,
       fontWeight: FontWeight.w700,
-      letterSpacing: -size * 0.04,
+      letterSpacing: -size * 0.05,
       height: 1,
       color: color ?? context.inb.fg,
     );
@@ -232,24 +235,18 @@ TextStyle arabicDisplay(
       color: color ?? context.inb.fg,
     );
 
-/// Tiny uppercase mono label used above data and inside cells.
+/// Tiny label above data and inside cells.
+///
+/// Labels in this app are Arabic only (the owner banned every English tech
+/// label), so this is the Arabic face at label size: Space Mono has no Arabic
+/// glyphs, and its 0.66 tracking would break the cursive joins. Numbers never
+/// come through here — they use [monoStyle].
 TextStyle microStyle(BuildContext context, {Color? color, double size = 11}) =>
     TextStyle(
-      fontFamily: InbFonts.mono,
+      fontFamily: InbFonts.arabic,
       fontSize: size,
       fontWeight: FontWeight.w700,
-      letterSpacing: 0.66,
-      height: 1.2,
+      letterSpacing: 0,
+      height: 1.3,
       color: color ?? context.inb.muted,
-    );
-
-/// Pixel wordmark style — only for the wordmark and tiny marks.
-TextStyle pixelStyle(BuildContext context, {double size = 11, Color? color}) =>
-    TextStyle(
-      fontFamily: InbFonts.pixel,
-      fontSize: size,
-      fontWeight: FontWeight.w400,
-      letterSpacing: 0.04,
-      height: 1.2,
-      color: color ?? context.inb.fg,
     );

@@ -285,5 +285,17 @@
   "withdrawal": "Withdrawal",
   "withinDays": "within {duration} days",
   "youAreUpToDate": "You are using the latest version",
-  "yourGoal": "Your goal"
+  "yourGoal": "Your goal",
+  "allAccounts": "All accounts",
+  "myDebts": "My debts",
+  "totalBalanceLabel": "Total balance",
+  "cashBalanceLabel": "Cash balance",
+  "bankBalanceLabel": "Bank balance",
+  "todayIncome": "Income today",
+  "quickIncome": "Income",
+  "quickExpense": "Expense",
+  "quickSavings": "Savings",
+  "quickDebt": "Debt",
+  "settled": "Settled",
+  "paidOff": "Paid"
 }
