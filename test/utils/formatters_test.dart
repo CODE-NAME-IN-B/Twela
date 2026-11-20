@@ -20,8 +20,12 @@ void main() {
       expect(formatLyd(1234567.89), '1,234,567.89 د.ل');
     });
 
-    test('formats negative amount', () {
-      expect(formatLyd(-50.25), '-50.25 د.ل');
+    test('formats negative amount with the real minus (U+2212)', () {
+      // An ASCII hyphen flips to the wrong side of the number in RTL, so the
+      // formatter must emit U+2212 and never `-,100` on grouped values.
+      expect(formatLyd(-50.25), '−50.25 د.ل');
+      expect(formatLyd(-100), '−100.00 د.ل');
+      expect(formatLyd(-1234567.89), '−1,234,567.89 د.ل');
     });
   });
 

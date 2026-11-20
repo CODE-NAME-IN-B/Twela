@@ -14,6 +14,7 @@ class InbColors extends ThemeExtension<InbColors> {
     required this.line,
     required this.island,
     required this.onIsland,
+    required this.onIslandMuted,
     required this.mint,
     required this.rose,
     required this.onRose,
@@ -29,6 +30,7 @@ class InbColors extends ThemeExtension<InbColors> {
       line,
       island,
       onIsland,
+      onIslandMuted,
       mint,
       rose,
       onRose,
@@ -44,6 +46,7 @@ class InbColors extends ThemeExtension<InbColors> {
     line: Color(0x2615130F),
     island: Color(0xFF0E2A21),
     onIsland: Color(0xFFEAF4EE),
+    onIslandMuted: Color(0xFFA9C7B8),
     mint: Color(0xFF3DDC84),
     rose: Color(0xFFE3BDB4),
     onRose: Color(0xFF15130F),
@@ -60,6 +63,7 @@ class InbColors extends ThemeExtension<InbColors> {
     line: Color(0x33F2ECE1),
     island: Color(0xFF17382B),
     onIsland: Color(0xFFEAF4EE),
+    onIslandMuted: Color(0xFFA9C7B8),
     mint: Color(0xFF3DDC84),
     rose: Color(0xFF3A2A27),
     onRose: Color(0xFFF0CFC8),
@@ -77,6 +81,7 @@ class InbColors extends ThemeExtension<InbColors> {
         line: line,
         island: island ?? this.island,
         onIsland: onIsland,
+        onIslandMuted: onIslandMuted,
         mint: mint,
         rose: rose ?? this.rose,
         onRose: onRose,
@@ -97,6 +102,7 @@ class InbColors extends ThemeExtension<InbColors> {
       line: l(line, other.line),
       island: l(island, other.island),
       onIsland: l(onIsland, other.onIsland),
+      onIslandMuted: l(onIslandMuted, other.onIslandMuted),
       mint: l(mint, other.mint),
       rose: l(rose, other.rose),
       onRose: l(onRose, other.onRose),
@@ -113,11 +119,15 @@ class InbColors extends ThemeExtension<InbColors> {
 /// these colours never paint a surface, never fill a card and never become a
 /// gradient. They mark an amount, a badge or a chart series — nothing else.
 ///
-/// - income  : money came in
-/// - expense : money went out
-/// - debt    : money somebody owes the user (and budget warnings)
-/// - savings : money locked in a goal
-/// - danger  : destructive action only
+/// The owner's palette (DESIGN.md, 2026-11-20) — no orange, no gold, no
+/// ochre, and red never marks an ordinary expense:
+///
+/// - income  : money came in — mint-green (dark green on paper, mint in dark)
+/// - expense : money went out — **ink**, always carrying a `−`
+/// - debt    : money somebody owes the user — indigo, always an icon
+/// - savings : money locked in a goal — island green
+/// - danger  : delete / late / error only, a faint red
+/// - warning : budget limit reached — the same faint red (gold is banned)
 class InbSemantics extends ThemeExtension<InbSemantics> {
   const InbSemantics({
     required this.income,
@@ -132,20 +142,20 @@ class InbSemantics extends ThemeExtension<InbSemantics> {
 
   static const light = InbSemantics(
     income: Color(0xFF0E6B43),
-    expense: Color(0xFFB33A2E),
-    debt: Color(0xFF9A6A06),
-    savings: Color(0xFF0E7683),
-    danger: Color(0xFFA32E22),
-    warning: Color(0xFF9A6A06),
+    expense: Color(0xFF15130F),
+    debt: Color(0xFF4747E0),
+    savings: Color(0xFF0E2A21),
+    danger: Color(0xFFA8443A),
+    warning: Color(0xFFA8443A),
   );
 
   static const dark = InbSemantics(
     income: Color(0xFF4FD68B),
-    expense: Color(0xFFFF8F7E),
-    debt: Color(0xFFE5B54A),
-    savings: Color(0xFF55CEDA),
-    danger: Color(0xFFFF8F7E),
-    warning: Color(0xFFE5B54A),
+    expense: Color(0xFFF2ECE1),
+    debt: Color(0xFF8B8BFF),
+    savings: Color(0xFF6E9C89),
+    danger: Color(0xFFFF9A8C),
+    warning: Color(0xFFFF9A8C),
   );
 
   @override

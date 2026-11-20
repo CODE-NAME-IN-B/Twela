@@ -6,6 +6,59 @@ Functional contract: `re_v1.md` (UI/UX reconstruction v10) — every P0/P1/P2 it
 
 ---
 
+## Final INB repair (A–G) — the owner's last prompt, 2026-11-20
+<!-- Every box must be ticked before sign-off. A–E run screen by screen: Home → History → Debts → Stats. -->
+### A. Shared foundations
+- [x] Island palette locked to `InbColors.island` (`#0E2A21` / `#17382B`) + third tone `onIslandMuted` (`#A9C7B8`); island text limited to `onIsland` / `onIslandMuted` / `mint`
+- [x] Semantic palette shifted: income mint-green, expense **ink** with `−`, savings island green, debt indigo, faint red only for delete/late/error; gold/ochre/orange and red-for-expense banned (`InbSemantics`)
+- [x] `Money` rebuilt: whole widget inside `Directionality(ltr)`, sign part of the number with U+2212, Space Mono, small `د.ل` after; `formatNumber` no longer emits `-,100`
+- [x] English month names gone — `16 نوفمبر 2026` from the Arabic table in `lib/design/format.dart`; `DateFormat('MMMM yyyy','en')` removed
+- [x] `GlassBar` = 4 tabs (icon + name, sliding indicator) + **separate** circular mint add button beside it, `ProgressiveBlur` + paper gradient ramp under the bar, lists padded to the bar
+- [x] No top navigation bar and no state switcher on the four main screens
+- [x] Four states per screen (loading skeleton via `skeletonizer`, empty with one action, error with «أعد المحاولة», content)
+- [x] Delete = instant + snackbar undo, no confirm dialog
+- [x] 48 px targets, `PressScale` everywhere, one `Reveal` per screen, `disableAnimations` honoured
+- [x] Packages verified on pub.dev and added: `flutter_animate`, `skeletonizer`, `lucide_icons_flutter` (2 px stroke), `intl` pinned to `en` + Arabic month table in `lib/design/`; no `fl_chart`, no syncfusion, no full 3-D lib
+- [ ] Owner decision: `inb-proto.html` is absent — the visual reference used is the skill's `templates/prototype.html`
+
+### B. Home
+- [ ] Greeting «الفجر يناديك» + `Twela` ~58 px right, 48 px settings button left
+- [ ] Tagline «مش لازم تكون مثالي، بس لازم تفهم» 14 px `muted`
+- [ ] `RoseFrame` + 2 mint corner squares
+- [ ] Island: segmented pills (الكل/كاش/مصرف) → mint label → giant mono 48 `CountUp` → دخل اليوم (+mint) / صرف اليوم (−onIsland)
+- [ ] Notch = ↗ «كل الحسابات» with doodle arrow + label (not `+`)
+- [ ] 3D coin stack on the left, tilts with touch, mint glow
+- [ ] Bento: long «الحصالة» tile ~55% (amount + progress + indigo badge) + two radius-18 tiles («صرف اليوم»، «ديون لي» indigo), all `surface`, no rose except the frame
+- [ ] «إجراءات سريعة» 24 px + outline capsules (دخل/مصروف/ادخار/دين)
+
+### C. History
+- [ ] Title 36 Arabic 700 + indigo count badge, no app bar
+- [ ] Compact island (no 3D): صافي الشهر + دخل/مصروف
+- [ ] Search + filter capsules, exactly one ink-selected
+- [ ] One `CellFrame` labelled «نوفمبر 2026», day headers, borderless rows (circular icon ↙/↗/savings, title, small type, `Money`, 48 px ⋮)
+- [ ] Four states
+
+### D. Debts
+- [ ] Title style matches History; island with لي/ عليّ segments, active total, remaining/% paid, small soft orb
+- [ ] Debt card in `CellFrame`: initial, name, description, indigo «أنا أعطيت» badge, indigo amount, mono %, 20-segment bar filling right-to-left in indigo, «تم سداد X · متبقي Y»
+- [ ] «مسدّدة» section with an explanatory empty state
+- [ ] One filled button «سجّل دفعة»; every gold → indigo
+- [ ] Four states
+
+### E. Stats
+- [ ] `ClayDonutPainter` (option A) with the fixed palette, tilt 0.56, 900 ms entrance + pop, drag-to-rotate, `atan2` hit test with vertical distance ÷ tilt, `RepaintBoundary`
+- [ ] Island holds segments + donut + total in the centre + legend capsules; tap a segment/capsule to lift it and swap the centre text, tap again to clear
+- [ ] Big card-with-two-cards and red/purple KPI backgrounds removed
+- [ ] All sections share month + filter; total = sum of segments (**the «المصروفات 0.00» vs 1,096.50 bug**)
+- [ ] Four states
+
+### F. Packages / G. Delivery
+- [ ] `dart format`, `flutter analyze` 0, `flutter test` green after every screen
+- [ ] Coverage matrix re-filled with no empty cells and no unexplained N/A
+- [ ] Modified-file list, light + dark screenshot per screen, analyze result, honest list of what was not done
+
+---
+
 ## Phase 0: Bootstrap
 - [x] DESIGN.md created (values marked inferred or confirmed)
 - [x] `lib/design/` installed from the skill's `reference/` (`tokens.dart`, `theme.dart`, `motion.dart`, `widgets.dart`)

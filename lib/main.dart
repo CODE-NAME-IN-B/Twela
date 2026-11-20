@@ -24,7 +24,11 @@ Future<void> main() async {
     systemNavigationBarColor: Colors.transparent,
   ));
 
-  await initializeDateFormatting('ar', null);
+  // Dates never come from `intl`'s locale tables: every screen formats a date
+  // through `lib/design/format.dart`, which has its own Arabic month table and
+  // always emits Latin digits. `intl` itself is pinned to `en` so any date it
+  // does format falls back to Latin digits instead of ٢٠٢٦.
+  await initializeDateFormatting('en', null);
 
   final storageService = StorageService();
   await storageService.init();

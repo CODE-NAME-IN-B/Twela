@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 
 import 'design/motion.dart';
@@ -31,6 +32,15 @@ import 'models/transaction.dart';
 
 /// Height of the floating glass navigation (without the system inset).
 const double kNavBarHeight = 58;
+
+/// The ramp above the bar: paper fading into transparency plus a progressive
+/// blur, so scrolling content dissolves under the bar instead of stopping at
+/// a hard edge.
+const double kNavScrimHeight = 76;
+
+/// Diameter of the mint add button that sits beside the bar — never inside
+/// it, so it can never be mistaken for a fifth destination.
+const double kNavAddSize = 52;
 
 class TwelaApp extends StatelessWidget {
   const TwelaApp({super.key});
@@ -168,6 +178,7 @@ class _MainScreenState extends State<MainScreen> {
         index: _currentIndex,
         onSelected: _goTo,
         onAction: () => showMovementSheet(context),
+        bottomInset: bottomInset,
       ),
     );
   }
@@ -177,77 +188,133 @@ class _MainScreenState extends State<MainScreen> {
   }
 }
 
-/// The floating glass navigation: four destinations, one movement action.
-/// The action lives inside the bar, so it can never cover a destination.
+/// The floating glass navigation: four destinations, and one separate mint
+/// action beside the bar. The action never lives inside the bar, so the bar
+/// stays a pure four-tab destination switcher.
 class _GlassNav extends StatelessWidget {
   const _GlassNav({
     required this.index,
     required this.onSelected,
     required this.onAction,
+    required this.bottomInset,
   });
 
   final int index;
   final ValueChanged<int> onSelected;
   final VoidCallback onAction;
+  final double bottomInset;
 
   static const _items = <_NavItem>[
-    _NavItem('الرئيسية', Icons.home_outlined, Icons.home_rounded),
-    _NavItem('السجل', Icons.receipt_long_outlined, Icons.receipt_long_rounded),
-    _NavItem('الديون', Icons.handshake_outlined, Icons.handshake_rounded),
-    _NavItem('الإحصائيات', Icons.insights_outlined, Icons.insights_rounded),
+    _NavItem('الرئيسية', LucideIcons.house, LucideIcons.house),
+    _NavItem('السجل', LucideIcons.receipt, LucideIcons.receipt),
+    _NavItem('الديون', LucideIcons.handshake, LucideIcons.handshake),
+    _NavItem('الإحصائيات', LucideIcons.chartPie, LucideIcons.chartPie),
   ];
 
   @override
   Widget build(BuildContext context) {
     final c = context.inb;
-    final bottomInset = MediaQuery.of(context).padding.bottom;
 
-    // Five slots: four destinations with the movement action in the centre,
-    // so the action can never cover a destination.
-    return Padding(
-      padding: EdgeInsets.fromLTRB(S.md, 0, S.md, S.sm + bottomInset),
-      child: GlassBar(
-        height: kNavBarHeight,
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final count = _items.length;
-            final slot = constraints.maxWidth / (count + 1);
-            int slotOf(int destination) =>
-                destination < 2 ? destination : destination + 1;
-            return Stack(
+    return SizedBox(
+      height: kNavBarHeight + S.sm + bottomInset,
+      child: Stack(
+        // The ramp paints above the bar, over the scrolling content.
+        clipBehavior: Clip.none,
+        children: [
+          PositionedDirectional(
+            start: -S.md,
+            end: -S.md,
+            top: -kNavScrimHeight,
+            height: kNavScrimHeight,
+            child: const _NavRamp(),
+          ),
+          PositionedDirectional(
+            start: S.md,
+            end: S.md,
+            bottom: S.sm + bottomInset,
+            height: kNavBarHeight,
+            child: Row(
               children: [
-                AnimatedPositionedDirectional(
-                  duration: Motion.base,
-                  curve: Motion.emphasized,
-                  start: slot * slotOf(index) + 5,
-                  top: 5,
-                  bottom: 5,
-                  width: slot - 10,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: c.fg,
-                      borderRadius: BorderRadius.circular(R.pill),
+                Expanded(
+                  child: GlassBar(
+                    height: kNavBarHeight,
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final count = _items.length;
+                        final slot = constraints.maxWidth / count;
+                        return Stack(
+                          children: [
+                            AnimatedPositionedDirectional(
+                              duration: Motion.base,
+                              curve: Motion.emphasized,
+                              start: slot * index + 5,
+                              top: 5,
+                              bottom: 5,
+                              width: slot - 10,
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  color: c.fg,
+                                  borderRadius: BorderRadius.circular(R.pill),
+                                ),
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                for (var i = 0; i < count; i++)
+                                  Expanded(
+                                    child: _NavButton(
+                                      item: _items[i],
+                                      selected: i == index,
+                                      onTap: () => onSelected(i),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ),
                 ),
-                Row(
-                  children: [
-                    for (var i = 0; i < count; i++) ...[
-                      if (i == 2) Expanded(child: _NavAction(onTap: onAction)),
-                      Expanded(
-                        child: _NavButton(
-                          item: _items[i],
-                          selected: i == index,
-                          onTap: () => onSelected(i),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
+                const SizedBox(width: S.sm),
+                _NavAddButton(onTap: onAction),
               ],
-            );
-          },
-        ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The paper ramp under the bar: a gradient from transparent to paper with a
+/// progressive blur on top of it.
+class _NavRamp extends StatelessWidget {
+  const _NavRamp();
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.inb;
+    return IgnorePointer(
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  c.paper.withValues(alpha: 0),
+                  c.paper.withValues(alpha: 0.72),
+                  c.paper,
+                ],
+                stops: const [0, 0.5, 1],
+              ),
+            ),
+          ),
+          ProgressiveBlur(height: kNavScrimHeight, maxSigma: 16),
+        ],
       ),
     );
   }
@@ -260,9 +327,9 @@ class _NavItem {
   final IconData activeIcon;
 }
 
-/// The centre slot: a mint circle with a plus, opening the movement sheet.
-class _NavAction extends StatelessWidget {
-  const _NavAction({required this.onTap});
+/// The mint add button: a circle beside the bar, opening the movement sheet.
+class _NavAddButton extends StatelessWidget {
+  const _NavAddButton({required this.onTap});
 
   final VoidCallback onTap;
 
@@ -275,14 +342,17 @@ class _NavAction extends StatelessWidget {
       child: PressScale(
         onTap: onTap,
         scale: 0.9,
-        child: Center(
-          child: Container(
-            width: 44,
-            height: 44,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(color: c.mint, shape: BoxShape.circle),
-            child: Icon(Icons.add_rounded, size: 24, color: c.island),
+        child: Container(
+          width: kNavAddSize,
+          height: kNavAddSize,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: c.mint,
+            shape: BoxShape.circle,
+            border: Border.all(color: c.line),
           ),
+          child:
+              const Icon(LucideIcons.plus, size: 26, color: Color(0xFF0E2A21)),
         ),
       ),
     );
