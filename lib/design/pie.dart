@@ -30,6 +30,41 @@ class InbPieLabel {
   static const none = InbPieLabel(PieLabelKind.none, '');
 }
 
+/// The extruded donut's geometry, resolved for a given box.
+///
+/// The wall is drawn downward from the top face, so the face is lifted by
+/// half the depth and the radius shrinks by it — otherwise the bottom of the
+/// wall would be clipped by the chart's own height.
+@visibleForTesting
+class InbPieGeometry {
+  const InbPieGeometry({
+    required this.center,
+    required this.outer,
+    required this.inner,
+    required this.depth,
+  });
+
+  final Offset center;
+  final double outer;
+  final double inner;
+  final double depth;
+
+  double get thickness => outer - inner;
+}
+
+InbPieGeometry inbPieGeometry(Size size, {double centerFactor = 0.34}) {
+  final minSide = math.min(size.width, size.height);
+  final depth = (minSide * 0.07).clamp(6.0, 14.0);
+  final outer = (minSide - depth) / 2 - 2;
+  final center = Offset(size.width / 2, (size.height - depth) / 2);
+  return InbPieGeometry(
+    center: center,
+    outer: outer,
+    inner: outer * centerFactor,
+    depth: depth,
+  );
+}
+
 /// Picks the richest label that fits **inside its own wedge**.
 ///
 /// A label is drawn horizontally and centred on the slice's mid-angle, so it
@@ -195,36 +230,70 @@ class _InbPiePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final center = size.center(Offset.zero);
-    final outer = math.min(size.width, size.height) / 2 - 2;
-    if (outer <= 0) return;
-    final inner = outer * centerFactor;
-    final thickness = outer - inner;
-    final outerRect = Rect.fromCircle(center: center, radius: outer);
-    final innerRect = Rect.fromCircle(center: center, radius: inner);
-    // One pixel of air between slices, converted to radians at the rim.
+    if (size.width <= 0 || size.height <= 0) return;
+    final geo = inbPieGeometry(size, centerFactor: centerFactor);
+    final outer = geo.outer;
+    final inner = geo.inner;
+    final depth = geo.depth;
+    final center = geo.center;
+    if (outer <= 0 || outer <= inner) return;
+    // One pixel of air between top slices, converted to radians at the rim.
     final gap = 1 / outer;
 
+    // Pass 1: the extruded walls (3D Soft Realism — depth from a darker
+    // tone of the slice itself, never a gradient), drawn as one continuous
+    // base so the slices sit on a solid ring instead of floating slabs.
     var angle = -math.pi / 2;
+    final sweeps = <double>[];
     for (final slice in slices) {
-      final fullSweep = (slice.value / total) * math.pi * 2;
-      final sweep = fullSweep * progress;
-      final start = angle + gap;
-      final end = angle + sweep - gap;
-      if (end > start) {
-        final path = Path()
-          ..arcTo(outerRect, start, end - start, true)
-          ..arcTo(innerRect, end, start - end, false)
-          ..close();
-        canvas.drawPath(path, Paint()..color = slice.color);
+      final sweep = (slice.value / total) * math.pi * 2 * progress;
+      sweeps.add(sweep);
+      if (sweep > 2 * gap) {
+        canvas.drawPath(
+            _ring(center + Offset(0, depth), outer, inner, angle, sweep),
+            Paint()..color = _shade(slice.color));
+      }
+      angle += sweep;
+    }
+
+    // Pass 2: the top faces, then the labels that belong to them.
+    angle = -math.pi / 2;
+    for (var i = 0; i < slices.length; i++) {
+      final slice = slices[i];
+      final sweep = sweeps[i];
+      if (sweep > 2 * gap) {
+        final face = _ring(center, outer, inner, angle + gap, sweep - 2 * gap);
+        canvas.drawPath(face, Paint()..color = slice.color);
+        // Bevel: a hairline of light on the edge reads as thickness.
+        canvas.drawPath(
+            face,
+            Paint()
+              ..color = Color.lerp(slice.color, InbColors.light.paper, 0.35)!
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 1.2);
       }
 
       if (progress > 0.999) {
-        _paintLabel(canvas, center, inner, thickness, slice, fullSweep, angle);
+        _paintLabel(canvas, center, inner, outer - inner, slice, sweep, angle);
       }
       angle += sweep;
     }
   }
+
+  /// A donut slice between [inner] and [outer], starting at [start] and
+  /// sweeping [sweep] radians.
+  Path _ring(Offset center, double outer, double inner, double start,
+          double sweep) =>
+      Path()
+        ..arcTo(
+            Rect.fromCircle(center: center, radius: outer), start, sweep, true)
+        ..arcTo(Rect.fromCircle(center: center, radius: inner), start + sweep,
+            -sweep, false)
+        ..close();
+
+  /// The extruded wall tone: the slice colour sunk toward the app's ink.
+  Color _shade(Color base) =>
+      Color.lerp(base, InbColors.dark.paper, 0.38) ?? base;
 
   void _paintLabel(Canvas canvas, Offset center, double inner, double thickness,
       InbPieSlice slice, double sweep, double startAngle) {

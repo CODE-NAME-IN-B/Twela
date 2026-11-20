@@ -12,7 +12,7 @@ import '../../providers/twela_provider.dart';
 import '../../models/transaction.dart';
 import '../../widgets/twela_design_system.dart';
 import '../../l10n/generated/app_localizations.dart';
-import '../../design/format.dart' show Money;
+import '../../design/format.dart' show Money, formatPercent;
 import '../../design/motion.dart';
 import 'package:intl/intl.dart';
 
@@ -217,56 +217,72 @@ class StatsScreen extends StatelessWidget {
             }).toList(),
           ),
           const SizedBox(height: S.md),
-          // The legend always lists every category; two columns capped at
-          // half the card width so a long name cannot push a percentage off
-          // a narrow phone.
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final itemWidth = (constraints.maxWidth - S.sm) / 2;
-              return Wrap(
-                spacing: S.sm,
-                runSpacing: S.sm,
-                children: sorted.map((entry) {
-                  final category = provider.getCategoryById(entry.key);
-                  final percentage =
-                      totalSpent > 0 ? entry.value / totalSpent : 0.0;
-                  return SizedBox(
-                    width: itemWidth,
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: category?.color ?? AppColors.expense,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: S.xs + 2),
-                        Expanded(
-                          child: Text(
-                            category?.name ??
-                                AppLocalizations.of(context)!.unknown,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.bodySmall,
-                          ),
-                        ),
-                        const SizedBox(width: S.xs),
-                        Text(
-                          '${(percentage * 100).toStringAsFixed(0)}%',
-                          style: daftarNumberStyle(
-                            context,
-                            fontSize: 12,
-                            color: theme.colorScheme.onSurface,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
-              );
-            },
+          // Two aligned columns: dot + name at the column's start, the
+          // percentage pinned to its end. A `Wrap` of fixed-width items
+          // scattered the percentages into a fourth column.
+          Builder(builder: (context) {
+            final mid = (sorted.length + 1) ~/ 2;
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    children: [
+                      for (final entry in sorted.take(mid))
+                        _legendRow(context, provider, entry, totalSpent, theme),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: S.md),
+                Expanded(
+                  child: Column(
+                    children: [
+                      for (final entry in sorted.skip(mid))
+                        _legendRow(context, provider, entry, totalSpent, theme),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _legendRow(BuildContext context, TwelaProvider provider,
+      MapEntry<String, double> entry, double totalSpent, ThemeData theme) {
+    final category = provider.getCategoryById(entry.key);
+    final percentage = totalSpent > 0 ? entry.value / totalSpent : 0.0;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: S.sm),
+      child: Row(
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(
+              color: category?.color ?? AppColors.expense,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: S.xs + 2),
+          Expanded(
+            child: Text(
+              category?.name ?? AppLocalizations.of(context)!.unknown,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodySmall,
+            ),
+          ),
+          const SizedBox(width: S.xs),
+          Text(
+            formatPercent(percentage),
+            style: daftarNumberStyle(
+              context,
+              fontSize: 12,
+              color: theme.colorScheme.onSurface,
+            ),
           ),
         ],
       ),

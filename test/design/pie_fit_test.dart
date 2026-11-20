@@ -83,6 +83,31 @@ void main() {
     expect(label.kind, PieLabelKind.percent);
   });
 
+  test('the extruded wall always fits inside the chart box', () {
+    const boxes = <Size>[
+      Size(320, 224),
+      Size(224, 224),
+      Size(200, 224),
+      Size(160, 160),
+      Size(400, 300),
+      Size(60, 60),
+    ];
+    for (final box in boxes) {
+      final geo = inbPieGeometry(box);
+      expect(geo.outer, greaterThan(0), reason: '$box');
+      expect(geo.outer, greaterThan(geo.inner), reason: '$box');
+      expect(geo.center.dy - geo.outer, greaterThanOrEqualTo(0),
+          reason: 'top clipped in $box');
+      expect(
+          geo.center.dy + geo.outer + geo.depth, lessThanOrEqualTo(box.height),
+          reason: 'wall clipped in $box');
+      expect(geo.center.dx - geo.outer, greaterThanOrEqualTo(0),
+          reason: 'left clipped in $box');
+      expect(geo.center.dx + geo.outer, lessThanOrEqualTo(box.width),
+          reason: 'right clipped in $box');
+    }
+  });
+
   testWidgets('InbPie paints a donut with labels, in both themes',
       (tester) async {
     const slices = [
