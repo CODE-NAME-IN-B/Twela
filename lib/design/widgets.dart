@@ -1009,6 +1009,47 @@ class InbIconButton extends StatelessWidget {
   }
 }
 
+/// The single app-bar action shape: 44 px paper pill with a line, inside a
+/// 48 px touch target. Replaces the oversized tinted boxes screens used to
+/// hand-roll (`Container` + `IconButton`), which read as buttons from another
+/// app on a phone.
+class InbAppBarAction extends StatelessWidget {
+  const InbAppBarAction({
+    super.key,
+    required this.icon,
+    required this.onPressed,
+    this.color,
+    this.tooltip,
+  });
+
+  final IconData icon;
+  final VoidCallback? onPressed;
+  final Color? color;
+  final String? tooltip;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.inb;
+    return Padding(
+      padding: const EdgeInsetsDirectional.only(end: S.sm),
+      child: IconButton(
+        tooltip: tooltip,
+        onPressed: onPressed,
+        icon: Icon(icon, size: 22, color: color ?? c.fg),
+        style: IconButton.styleFrom(
+          minimumSize: const Size(44, 44),
+          backgroundColor: c.paper,
+          foregroundColor: color ?? c.fg,
+          side: BorderSide(color: c.line),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(R.inner),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// The one toast in the app: ink pill at the bottom, optional undo.
 /// Loading placeholder: a soft pulsing block in the line color.
 ///

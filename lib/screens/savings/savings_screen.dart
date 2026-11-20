@@ -12,6 +12,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../design/format.dart';
 import '../../design/motion.dart';
 import '../../design/tokens.dart';
+import '../../design/widgets.dart';
 
 class SavingsScreen extends StatelessWidget {
   const SavingsScreen({super.key});
@@ -27,21 +28,12 @@ class SavingsScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.savingsGoal),
         actions: [
-          Padding(
-            padding: const EdgeInsetsDirectional.only(start: 16),
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.savingsSurface,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: IconButton(
-                icon: Icon(Icons.add, color: AppColors.savings),
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) => const AddSavingsGoalScreen()),
-                ),
-              ),
+          InbAppBarAction(
+            icon: Icons.add,
+            tooltip: AppLocalizations.of(context)!.createSavingsGoal,
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const AddSavingsGoalScreen()),
             ),
           ),
         ],

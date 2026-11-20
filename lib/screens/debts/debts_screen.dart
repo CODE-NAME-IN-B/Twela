@@ -10,6 +10,7 @@ import '../../widgets/daftar_card.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../design/format.dart';
 import '../../design/motion.dart';
+import '../../design/widgets.dart';
 
 class DebtsScreen extends StatelessWidget {
   const DebtsScreen({
@@ -82,18 +83,10 @@ class DebtsScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.debts),
         actions: [
-          Padding(
-            padding: const EdgeInsetsDirectional.only(start: 16),
-            child: Container(
-              decoration: BoxDecoration(
-                color: isDark ? AppColors.darkCard : AppColors.card,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: IconButton(
-                icon: Icon(Icons.add, color: AppColors.debt),
-                onPressed: () => Navigator.pushNamed(context, '/add-debt'),
-              ),
-            ),
+          InbAppBarAction(
+            icon: Icons.add,
+            tooltip: AppLocalizations.of(context)!.addDebt,
+            onPressed: () => Navigator.pushNamed(context, '/add-debt'),
           ),
         ],
       ),

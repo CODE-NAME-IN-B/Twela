@@ -43,13 +43,34 @@ class BalanceCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('الرصيد الكلي', style: microStyle(context)),
-            const SizedBox(height: S.sm),
-            Money(
-              provider.totalBalance,
-              size: 40,
-              color: context.inb.onIsland,
-              animate: true,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('الرصيد الكلي', style: microStyle(context)),
+                      const SizedBox(height: S.sm),
+                      // The balance shrinks instead of overflowing on a
+                      // narrow phone or with a large font scale.
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: AlignmentDirectional.centerStart,
+                        child: Money(
+                          provider.totalBalance,
+                          size: 40,
+                          color: context.inb.onIsland,
+                          animate: true,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: S.sm),
+                // The hero's one soft 3D object.
+                const CoinStack(size: 64, coins: 3),
+              ],
             ),
             const SizedBox(height: S.md),
             Row(

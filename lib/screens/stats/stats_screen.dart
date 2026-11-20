@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:fl_chart/fl_chart.dart';
 import '../../design/screen.dart';
+import '../../design/pie.dart';
 import '../../design/theme.dart';
 import '../../design/tokens.dart';
 import '../../theme/app_colors.dart';
@@ -202,90 +202,71 @@ class StatsScreen extends StatelessWidget {
             style: theme.textTheme.headlineSmall,
           ),
           const SizedBox(height: 20),
-          // No labels inside the ring on thin slices — they collide. Big
-          // slices carry the Arabic name + percentage, mid slices the
-          // percentage alone; everything stays in the legend below.
-          SizedBox(
-            height: 220,
-            child: PieChart(
-              PieChartData(
-                sections: sorted.map((entry) {
+          // Labels live inside each slice and are measured against that
+          // slice's own width, so Arabic names can never run into a
+          // neighbour (see lib/design/pie.dart).
+          InbPie(
+            height: 224,
+            slices: sorted.map((entry) {
+              final category = provider.getCategoryById(entry.key);
+              return InbPieSlice(
+                name: category?.name ?? AppLocalizations.of(context)!.unknown,
+                value: entry.value,
+                color: category?.color ?? AppColors.expense,
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: S.md),
+          // The legend always lists every category; two columns capped at
+          // half the card width so a long name cannot push a percentage off
+          // a narrow phone.
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final itemWidth = (constraints.maxWidth - S.sm) / 2;
+              return Wrap(
+                spacing: S.sm,
+                runSpacing: S.sm,
+                children: sorted.map((entry) {
                   final category = provider.getCategoryById(entry.key);
                   final percentage =
                       totalSpent > 0 ? entry.value / totalSpent : 0.0;
-                  final pctText = '${(percentage * 100).toStringAsFixed(0)}%';
-                  final name =
-                      category?.name ?? AppLocalizations.of(context)!.unknown;
-
-                  final String title;
-                  if (percentage >= 0.15) {
-                    title = '$name $pctText';
-                  } else if (percentage >= 0.08) {
-                    title = pctText;
-                  } else {
-                    title = '';
-                  }
-
-                  return PieChartSectionData(
-                    value: entry.value,
-                    color: category?.color ?? AppColors.expense,
-                    radius: 88,
-                    showTitle: title.isNotEmpty,
-                    title: title,
-                    titleStyle: percentage >= 0.15
-                        ? TextStyle(
-                            fontFamily: InbFonts.arabic,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            height: 1.2,
-                            color: context.inb.paper,
-                          )
-                        : monoStyle(context,
-                            size: 12, color: context.inb.paper),
+                  return SizedBox(
+                    width: itemWidth,
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: category?.color ?? AppColors.expense,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: S.xs + 2),
+                        Expanded(
+                          child: Text(
+                            category?.name ??
+                                AppLocalizations.of(context)!.unknown,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodySmall,
+                          ),
+                        ),
+                        const SizedBox(width: S.xs),
+                        Text(
+                          '${(percentage * 100).toStringAsFixed(0)}%',
+                          style: daftarNumberStyle(
+                            context,
+                            fontSize: 12,
+                            color: theme.colorScheme.onSurface,
+                          ),
+                        ),
+                      ],
+                    ),
                   );
                 }).toList(),
-                sectionsSpace: 2,
-                centerSpaceRadius: 48,
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          // Spans the full card width: items spread evenly on every line.
-          Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            runSpacing: 8,
-            children: sorted.map((entry) {
-              final category = provider.getCategoryById(entry.key);
-              final percentage =
-                  totalSpent > 0 ? entry.value / totalSpent : 0.0;
-              return Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 10,
-                    height: 10,
-                    decoration: BoxDecoration(
-                      color: category?.color ?? AppColors.expense,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    category?.name ?? AppLocalizations.of(context)!.unknown,
-                    style: theme.textTheme.bodySmall,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    '${(percentage * 100).toStringAsFixed(0)}%',
-                    style: daftarNumberStyle(
-                      context,
-                      fontSize: 12,
-                      color: theme.colorScheme.onSurface,
-                    ),
-                  ),
-                ],
               );
-            }).toList(),
+            },
           ),
         ],
       ),

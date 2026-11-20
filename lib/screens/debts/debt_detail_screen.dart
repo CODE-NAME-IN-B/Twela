@@ -14,7 +14,7 @@ import '../../widgets/daftar_card.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../design/format.dart';
 import '../../design/motion.dart';
-import '../../design/widgets.dart' show showInbToast;
+import '../../design/widgets.dart' show InbAppBarAction, showInbToast;
 
 class DebtDetailScreen extends StatefulWidget {
   final Debt debt;
@@ -108,20 +108,11 @@ class _DebtDetailScreenState extends State<DebtDetailScreen> {
       appBar: AppBar(
         title: Text(widget.debt.personName),
         actions: [
-          Padding(
-            padding: const EdgeInsetsDirectional.only(start: 16),
-            child: Container(
-              decoration: BoxDecoration(
-                color: isDark
-                    ? AppColors.danger.withValues(alpha: 0.12)
-                    : AppColors.dangerSurface,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: IconButton(
-                icon: Icon(Icons.delete_outline, color: AppColors.danger),
-                onPressed: () => _confirmDelete(context),
-              ),
-            ),
+          InbAppBarAction(
+            icon: Icons.delete_outline,
+            color: AppColors.danger,
+            tooltip: AppLocalizations.of(context)!.deleteDebt,
+            onPressed: () => _confirmDelete(context),
           ),
         ],
       ),

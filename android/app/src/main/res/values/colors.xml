@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- INB paper + ink, mirrored from lib/design/tokens.dart so the window
+         behind the app (splash, cutout, system bars) never flashes white or
+         black on either theme. -->
+    <color name="inb_paper_light">#FBF7EF</color>
+    <color name="inb_paper_dark">#12241C</color>
+</resources>
