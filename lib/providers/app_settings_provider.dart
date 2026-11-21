@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import '../models/app_settings.dart';
 import '../services/storage_service.dart';
+import 'boot_state.dart';
 
-class AppSettingsProvider extends ChangeNotifier {
+class AppSettingsProvider extends ChangeNotifier with BootState {
   final StorageService _storage;
   AppSettings _settings = const AppSettings();
 
   AppSettingsProvider(this._storage) {
-    _settings = _storage.getAppSettings();
+    boot(_storage, _load);
   }
+
+  void _load() => _settings = _storage.getAppSettings();
 
   AppSettings get settings => _settings;
   bool get hapticFeedback => _settings.hapticFeedback;

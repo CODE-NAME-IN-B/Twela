@@ -942,4 +942,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get paidOff => 'تم السداد';
+
+  @override
+  String get loadFailedTitle => 'تعذّر تحميل بياناتك';
+
+  @override
+  String get retry => 'أعد المحاولة';
 }

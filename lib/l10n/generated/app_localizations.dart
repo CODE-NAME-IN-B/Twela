@@ -1885,6 +1885,18 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تم السداد'**
   String get paidOff;
+
+  /// No description provided for @loadFailedTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر تحميل بياناتك'**
+  String get loadFailedTitle;
+
+  /// No description provided for @retry.
+  ///
+  /// In ar, this message translates to:
+  /// **'أعد المحاولة'**
+  String get retry;
 }
 
 class _AppLocalizationsDelegate

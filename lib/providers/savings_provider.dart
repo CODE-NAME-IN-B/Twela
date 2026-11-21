@@ -6,6 +6,7 @@ import '../models/transaction.dart';
 import '../providers/twela_provider.dart';
 import '../providers/debt_provider.dart';
 import '../services/storage_service.dart';
+import 'boot_state.dart';
 
 /// Owns every savings goal and the money inside it.
 ///
@@ -18,7 +19,7 @@ import '../services/storage_service.dart';
 ///   `savingsWithdrawal` credit and the `debtPayment` debit cancel out.
 /// - A goal's saved amount is always derived from its entries, never trusted
 ///   from storage, so it can never drift.
-class SavingsProvider extends ChangeNotifier {
+class SavingsProvider extends ChangeNotifier with BootState {
   final StorageService _storage;
   static const _uuid = Uuid();
 
@@ -31,6 +32,10 @@ class SavingsProvider extends ChangeNotifier {
   final DebtProvider? debts;
 
   SavingsProvider(this._storage, this.ledger, [this.debts]) {
+    boot(_storage, _load);
+  }
+
+  void _load() {
     _goals = _storage.getSavingsGoals();
     _entries = _storage.getSavingsEntries();
     _syncGoalAmounts();

@@ -4,8 +4,9 @@ import '../models/debt.dart';
 import '../models/transaction.dart';
 import '../providers/twela_provider.dart';
 import '../services/storage_service.dart';
+import 'boot_state.dart';
 
-class DebtProvider extends ChangeNotifier {
+class DebtProvider extends ChangeNotifier with BootState {
   final StorageService _storage;
   static const _uuid = Uuid();
 
@@ -13,8 +14,10 @@ class DebtProvider extends ChangeNotifier {
   final TwelaProvider ledger;
 
   DebtProvider(this._storage, this.ledger) {
-    _debts = _storage.getDebts();
+    boot(_storage, _load);
   }
+
+  void _load() => _debts = _storage.getDebts();
 
   /// Reload debts from storage. Call after import to refresh in-memory state.
   void reloadData() {

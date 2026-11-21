@@ -27,9 +27,33 @@ class StorageService {
 
   late SharedPreferences _prefs;
 
-  Future<void> init() async {
+  bool _ready = false;
+  Future<void>? _initFuture;
+
+  /// True once [ensureInitialized] has finished. Providers use it to choose
+  /// between a synchronous load (warm storage: unit tests, hot restart) and
+  /// the async path on a cold start.
+  bool get isReady => _ready;
+
+  /// Idempotent, memoised init. `main()` never blocks on it — the first frame
+  /// gates on it instead (see `TwelaApp`), so the user meets an INB skeleton
+  /// rather than a frozen splash.
+  Future<void> ensureInitialized() {
+    return _initFuture ??= _init().catchError(
+      (Object error, StackTrace stack) {
+        // Let the next caller retry instead of caching a dead future.
+        _initFuture = null;
+        Error.throwWithStackTrace(error, stack);
+      },
+    );
+  }
+
+  Future<void> init() => ensureInitialized();
+
+  Future<void> _init() async {
     _prefs = await SharedPreferences.getInstance();
     await _runMigrations();
+    _ready = true;
   }
 
   Future<void> _runMigrations() async {

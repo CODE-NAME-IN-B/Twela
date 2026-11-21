@@ -297,5 +297,7 @@
   "quickSavings": "Savings",
   "quickDebt": "Debt",
   "settled": "Settled",
-  "paidOff": "Paid"
+  "paidOff": "Paid",
+  "loadFailedTitle": "Could not load your data",
+  "retry": "Try again"
 }

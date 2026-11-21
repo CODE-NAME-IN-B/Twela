@@ -949,4 +949,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get paidOff => 'Paid';
+
+  @override
+  String get loadFailedTitle => 'Could not load your data';
+
+  @override
+  String get retry => 'Try again';
 }

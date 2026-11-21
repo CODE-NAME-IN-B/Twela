@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -31,7 +33,9 @@ Future<void> main() async {
   await initializeDateFormatting('en', null);
 
   final storageService = StorageService();
-  await storageService.init();
+  // Cold start never blocks on storage: `TwelaApp` opens it and paints the
+  // INB boot skeleton until it is ready, instead of freezing the splash.
+  unawaited(storageService.ensureInitialized());
 
   await NotificationService.init();
 

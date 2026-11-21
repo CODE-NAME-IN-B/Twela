@@ -4,12 +4,13 @@ import '../models/transaction.dart';
 import '../models/wallet_settings.dart';
 import '../models/budget_settings.dart';
 import '../services/storage_service.dart';
+import 'boot_state.dart';
 import '../services/notification_service.dart';
 import '../services/routine_detection_service.dart';
 import '../models/routine_pattern.dart';
 import '../utils/formatters.dart' as fmt;
 
-class TwelaProvider extends ChangeNotifier {
+class TwelaProvider extends ChangeNotifier with BootState {
   final StorageService _storage;
 
   List<ExpenseCategory> _categories = [];
@@ -19,7 +20,7 @@ class TwelaProvider extends ChangeNotifier {
   List<RoutinePattern> _patterns = [];
 
   TwelaProvider(this._storage) {
-    _loadData();
+    boot(_storage, _loadData);
   }
 
   void _loadData() {

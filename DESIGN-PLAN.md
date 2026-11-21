@@ -22,14 +22,14 @@ Functional contract: `re_v1.md` (UI/UX reconstruction v10) — every P0/P1/P2 it
 - [ ] Owner decision: `inb-proto.html` is absent — the visual reference used is the skill's `templates/prototype.html`
 
 ### B. Home
-- [ ] Greeting «الفجر يناديك» + `Twela` ~58 px right, 48 px settings button left
-- [ ] Tagline «مش لازم تكون مثالي، بس لازم تفهم» 14 px `muted`
-- [ ] `RoseFrame` + 2 mint corner squares
-- [ ] Island: segmented pills (الكل/كاش/مصرف) → mint label → giant mono 48 `CountUp` → دخل اليوم (+mint) / صرف اليوم (−onIsland)
-- [ ] Notch = ↗ «كل الحسابات» with doodle arrow + label (not `+`)
-- [ ] 3D coin stack on the left, tilts with touch, mint glow
-- [ ] Bento: long «الحصالة» tile ~55% (amount + progress + indigo badge) + two radius-18 tiles («صرف اليوم»، «ديون لي» indigo), all `surface`, no rose except the frame
-- [ ] «إجراءات سريعة» 24 px + outline capsules (دخل/مصروف/ادخار/دين)
+- [x] Greeting «الفجر يناديك» + `Twela` ~58 px right, 48 px settings button left
+- [x] Tagline «مش لازم تكون مثالي، بس لازم تفهم» 14 px `muted`
+- [x] `RoseFrame` + 2 mint corner squares
+- [x] Island: segmented pills (الكل/كاش/مصرف) → mint label → giant mono 48 `CountUp` → دخل اليوم (+mint) / صرف اليوم (−onIsland)
+- [x] Notch = ↗ «كل الحسابات» with doodle arrow + label (not `+`)
+- [x] 3D coin stack on the left, tilts with touch, mint glow
+- [x] Bento: long «الحصالة» tile ~55% (amount + progress + indigo badge) + two radius-18 tiles («صرف اليوم»، «ديون لي» indigo), all `surface`, no rose except the frame
+- [x] «إجراءات سريعة» 24 px + outline capsules (دخل/مصروف/ادخار/دين)
 
 ### C. History
 - [ ] Title 36 Arabic 700 + indigo count badge, no app bar

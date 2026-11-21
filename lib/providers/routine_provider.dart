@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/routine_pattern.dart';
 import '../services/storage_service.dart';
+import 'boot_state.dart';
 
-class RoutineProvider extends ChangeNotifier {
+class RoutineProvider extends ChangeNotifier with BootState {
   final StorageService _storage;
   static const _isEnabledKey = 'routine_is_enabled';
 
@@ -11,9 +12,11 @@ class RoutineProvider extends ChangeNotifier {
   bool _isEnabled = true;
 
   RoutineProvider(this._storage) {
-    _patterns = _storage.getPatterns();
+    boot(_storage, _load);
     _loadIsEnabled();
   }
+
+  void _load() => _patterns = _storage.getPatterns();
 
   Future<void> _loadIsEnabled() async {
     final prefs = await SharedPreferences.getInstance();

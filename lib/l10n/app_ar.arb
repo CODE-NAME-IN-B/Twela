@@ -297,5 +297,7 @@
   "quickSavings": "ادخار",
   "quickDebt": "دين",
   "settled": "مسدّدة",
-  "paidOff": "تم السداد"
+  "paidOff": "تم السداد",
+  "loadFailedTitle": "تعذّر تحميل بياناتك",
+  "retry": "أعد المحاولة"
 }

@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import '../models/person.dart';
 import '../services/storage_service.dart';
+import 'boot_state.dart';
 
-class PersonProvider extends ChangeNotifier {
+class PersonProvider extends ChangeNotifier with BootState {
   final StorageService _storage;
 
   List<Person> _persons = [];
 
   PersonProvider(this._storage) {
-    _persons = _storage.getPersons();
+    boot(_storage, _load);
   }
+
+  void _load() => _persons = _storage.getPersons();
 
   List<Person> get persons => _persons;
 

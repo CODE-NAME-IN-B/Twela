@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import 'design/motion.dart';
 import 'design/theme.dart';
@@ -42,13 +43,48 @@ const double kNavScrimHeight = 76;
 /// it, so it can never be mistaken for a fifth destination.
 const double kNavAddSize = 52;
 
-class TwelaApp extends StatelessWidget {
+class TwelaApp extends StatefulWidget {
   const TwelaApp({super.key});
 
   @override
+  State<TwelaApp> createState() => _TwelaAppState();
+}
+
+class _TwelaAppState extends State<TwelaApp> {
+  late final StorageService _storage = context.read<StorageService>();
+  bool _bootFailed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _openStorage();
+  }
+
+  /// The first frame never waits on storage. While it opens, `builder` shows
+  /// the INB boot skeleton; if opening fails, a real error state with
+  /// «أعد المحاولة» — never a frozen splash.
+  Future<void> _openStorage() async {
+    try {
+      await _storage.ensureInitialized();
+      _bootFailed = false;
+    } catch (_) {
+      _bootFailed = true;
+    }
+    if (mounted) setState(() {});
+  }
+
+  void _retryBoot() {
+    setState(() => _bootFailed = false);
+    _openStorage();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final storage = context.read<StorageService>();
-    final onboardingComplete = storage.getOnboardingComplete();
+    final storage = _storage;
+    final ready = storage.isReady;
+    // Evaluated only once storage is open — the routes below mount after the
+    // gate opens, so this is the value the Navigator actually resolves.
+    final onboardingComplete = ready && storage.getOnboardingComplete();
 
     return Consumer2<ThemeProvider, AppSettingsProvider>(
       builder: (context, themeProvider, appSettings, _) {
@@ -72,6 +108,11 @@ class TwelaApp extends StatelessWidget {
             Locale('ar'),
             Locale('en'),
           ],
+          // The boot gate: until storage is open the Navigator is not
+          // mounted, so no route resolves against half-known state.
+          builder: (context, child) => ready
+              ? (child ?? const SizedBox.shrink())
+              : _BootShell(failed: _bootFailed, onRetry: _retryBoot),
           initialRoute: onboardingComplete ? '/home' : '/onboarding',
           routes: {
             '/onboarding': (context) => const OnboardingScreen(),
@@ -545,3 +586,89 @@ class _SheetAction {
   final Color color;
   final VoidCallback onTap;
 }
+
+/// What the user meets before storage opens: warm paper with the Home layout
+/// drawn as shimmering bones, or a real error state with a retry if storage
+/// refuses to open. Never a frozen splash, never an English word.
+class _BootShell extends StatelessWidget {
+  const _BootShell({this.failed = false, this.onRetry});
+
+  final bool failed;
+  final VoidCallback? onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.inb;
+    final l10n = AppLocalizations.of(context);
+
+    if (failed) {
+      return ColoredBox(
+        color: c.paper,
+        child: SafeArea(
+          child: InbErrorState(
+            title: l10n?.loadFailedTitle ?? 'تعذّر تحميل بياناتك',
+            retryLabel: l10n?.retry ?? 'أعد المحاولة',
+            onRetry: onRetry,
+          ),
+        ),
+      );
+    }
+
+    return ColoredBox(
+      color: c.paper,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(S.md, S.lg, S.md, S.lg),
+          child: Skeletonizer.zone(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Greeting + wordmark.
+                Bone.text(width: 168, fontSize: 44),
+                const SizedBox(height: S.sm),
+                // Tagline.
+                Bone.text(width: 232, fontSize: 14),
+                const SizedBox(height: S.lg),
+                // The hero island inside its rose frame.
+                Bone(height: 208, borderRadius: _bootRadius),
+                const SizedBox(height: S.md),
+                // The bento row.
+                const Row(
+                  children: [
+                    Expanded(
+                      child: Bone(height: 116, borderRadius: _bootRadius),
+                    ),
+                    SizedBox(width: S.sm),
+                    Expanded(
+                      child: Bone(height: 116, borderRadius: _bootRadius),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: S.md),
+                Bone.text(width: 140, fontSize: 22),
+                const SizedBox(height: S.sm),
+                const Row(
+                  children: [
+                    Expanded(
+                      child: Bone(height: 56, borderRadius: _bootRadius),
+                    ),
+                    SizedBox(width: S.sm),
+                    Expanded(
+                      child: Bone(height: 56, borderRadius: _bootRadius),
+                    ),
+                    SizedBox(width: S.sm),
+                    Expanded(
+                      child: Bone(height: 56, borderRadius: _bootRadius),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+const _bootRadius = BorderRadius.all(Radius.circular(R.card));
