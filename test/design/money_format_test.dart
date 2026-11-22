@@ -71,6 +71,34 @@ void main() {
       expect(find.text('+0.00'), findsOneWidget);
     });
 
+    // Regression: the sign check used to re-parse the *grouped* string, so
+    // every negative amount of 1,000 or more threw a FormatException and the
+    // release build painted an ErrorWidget grey slab instead of the row.
+    testWidgets('signed negatives with thousands survive grouping',
+        (tester) async {
+      await tester.pumpWidget(wrap(const Money(-1500, signed: true)));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      expect(find.text('\u22121,500.00'), findsOneWidget);
+    });
+
+    testWidgets('unsigned grouped negatives keep their minus', (tester) async {
+      await tester.pumpWidget(wrap(const Money(-1234567.89)));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      expect(find.text('\u22121,234,567.89'), findsOneWidget);
+    });
+
+    testWidgets('the animated path groups without throwing', (tester) async {
+      await tester
+          .pumpWidget(wrap(const Money(-1500, signed: true, animate: true)));
+      await tester.pump(const Duration(milliseconds: 120));
+      expect(tester.takeException(), isNull);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      expect(find.text('\u22121,500.00'), findsOneWidget);
+    });
+
     testWidgets('keeps the currency after the number in LTR', (tester) async {
       await tester.pumpWidget(wrap(const Money(1200)));
       await tester.pumpAndSettle();
@@ -96,6 +124,13 @@ void main() {
       await tester.pumpWidget(wrap(const MoneyDelta(-100)));
       await tester.pumpAndSettle();
       expect(find.text('\u2212100.00'), findsOneWidget);
+    });
+
+    testWidgets('a grouped negative delta does not throw', (tester) async {
+      await tester.pumpWidget(wrap(const MoneyDelta(-4200)));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      expect(find.text('\u22124,200.00'), findsOneWidget);
     });
   });
 }

@@ -47,8 +47,7 @@ const List<String> kArabicWeekdays = <String>[
 /// of the number in an RTL paragraph. The sign is decided from the *value*,
 /// not from the formatted string, so `−100.00` can never become `-,100`.
 String formatNumber(double value, {int decimals = 2, bool grouping = true}) {
-  final abs = value.abs();
-  final fixed = abs.toStringAsFixed(decimals);
+  final fixed = value.abs().toStringAsFixed(decimals);
   final parts = fixed.split('.');
   final digits = parts.first;
   final buffer = StringBuffer();
@@ -59,9 +58,17 @@ String formatNumber(double value, {int decimals = 2, bool grouping = true}) {
   if (parts.length > 1) buffer.write('.${parts[1]}');
   final body = buffer.toString();
   // A value that rounds to zero keeps no sign: `−0.00` is noise.
-  if (value < 0 && double.parse(fixed) != 0) return '−$body';
+  if (value < 0 && !_roundsToZero(value, decimals)) return '−$body';
   return body;
 }
+
+/// Whether [value]'s magnitude disappears at [decimals] places.
+///
+/// This reads the ungrouped form on purpose: the printed string carries
+/// thousands separators, and `double.parse('1,500.00')` throws — a crash that
+/// only shows up on negative amounts of 1,000 or more.
+bool _roundsToZero(double value, int decimals) =>
+    double.parse(value.abs().toStringAsFixed(decimals)) == 0;
 
 /// `1500` → `1,500` ; `1500.5` → `1,500.50` ; `-100` → `−100`
 String formatMoney(double value, {int decimals = 2}) =>
@@ -142,10 +149,13 @@ class Money extends StatelessWidget {
 
   /// The sign belongs to the value, never to the tween: the animation runs on
   /// the magnitude only, so a negative amount can never flash `+` on the way.
-  String _text(double v) {
-    final body = formatMoney(v, decimals: decimals);
-    // A value that rounds to zero carries no sign — `−0.00` is noise.
-    final negative = amount < 0 && double.parse(body) != 0;
+  ///
+  /// [magnitude] is always the absolute amount; the sign is decided from
+  /// [amount]. The zero test must not re-read the formatted string: it is
+  /// grouped (`1,500.00`) and `double.parse` refuses the comma.
+  String _text(double magnitude) {
+    final body = formatMoney(magnitude, decimals: decimals);
+    final negative = amount < 0 && !_roundsToZero(magnitude, decimals);
     if (signed) return negative ? '−$body' : '+$body';
     return negative ? '−$body' : body;
   }

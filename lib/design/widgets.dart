@@ -1046,14 +1046,14 @@ class _CoinStackPainter extends CustomPainter {
       old.rim != rim;
 }
 
-/// Hand-drawn doodle arrow (Detailed Illustrations). The head points toward
-/// the start edge and upward — toward a notch action. Drawn once, no animation.
 /// A small soft 3D orb (3D Soft Realism).
 ///
-/// Where [CoinStack] is the money object on Home, this is the quiet sphere a
-/// secondary island uses: one body, one mint specular, one rim — a real
-/// object with thickness, no stock icon and no drop shadow. It stays still
-/// under reduced motion.
+/// Where [CoinStack] is the money object on Home, this is the sphere a
+/// secondary island uses. It is drawn as a body, not a disc: an off-centre
+/// light, a terminator that turns the back half, a reflected-light arc on the
+/// shadow edge and a flat seat it rests on. No blur, no drop shadow, no stock
+/// icon — the same "tone carries the volume" rule as the coin stack and the
+/// clay donut.
 class SoftOrb extends StatelessWidget {
   const SoftOrb({super.key, this.size = 56});
 
@@ -1068,9 +1068,13 @@ class SoftOrb extends StatelessWidget {
         height: size,
         child: CustomPaint(
           painter: _SoftOrbPainter(
-            body: Color.lerp(c.island, c.mint, 0.40)!,
+            body: Color.lerp(c.island, c.mint, 0.34)!,
+            light: Color.lerp(c.island, c.mint, 0.66)!,
+            deep: Color.lerp(c.island, Colors.black, 0.30)!,
             specular: c.mint,
-            rim: c.onIsland.withValues(alpha: 0.30),
+            rim: c.onIsland.withValues(alpha: 0.28),
+            seat: Color.lerp(c.island, Colors.black, 0.22)!
+                .withValues(alpha: 0.45),
           ),
         ),
       ),
@@ -1078,51 +1082,104 @@ class SoftOrb extends StatelessWidget {
   }
 }
 
+/// Geometry of the orb inside its box: the lit sphere plus the flat seat it
+/// rests on. Exposed so a test can prove the object always fits its box at
+/// every size the islands ask for.
+class SoftOrbGeometry {
+  const SoftOrbGeometry._({
+    required this.radius,
+    required this.center,
+    required this.seat,
+  });
+
+  factory SoftOrbGeometry.forSize(Size size) {
+    final r = size.shortestSide * 0.36;
+    final center = Offset(size.width / 2, size.height / 2 - r * 0.16);
+    return SoftOrbGeometry._(
+      radius: r,
+      center: center,
+      seat: Rect.fromCenter(
+        center: Offset(center.dx, center.dy + r * 0.96),
+        width: r * 1.6,
+        height: r * 0.36,
+      ),
+    );
+  }
+
+  final double radius;
+  final Offset center;
+  final Rect seat;
+}
+
 class _SoftOrbPainter extends CustomPainter {
   _SoftOrbPainter({
     required this.body,
+    required this.light,
+    required this.deep,
     required this.specular,
     required this.rim,
+    required this.seat,
   });
 
   final Color body;
+  final Color light;
+  final Color deep;
   final Color specular;
   final Color rim;
+  final Color seat;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final r = size.shortestSide / 2 - 1;
-    final center = Offset(size.width / 2, size.height / 2);
-    final light = Color.lerp(body, Colors.white, 0.20)!;
-    final shade = Color.lerp(body, Colors.black, 0.45)!;
+    // The sphere leaves room at the bottom for its seat, so it sits on the
+    // island instead of floating as a flat circle.
+    final g = SoftOrbGeometry.forSize(size);
+    final r = g.radius;
+    final center = g.center;
 
-    // Body: the tone carries the volume, exactly like the coin stack.
+    // Seat: one flat ellipse, no blur. A blurred shadow is banned; a contact
+    // patch is what makes a painted sphere read as an object in space.
+    canvas.drawOval(g.seat, Paint()..color = seat);
+
+    // Body: three tones around an off-centre light. The last stop is the
+    // terminator, so the lower-right edge turns away from the viewer.
     canvas.drawCircle(
       center,
       r,
       Paint()
         ..shader = RadialGradient(
-          center: const Alignment(-0.35, -0.45),
-          radius: 0.95,
-          colors: [light, body, shade],
-          stops: const [0.0, 0.55, 1.0],
+          center: const Alignment(-0.38, -0.46),
+          radius: 1.05,
+          colors: [light, body, deep],
+          stops: const [0.0, 0.48, 1.0],
         ).createShader(Rect.fromCircle(center: center, radius: r)),
     );
 
-    // Specular: one soft mint kiss on the lit side — the island's own glow.
+    // Reflected light: a thin mint arc on the shadow edge. This is the cue
+    // that separates a lit sphere from a flat gradient disc.
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: r - 0.8),
+      _deg(24),
+      _deg(120),
+      false,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.4
+        ..strokeCap = StrokeCap.round
+        ..color = specular.withValues(alpha: 0.34),
+    );
+
+    // Specular: one soft mint kiss on the lit side.
+    final kiss = center.translate(-r * 0.34, -r * 0.38);
     canvas.drawCircle(
-      center.translate(-r * 0.32, -r * 0.36),
-      r * 0.26,
+      kiss,
+      r * 0.28,
       Paint()
         ..shader = RadialGradient(
           colors: [
-            specular.withValues(alpha: 0.42),
+            specular.withValues(alpha: 0.46),
             specular.withValues(alpha: 0)
           ],
-        ).createShader(Rect.fromCircle(
-          center: center.translate(-r * 0.32, -r * 0.36),
-          radius: r * 0.26,
-        )),
+        ).createShader(Rect.fromCircle(center: kiss, radius: r * 0.28)),
     );
 
     // Rim: a 1 px edge, not a shadow.
@@ -1136,11 +1193,20 @@ class _SoftOrbPainter extends CustomPainter {
     );
   }
 
+  static double _deg(double degrees) => degrees * math.pi / 180;
+
   @override
   bool shouldRepaint(_SoftOrbPainter old) =>
-      old.body != body || old.specular != specular || old.rim != rim;
+      old.body != body ||
+      old.light != light ||
+      old.deep != deep ||
+      old.specular != specular ||
+      old.rim != rim ||
+      old.seat != seat;
 }
 
+/// Hand-drawn doodle arrow (Detailed Illustrations). The head points toward
+/// the start edge and upward — toward a notch action. Drawn once, no animation.
 class DoodleArrow extends StatelessWidget {
   const DoodleArrow({super.key, this.color, this.width = 76, this.height = 44});
 
