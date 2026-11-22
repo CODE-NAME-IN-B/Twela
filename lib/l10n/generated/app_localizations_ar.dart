@@ -948,4 +948,55 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get retry => 'أعد المحاولة';
+
+  @override
+  String get netMonth => 'صافي الشهر';
+
+  @override
+  String get owedToMe => 'لي';
+
+  @override
+  String get iOwe => 'عليّ';
+
+  @override
+  String get totalRemaining => 'إجمالي المتبقي';
+
+  @override
+  String get settledDebts => 'مسدّدة';
+
+  @override
+  String get paidDebtsEmptyTitle => 'لا توجد ديون مسدّدة بعد';
+
+  @override
+  String get paidDebtsEmptyBody => 'أي دين يُسدَّد بالكامل سيظهر هنا.';
+
+  @override
+  String get payDebt => 'سجّل دفعة';
+
+  @override
+  String get percentPaid => 'نسبة السداد';
+
+  @override
+  String get spentThisMonth => 'مصروفات الشهر';
+
+  @override
+  String get biggestCategories => 'أكبر الفئات';
+
+  @override
+  String get smallCategories => 'فئات صغيرة';
+
+  @override
+  String get noMonthExpenses => 'لا توجد مصروفات في هذا الشهر';
+
+  @override
+  String get noMonthExpensesBody => 'جرّب شهرًا آخر أو سجّل مصروفًا جديدًا.';
+
+  @override
+  String get rotateHint => 'اسحب الفطيرة لتدويرها';
+
+  @override
+  String get previousMonth => 'الشهر السابق';
+
+  @override
+  String get nextMonth => 'الشهر التالي';
 }

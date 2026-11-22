@@ -955,4 +955,56 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get retry => 'Try again';
+
+  @override
+  String get netMonth => 'Month net';
+
+  @override
+  String get owedToMe => 'Owed to me';
+
+  @override
+  String get iOwe => 'I owe';
+
+  @override
+  String get totalRemaining => 'Total remaining';
+
+  @override
+  String get settledDebts => 'Settled';
+
+  @override
+  String get paidDebtsEmptyTitle => 'No settled debts yet';
+
+  @override
+  String get paidDebtsEmptyBody => 'A debt appears here once it is fully paid.';
+
+  @override
+  String get payDebt => 'Record a payment';
+
+  @override
+  String get percentPaid => 'Paid ratio';
+
+  @override
+  String get spentThisMonth => 'Spent this month';
+
+  @override
+  String get biggestCategories => 'Biggest categories';
+
+  @override
+  String get smallCategories => 'Small categories';
+
+  @override
+  String get noMonthExpenses => 'No expenses this month';
+
+  @override
+  String get noMonthExpensesBody =>
+      'Try another month or record a new expense.';
+
+  @override
+  String get rotateHint => 'Drag the donut to rotate';
+
+  @override
+  String get previousMonth => 'Previous month';
+
+  @override
+  String get nextMonth => 'Next month';
 }

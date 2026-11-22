@@ -299,5 +299,22 @@
   "settled": "مسدّدة",
   "paidOff": "تم السداد",
   "loadFailedTitle": "تعذّر تحميل بياناتك",
-  "retry": "أعد المحاولة"
+  "retry": "أعد المحاولة",
+  "netMonth": "صافي الشهر",
+  "owedToMe": "لي",
+  "iOwe": "عليّ",
+  "totalRemaining": "إجمالي المتبقي",
+  "settledDebts": "مسدّدة",
+  "paidDebtsEmptyTitle": "لا توجد ديون مسدّدة بعد",
+  "paidDebtsEmptyBody": "أي دين يُسدَّد بالكامل سيظهر هنا.",
+  "payDebt": "سجّل دفعة",
+  "percentPaid": "نسبة السداد",
+  "spentThisMonth": "مصروفات الشهر",
+  "biggestCategories": "أكبر الفئات",
+  "smallCategories": "فئات صغيرة",
+  "noMonthExpenses": "لا توجد مصروفات في هذا الشهر",
+  "noMonthExpensesBody": "جرّب شهرًا آخر أو سجّل مصروفًا جديدًا.",
+  "rotateHint": "اسحب الفطيرة لتدويرها",
+  "previousMonth": "الشهر السابق",
+  "nextMonth": "الشهر التالي"
 }

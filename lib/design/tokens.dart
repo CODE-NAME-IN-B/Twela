@@ -200,6 +200,26 @@ class InbFonts {
   static const display = 'Unbounded';
 }
 
+/// The fixed chart palette, in the owner's order (DESIGN.md, 2026-11-20).
+///
+/// Colour follows the **category**, never the position on the ring, so a
+/// category keeps its hue between months. The fifth tone is reserved for the
+/// merged «فئات صغيرة» bucket. `buildStatsSegments` maps a category into the
+/// first [majorCount] tones and breaks collisions there.
+class InbCharts {
+  static const List<Color> palette = <Color>[
+    Color(0xFF3DDC84),
+    Color(0xFF8B8BFF),
+    Color(0xFFE3BDB4),
+    Color(0xFF6E9C89),
+    Color(0xFFE9DFC8),
+  ];
+
+  /// Four major categories keep their own hue; everything smaller shares the
+  /// last tone.
+  static const int majorCount = 4;
+}
+
 /// The only thing the user may re-colour: the tint of the dark island.
 ///
 /// The paper, the ink, the mint, the rose, the indigo and the four money

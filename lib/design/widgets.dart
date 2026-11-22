@@ -1048,6 +1048,99 @@ class _CoinStackPainter extends CustomPainter {
 
 /// Hand-drawn doodle arrow (Detailed Illustrations). The head points toward
 /// the start edge and upward — toward a notch action. Drawn once, no animation.
+/// A small soft 3D orb (3D Soft Realism).
+///
+/// Where [CoinStack] is the money object on Home, this is the quiet sphere a
+/// secondary island uses: one body, one mint specular, one rim — a real
+/// object with thickness, no stock icon and no drop shadow. It stays still
+/// under reduced motion.
+class SoftOrb extends StatelessWidget {
+  const SoftOrb({super.key, this.size = 56});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.inb;
+    return RepaintBoundary(
+      child: SizedBox(
+        width: size,
+        height: size,
+        child: CustomPaint(
+          painter: _SoftOrbPainter(
+            body: Color.lerp(c.island, c.mint, 0.40)!,
+            specular: c.mint,
+            rim: c.onIsland.withValues(alpha: 0.30),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SoftOrbPainter extends CustomPainter {
+  _SoftOrbPainter({
+    required this.body,
+    required this.specular,
+    required this.rim,
+  });
+
+  final Color body;
+  final Color specular;
+  final Color rim;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final r = size.shortestSide / 2 - 1;
+    final center = Offset(size.width / 2, size.height / 2);
+    final light = Color.lerp(body, Colors.white, 0.20)!;
+    final shade = Color.lerp(body, Colors.black, 0.45)!;
+
+    // Body: the tone carries the volume, exactly like the coin stack.
+    canvas.drawCircle(
+      center,
+      r,
+      Paint()
+        ..shader = RadialGradient(
+          center: const Alignment(-0.35, -0.45),
+          radius: 0.95,
+          colors: [light, body, shade],
+          stops: const [0.0, 0.55, 1.0],
+        ).createShader(Rect.fromCircle(center: center, radius: r)),
+    );
+
+    // Specular: one soft mint kiss on the lit side — the island's own glow.
+    canvas.drawCircle(
+      center.translate(-r * 0.32, -r * 0.36),
+      r * 0.26,
+      Paint()
+        ..shader = RadialGradient(
+          colors: [
+            specular.withValues(alpha: 0.42),
+            specular.withValues(alpha: 0)
+          ],
+        ).createShader(Rect.fromCircle(
+          center: center.translate(-r * 0.32, -r * 0.36),
+          radius: r * 0.26,
+        )),
+    );
+
+    // Rim: a 1 px edge, not a shadow.
+    canvas.drawCircle(
+      center,
+      r,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1
+        ..color = rim,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_SoftOrbPainter old) =>
+      old.body != body || old.specular != specular || old.rim != rim;
+}
+
 class DoodleArrow extends StatelessWidget {
   const DoodleArrow({super.key, this.color, this.width = 76, this.height = 44});
 
@@ -1262,6 +1355,11 @@ Future<void> showInbToast(
 }) {
   final c = context.inb;
   final sem = context.sem;
+  // On the tab shell the toast would sit under the nav's progressive blur,
+  // which washes its left half out. Lift it above that ramp; on a pushed
+  // screen there is no ramp and the default inset is right.
+  final scaffold = Scaffold.maybeOf(context);
+  final overNav = scaffold?.widget.bottomNavigationBar != null;
   ScaffoldMessenger.of(context)
     ..hideCurrentSnackBar()
     ..showSnackBar(
@@ -1286,6 +1384,11 @@ Future<void> showInbToast(
         backgroundColor: c.island,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(R.pill),
+        ),
+        margin: EdgeInsetsDirectional.only(
+          start: S.md,
+          end: S.md,
+          bottom: overNav ? 88 : S.md,
         ),
         showCloseIcon: false,
         duration: const Duration(seconds: 4),

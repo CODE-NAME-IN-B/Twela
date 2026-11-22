@@ -1897,6 +1897,108 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'أعد المحاولة'**
   String get retry;
+
+  /// No description provided for @netMonth.
+  ///
+  /// In ar, this message translates to:
+  /// **'صافي الشهر'**
+  String get netMonth;
+
+  /// No description provided for @owedToMe.
+  ///
+  /// In ar, this message translates to:
+  /// **'لي'**
+  String get owedToMe;
+
+  /// No description provided for @iOwe.
+  ///
+  /// In ar, this message translates to:
+  /// **'عليّ'**
+  String get iOwe;
+
+  /// No description provided for @totalRemaining.
+  ///
+  /// In ar, this message translates to:
+  /// **'إجمالي المتبقي'**
+  String get totalRemaining;
+
+  /// No description provided for @settledDebts.
+  ///
+  /// In ar, this message translates to:
+  /// **'مسدّدة'**
+  String get settledDebts;
+
+  /// No description provided for @paidDebtsEmptyTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد ديون مسدّدة بعد'**
+  String get paidDebtsEmptyTitle;
+
+  /// No description provided for @paidDebtsEmptyBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'أي دين يُسدَّد بالكامل سيظهر هنا.'**
+  String get paidDebtsEmptyBody;
+
+  /// No description provided for @payDebt.
+  ///
+  /// In ar, this message translates to:
+  /// **'سجّل دفعة'**
+  String get payDebt;
+
+  /// No description provided for @percentPaid.
+  ///
+  /// In ar, this message translates to:
+  /// **'نسبة السداد'**
+  String get percentPaid;
+
+  /// No description provided for @spentThisMonth.
+  ///
+  /// In ar, this message translates to:
+  /// **'مصروفات الشهر'**
+  String get spentThisMonth;
+
+  /// No description provided for @biggestCategories.
+  ///
+  /// In ar, this message translates to:
+  /// **'أكبر الفئات'**
+  String get biggestCategories;
+
+  /// No description provided for @smallCategories.
+  ///
+  /// In ar, this message translates to:
+  /// **'فئات صغيرة'**
+  String get smallCategories;
+
+  /// No description provided for @noMonthExpenses.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد مصروفات في هذا الشهر'**
+  String get noMonthExpenses;
+
+  /// No description provided for @noMonthExpensesBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'جرّب شهرًا آخر أو سجّل مصروفًا جديدًا.'**
+  String get noMonthExpensesBody;
+
+  /// No description provided for @rotateHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'اسحب الفطيرة لتدويرها'**
+  String get rotateHint;
+
+  /// No description provided for @previousMonth.
+  ///
+  /// In ar, this message translates to:
+  /// **'الشهر السابق'**
+  String get previousMonth;
+
+  /// No description provided for @nextMonth.
+  ///
+  /// In ar, this message translates to:
+  /// **'الشهر التالي'**
+  String get nextMonth;
 }
 
 class _AppLocalizationsDelegate

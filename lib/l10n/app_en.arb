@@ -299,5 +299,22 @@
   "settled": "Settled",
   "paidOff": "Paid",
   "loadFailedTitle": "Could not load your data",
-  "retry": "Try again"
+  "retry": "Try again",
+  "netMonth": "Month net",
+  "owedToMe": "Owed to me",
+  "iOwe": "I owe",
+  "totalRemaining": "Total remaining",
+  "settledDebts": "Settled",
+  "paidDebtsEmptyTitle": "No settled debts yet",
+  "paidDebtsEmptyBody": "A debt appears here once it is fully paid.",
+  "payDebt": "Record a payment",
+  "percentPaid": "Paid ratio",
+  "spentThisMonth": "Spent this month",
+  "biggestCategories": "Biggest categories",
+  "smallCategories": "Small categories",
+  "noMonthExpenses": "No expenses this month",
+  "noMonthExpensesBody": "Try another month or record a new expense.",
+  "rotateHint": "Drag the donut to rotate",
+  "previousMonth": "Previous month",
+  "nextMonth": "Next month"
 }
